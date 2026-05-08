@@ -8,7 +8,7 @@ EdFind is a SaaS web app for graduating students in Turkey looking for master's 
 
 ## Phase
 
-We finished **Phase 0 (foundation docs)** and **Phase 1 (scaffold)** on 2026-05-07, and **Phase 2 (Profile Quiz UI)** + **Phase 3 (Database + seed)** on 2026-05-08. The Supabase project lives in `eu-west` (Ireland), the init migration and seed have been applied, and `scripts/check-db.mjs` confirms the seeded Politecnico di Milano + MSc Management Engineering rows are present. We are about to start **Phase 4 (Wire it up)** — the Server Action that submits a quiz, persists a profile, runs the placeholder matcher, and redirects to the real `/results/:matchId`. See `docs/architecture.md` for the full phased plan.
+We finished **Phase 0 (foundation docs)** and **Phase 1 (scaffold)** on 2026-05-07, and **Phase 2 (Profile Quiz UI)**, **Phase 3 (Database + seed)**, and **Phase 4 (Wire it up)** on 2026-05-08. The Supabase project lives in `eu-west` (Ireland) and the quiz works end-to-end at the DB layer: the `submitProfile` Server Action validates answers with Zod, persists a profile + match, sets an `edfind_client_id` httpOnly cookie, and the real `/results/[matchId]` page reads via a cookie-authorized service-role join. `scripts/smoke-flow.mjs` exercises the full insert → read → cleanup path. The remaining check is a browser walkthrough; Phase 5 (Vercel deploy) is next. See `docs/architecture.md` for the full phased plan.
 
 ## Tech stack — do not deviate without an ADR
 

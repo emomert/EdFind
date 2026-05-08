@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, RotateCw } from "lucide-react";
 
 import {
   ANSWERS_VERSION,
@@ -12,13 +13,17 @@ import {
   isQuestionAnswered,
   type Answers,
   type Destination,
+  type ValidatedAnswers,
 } from "@/lib/quiz/schema";
+import { getOrCreateClientId } from "@/lib/quiz/client-id";
+import { submitProfile } from "@/app/quiz/actions";
+import { Button } from "@/components/ui/button";
 import { QuizProgressBar } from "@/components/quiz/progress-bar";
 import { QuizMascot } from "@/components/quiz/mascot";
 import { QuestionScreen } from "@/components/quiz/question-screen";
 import { QuizLoadingScreen } from "@/components/quiz/loading-screen";
 
-type Phase = "questions" | "loading";
+type Phase = "questions" | "loading" | "error";
 
 type Draft = {
   answers: Answers;
@@ -74,7 +79,9 @@ export function QuizClient() {
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Answers>(EMPTY_ANSWERS);
   const [hydrated, setHydrated] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const headingRef = useRef<HTMLDivElement | null>(null);
+  const sequenceResolveRef = useRef<(() => void) | null>(null);
 
   // One-time hydration from localStorage on mount. setState-in-effect is the
   // documented React idiom here: localStorage isn't readable during SSR, so we
@@ -136,24 +143,56 @@ export function QuizClient() {
     [question],
   );
 
+  const handleSubmit = useCallback(async () => {
+    setErrorMessage(null);
+    setPhase("loading");
+
+    // Build the sequence promise BEFORE mounting LoadingScreen so its
+    // onSequenceComplete callback has somewhere to land.
+    const sequencePromise = new Promise<void>((resolve) => {
+      sequenceResolveRef.current = resolve;
+    });
+
+    const clientId = getOrCreateClientId();
+    const submission = submitProfile({
+      clientId,
+      answers: answers as ValidatedAnswers,
+    });
+
+    const [, result] = await Promise.all([sequencePromise, submission]);
+
+    if (result.ok) {
+      clearDraft();
+      router.push(`/results/${result.matchId}`);
+      return;
+    }
+
+    setErrorMessage(result.error);
+    setPhase("error");
+  }, [answers, router]);
+
   const handleNext = useCallback(() => {
     if (!canAdvance) return;
     if (isLastStep) {
-      setPhase("loading");
+      void handleSubmit();
       return;
     }
     setStepIndex((i) => Math.min(i + 1, TOTAL_STEPS - 1));
-  }, [canAdvance, isLastStep]);
+  }, [canAdvance, isLastStep, handleSubmit]);
 
   const handleBack = useCallback(() => {
     setStepIndex((i) => Math.max(i - 1, 0));
   }, []);
 
-  const handleLoadingComplete = useCallback(() => {
-    // Phase 2: no backend wiring yet. The Server Action + real matchId arrive in Phase 4.
-    clearDraft();
-    router.push("/results/placeholder");
-  }, [router]);
+  const handleSequenceComplete = useCallback(() => {
+    sequenceResolveRef.current?.();
+    sequenceResolveRef.current = null;
+  }, []);
+
+  const handleRetry = useCallback(() => {
+    setErrorMessage(null);
+    setPhase("questions");
+  }, []);
 
   const selectedValues = useMemo(
     () => selectedValuesFor(answers, question.field),
@@ -163,7 +202,33 @@ export function QuizClient() {
   if (phase === "loading") {
     return (
       <div className="mx-auto max-w-3xl px-6 py-16">
-        <QuizLoadingScreen onComplete={handleLoadingComplete} />
+        <QuizLoadingScreen onComplete={handleSequenceComplete} />
+      </div>
+    );
+  }
+
+  if (phase === "error") {
+    return (
+      <div
+        role="alert"
+        className="mx-auto flex max-w-md flex-col items-center px-6 py-16 text-center"
+      >
+        <h2 className="text-2xl font-semibold tracking-tight">
+          Something went wrong
+        </h2>
+        <p className="mt-3 text-sm text-muted-foreground">
+          {errorMessage ?? "Please try submitting again."}
+        </p>
+        <div className="mt-8 flex gap-3">
+          <Button type="button" variant="outline" onClick={handleRetry}>
+            <ArrowLeft />
+            Back to questions
+          </Button>
+          <Button type="button" onClick={handleSubmit}>
+            <RotateCw />
+            Try again
+          </Button>
+        </div>
       </div>
     );
   }

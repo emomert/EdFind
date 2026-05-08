@@ -8,6 +8,8 @@
  * change. Old answers are kept as-is — never destructive-migrate quiz data.
  */
 
+import { z } from "zod";
+
 export const ANSWERS_VERSION = 1;
 
 export const DESTINATIONS = ["IT", "NL", "DE", "GB", "ANY"] as const;
@@ -220,3 +222,30 @@ export function isQuestionAnswered(answers: Answers, question: Question): boolea
 }
 
 export const QUIZ_DRAFT_STORAGE_KEY = "edfind:quiz_draft:v1";
+
+/**
+ * Server-side validator for the answers blob. The Server Action runs this
+ * before any DB write — every required key must be present and every value
+ * must be in its enum/array. Tightened to mirror `Answers` exactly.
+ */
+export const AnswersSchema = z.object({
+  destinations: z.array(z.enum(DESTINATIONS)).min(1),
+  field_of_study: z.enum(FIELDS_OF_STUDY),
+  budget_per_year: z.enum(BUDGET_BRACKETS),
+  duration_preference: z.enum(DURATIONS),
+  english_level: z.enum(ENGLISH_LEVELS),
+  scholarship_need: z.enum(SCHOLARSHIP_NEEDS),
+  career_goal: z.enum(CAREER_GOALS),
+}) satisfies z.ZodType<{
+  // Compile-time guard: AnswersSchema's parsed shape must match Answers
+  // (with non-null fields, since validation rejects null at submit time).
+  destinations: Destination[];
+  field_of_study: FieldOfStudy;
+  budget_per_year: BudgetBracket;
+  duration_preference: Duration;
+  english_level: EnglishLevel;
+  scholarship_need: ScholarshipNeed;
+  career_goal: CareerGoal;
+}>;
+
+export type ValidatedAnswers = z.infer<typeof AnswersSchema>;

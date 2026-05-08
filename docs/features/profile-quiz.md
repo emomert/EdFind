@@ -65,21 +65,23 @@ The schema is **versioned** (`answers_version`). When we add or change a questio
 - Mascot illustration is `aria-hidden`.
 - Progress bar has `role="progressbar"` with `aria-valuenow`/`aria-valuemax`.
 
-## Implementation map (Phase 2)
+## Implementation map (Phase 2 + Phase 4)
 
 | Concern | File |
 |---|---|
-| Question definitions, types, `ANSWERS_VERSION`, draft storage key | `lib/quiz/schema.ts` |
-| Client state machine, draft persistence, navigation | `components/quiz/quiz-client.tsx` |
+| Question definitions, TS types, `ANSWERS_VERSION`, Zod validator, draft storage key | `lib/quiz/schema.ts` |
+| Client state machine, draft persistence, submission timing, error retry | `components/quiz/quiz-client.tsx` |
+| `getOrCreateClientId()` (UUID in localStorage) + `CLIENT_ID_COOKIE` name | `lib/quiz/client-id.ts` |
 | Sticky progress bar (`role="progressbar"`) | `components/quiz/progress-bar.tsx` |
 | Mascot character + supportive copy | `components/quiz/mascot.tsx` |
 | Single answer card (radio/checkbox) | `components/quiz/answer-card.tsx` |
 | Per-question screen layout (fieldset/legend, back/next) | `components/quiz/question-screen.tsx` |
 | Staged "Reading preferences → Searching database → Preparing results" | `components/quiz/loading-screen.tsx` |
 | Route shell (Server Component) | `app/quiz/page.tsx` |
-| Placeholder results page (Phase 4 will replace) | `app/results/[matchId]/page.tsx` |
+| `submitProfile(input)` Server Action — Zod validate, insert profile, run placeholder matcher, insert match, set httpOnly client_id cookie | `app/quiz/actions.ts` |
+| Real results page (cookie-authorized read of match → profile → program → university) | `app/results/[matchId]/page.tsx` |
 
-For MVP Phase 2, the loading screen completes by routing to `/results/placeholder`. The Server Action `submitProfile(answers)` and the real `matchId` arrive in Phase 4 once Supabase + the seeded program land in Phase 3.
+Loading-screen timing: the staged sequence and the Server Action run in parallel. The client uses `Promise.all([sequencePromise, submitProfile(...)])`, so even if the Server Action returns instantly the user still sees the full ~1.5s animation. On error, the quiz transitions to an inline error state with a "Try again" button.
 
 ## Out of scope for MVP
 

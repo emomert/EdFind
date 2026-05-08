@@ -6,7 +6,7 @@ EdFind is a SaaS web app that helps graduating students in Turkey discover and a
 
 ## Status
 
-**Phase 3 — Database + seed complete.** The repo has the Next.js scaffold, brand tokens, top nav, a working 7-question quiz with localStorage draft persistence, and a Supabase project (eu-west) with the init schema and Politecnico di Milano seed applied. Submitting the quiz still routes to a placeholder results page — the Server Action wiring lands in Phase 4.
+**Phase 4 — Wire it up complete (DB layer).** The quiz works end-to-end: the `submitProfile` Server Action validates answers with Zod, inserts a profile + match into Supabase, sets an httpOnly `edfind_client_id` cookie, and the real `/results/[matchId]` page renders the matched program. A browser walkthrough is the remaining check. Phase 5 (Vercel deploy) is next.
 
 See [`docs/architecture.md`](docs/architecture.md) for the phased roadmap.
 

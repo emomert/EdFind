@@ -78,10 +78,16 @@ A single submitted quiz response. Anonymous in MVP (no FK to `users`).
 
 **RLS:**
 - Insert: anyone (anonymous quiz submission).
-- Select: only when the requester provides the matching `client_id` (passed via signed cookie or URL token).
+- Select: anon SELECT denied at the policy level. The server reads via the
+  service-role client and authorizes the request itself by comparing the
+  `edfind_client_id` httpOnly cookie against `profiles.client_id` (see
+  `app/results/[matchId]/page.tsx`). This keeps the policy simple while
+  still ensuring a profile is only readable by the browser that created it.
 - Update/delete: service-role only.
 
-When auth is added later, a nullable `user_id uuid FK → auth.users` is added and a policy allows the owner to read their own profile.
+When auth is added later, a nullable `user_id uuid FK → auth.users` is added,
+the cookie-based authorization is replaced by a SELECT policy keyed off
+`auth.uid()`, and the service-role read path is dropped.
 
 ### `matches`
 
