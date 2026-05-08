@@ -8,7 +8,7 @@ EdFind is a SaaS web app for graduating students in Turkey looking for master's 
 
 ## Phase
 
-We finished **Phase 0 (foundation docs)** and **Phase 1 (scaffold)** on 2026-05-07, and **Phase 2 (Profile Quiz UI)** on 2026-05-08. **Phase 3 (Database + seed)** is in progress on 2026-05-08: the init migration, seed SQL, and Supabase helper modules (`lib/supabase/server.ts`, `lib/supabase/client.ts`) are written; we're waiting on the user to create a Supabase project and populate `.env.local` so the schema can actually be applied. See `docs/architecture.md` for the full phased plan and current status.
+We finished **Phase 0 (foundation docs)** and **Phase 1 (scaffold)** on 2026-05-07, and **Phase 2 (Profile Quiz UI)** + **Phase 3 (Database + seed)** on 2026-05-08. The Supabase project lives in `eu-west` (Ireland), the init migration and seed have been applied, and `scripts/check-db.mjs` confirms the seeded Politecnico di Milano + MSc Management Engineering rows are present. We are about to start **Phase 4 (Wire it up)** — the Server Action that submits a quiz, persists a profile, runs the placeholder matcher, and redirects to the real `/results/:matchId`. See `docs/architecture.md` for the full phased plan.
 
 ## Tech stack — do not deviate without an ADR
 

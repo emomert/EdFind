@@ -6,7 +6,7 @@ EdFind is a SaaS web app that helps graduating students in Turkey discover and a
 
 ## Status
 
-**Phase 2 — Profile Quiz UI complete.** The repo has the Next.js scaffold, brand tokens, top nav, and a working 7-question quiz with sticky progress bar, mascot, localStorage draft persistence, and a staged loading screen. Database wiring lands in Phase 3.
+**Phase 3 — Database + seed complete.** The repo has the Next.js scaffold, brand tokens, top nav, a working 7-question quiz with localStorage draft persistence, and a Supabase project (eu-west) with the init schema and Politecnico di Milano seed applied. Submitting the quiz still routes to a placeholder results page — the Server Action wiring lands in Phase 4.
 
 See [`docs/architecture.md`](docs/architecture.md) for the phased roadmap.
 
@@ -65,6 +65,9 @@ The quiz lives at `/quiz`. Drafts are saved to `localStorage` under `edfind:quiz
      `supabase/migrations/20260508120000_init_schema.sql`, then `supabase/seed.sql`.
    - **CLI:** `supabase link --project-ref <ref>` then `supabase db push` and
      `supabase db reset` (or `psql` the seed file).
+4. Verify with `node --env-file=.env.local scripts/check-db.mjs`. You should
+   see `✓ Phase 3 database is healthy.` along with the seeded Politecnico di
+   Milano + MSc Management Engineering rows.
 
 The `service_role` key bypasses RLS — only ever read it from server code
 (`lib/supabase/server.ts` enforces this with `import "server-only"`).

@@ -66,7 +66,7 @@ For the MVP placeholder matcher: no AI call yet. The matcher just returns the se
 | **0 — Foundation** | README, CLAUDE.md, architecture, data-model, ADRs 0001-0003, brand tokens, profile-quiz spec | Complete (2026-05-07) |
 | **1 — Scaffold** | Next.js 16 + TS + Tailwind v4 + shadcn init, brand tokens applied, top nav layout from design | Complete (2026-05-07) |
 | **2 — Profile quiz UI** | 7-question quiz with mascot + progress bar + loading screen, all client-side state | Complete (2026-05-08) |
-| **3 — Database + seed** | Supabase project, schema for `universities`/`programs`/`profiles`/`matches`, seed Politecnico di Milano | In progress (2026-05-08) — migration + seed SQL written, helpers in `lib/supabase/`; awaiting live Supabase project credentials to apply |
+| **3 — Database + seed** | Supabase project, schema for `universities`/`programs`/`profiles`/`matches`, seed Politecnico di Milano | Complete (2026-05-08) — Supabase project provisioned (eu-west, Ireland), migration + seed applied, smoke-tested via `scripts/check-db.mjs` |
 | **4 — Wire it up** | Server Action submits quiz → stores profile → placeholder matcher → results page | Not started |
 | **5 — Deploy** | Vercel deployment, end-to-end click-through with the user | Not started |
 
