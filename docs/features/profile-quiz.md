@@ -65,6 +65,22 @@ The schema is **versioned** (`answers_version`). When we add or change a questio
 - Mascot illustration is `aria-hidden`.
 - Progress bar has `role="progressbar"` with `aria-valuenow`/`aria-valuemax`.
 
+## Implementation map (Phase 2)
+
+| Concern | File |
+|---|---|
+| Question definitions, types, `ANSWERS_VERSION`, draft storage key | `lib/quiz/schema.ts` |
+| Client state machine, draft persistence, navigation | `components/quiz/quiz-client.tsx` |
+| Sticky progress bar (`role="progressbar"`) | `components/quiz/progress-bar.tsx` |
+| Mascot character + supportive copy | `components/quiz/mascot.tsx` |
+| Single answer card (radio/checkbox) | `components/quiz/answer-card.tsx` |
+| Per-question screen layout (fieldset/legend, back/next) | `components/quiz/question-screen.tsx` |
+| Staged "Reading preferences → Searching database → Preparing results" | `components/quiz/loading-screen.tsx` |
+| Route shell (Server Component) | `app/quiz/page.tsx` |
+| Placeholder results page (Phase 4 will replace) | `app/results/[matchId]/page.tsx` |
+
+For MVP Phase 2, the loading screen completes by routing to `/results/placeholder`. The Server Action `submitProfile(answers)` and the real `matchId` arrive in Phase 4 once Supabase + the seeded program land in Phase 3.
+
 ## Out of scope for MVP
 
 - Persisting answers across devices (needs auth).

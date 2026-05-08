@@ -32,19 +32,18 @@ export default function HomePage() {
           </div>
 
           <p className="mt-6 text-sm text-muted-foreground">
-            Phase 1 scaffold — the quiz and search pages will land in Phase 2.
+            Phase 2 — the quiz works end-to-end on the client. Database wiring and
+            real matches land in Phase 3 and Phase 4.
           </p>
         </div>
 
         <div className="rounded-2xl border bg-muted/40 p-8">
-          <p className="text-sm font-medium text-muted-foreground">Phase 1 status</p>
+          <p className="text-sm font-medium text-muted-foreground">Status</p>
           <ul className="mt-4 space-y-2 text-sm">
-            <li>✓ Next.js 16 + TypeScript scaffolded</li>
-            <li>✓ Tailwind v4 + brand tokens applied</li>
-            <li>✓ Inter font wired up</li>
-            <li>✓ shadcn/ui Button installed</li>
-            <li>✓ Top nav matches design</li>
-            <li className="text-muted-foreground">→ Next: Phase 2 — Profile Quiz UI</li>
+            <li>✓ Phase 0 — foundation docs</li>
+            <li>✓ Phase 1 — Next.js + Tailwind + shadcn scaffold</li>
+            <li>✓ Phase 2 — Profile quiz UI (7 questions, draft-saved, loading screen)</li>
+            <li className="text-muted-foreground">→ Next: Phase 3 — Supabase schema + seed</li>
           </ul>
         </div>
       </section>

@@ -6,7 +6,7 @@ EdFind is a SaaS web app that helps graduating students in Turkey discover and a
 
 ## Status
 
-**Phase 0 — foundation.** Tech stack and architecture are decided; documentation is being scaffolded. No application code yet.
+**Phase 2 — Profile Quiz UI complete.** The repo has the Next.js scaffold, brand tokens, top nav, and a working 7-question quiz with sticky progress bar, mascot, localStorage draft persistence, and a staged loading screen. Database wiring lands in Phase 3.
 
 See [`docs/architecture.md`](docs/architecture.md) for the phased roadmap.
 
@@ -41,7 +41,15 @@ EdFindAI/
 
 ## Quickstart
 
-_To be filled in after Phase 1 (Next.js scaffold)._
+```bash
+npm install
+npm run dev          # http://localhost:3000
+npm run typecheck    # tsc --noEmit
+npm run lint         # eslint
+npm run build        # production build
+```
+
+The quiz lives at `/quiz`. Drafts are saved to `localStorage` under `edfind:quiz_draft:v1`.
 
 ## Documentation
 
