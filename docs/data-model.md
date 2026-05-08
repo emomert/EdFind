@@ -32,6 +32,7 @@ Reference data describing each institution.
 | `logo_url` | text | Stored in Supabase Storage |
 | `hero_image_url` | text | Optional campus image |
 | `is_partner` | boolean not null default false | True for Partner Universities tier |
+| `qs_world_rank` | int | Nullable. Most recent QS World University Ranking known. |
 | `created_at` / `updated_at` | timestamptz | |
 
 **RLS:** read = public; write = service-role only.
@@ -57,6 +58,8 @@ A specific master's program offered by a university.
 | `description` | text | |
 | `requirements` | jsonb | Structured: GPA, language tests, prereq subjects, docs |
 | `curriculum_url` | text | |
+| `qs_subject_rank` | int | Nullable. Rank within `qs_subject_area`. |
+| `qs_subject_area` | text | Nullable. Free-text label, e.g. `Computer Science & Information Systems`. Doesn't map 1:1 to `field_of_study`. |
 | `created_at` / `updated_at` | timestamptz | |
 
 `UNIQUE (university_id, slug)`.
@@ -137,5 +140,6 @@ Every schema change ships as a new file under `supabase/migrations/` named `YYYY
 | Filename | Adds |
 |---|---|
 | `20260508120000_init_schema.sql` | `set_updated_at()` helper, `universities`, `programs`, `profiles`, `matches` with RLS enabled and the policies described above |
+| `20260508140000_add_ranking_columns.sql` | `universities.qs_world_rank`, `programs.qs_subject_rank`, `programs.qs_subject_area`, partial index on the program rank |
 
 Seed data lives in `supabase/seed.sql`. Re-running it is idempotent (`ON CONFLICT DO NOTHING` on slug uniques).
