@@ -32,11 +32,14 @@ const supabase = createClient(url, key, {
 
 console.log(`→ Connecting to ${url}`);
 
+// Baseline reflects the post-Phase-6 catalog (11 universities, 13 programs).
+// profiles + matches grow over time as users submit the quiz, so we just
+// require them to be non-negative rather than pinning to a snapshot.
 const checks = [
-  { table: "universities", expect: 1 },
-  { table: "programs", expect: 1 },
-  { table: "profiles", expect: 0 },
-  { table: "matches", expect: 0 },
+  { table: "universities", expect: 11 },
+  { table: "programs", expect: 13 },
+  { table: "profiles", expect: ">=0" },
+  { table: "matches", expect: ">=0" },
 ];
 
 let allOk = true;
@@ -52,7 +55,7 @@ for (const { table, expect } of checks) {
     continue;
   }
 
-  const ok = count === expect;
+  const ok = expect === ">=0" ? count >= 0 : count === expect;
   const status = ok ? "✓" : "✗";
   console.log(`${status} ${table.padEnd(15)} count=${count} (expected ${expect})`);
   if (!ok) allOk = false;
@@ -96,9 +99,36 @@ if (progRes.error) {
   console.log(`  field=${p.field_of_study}  lang=${p.language}  duration=${p.duration_months}mo  tuition=${p.tuition_per_year} ${p.currency}`);
 }
 
+// Catalog coverage: fields-of-study should hit all 8 enum values, and most
+// universities should have a QS world rank populated (specialist schools
+// like LBS/Bocconi may legitimately not be in the QS WUR).
+const { data: progRows } = await supabase
+  .from("programs")
+  .select("field_of_study, qs_subject_rank, qs_subject_area");
+const fieldsCovered = new Set((progRows ?? []).map((p) => p.field_of_study));
+const programsWithSubjectRank = (progRows ?? []).filter((p) => p.qs_subject_rank !== null).length;
+
+const { data: uniRows } = await supabase
+  .from("universities")
+  .select("name, country, qs_world_rank")
+  .order("qs_world_rank", { ascending: true, nullsFirst: false });
+const universitiesWithWorldRank = (uniRows ?? []).filter((u) => u.qs_world_rank !== null).length;
+
+console.log("");
+console.log(`Catalog coverage:`);
+console.log(`  fields of study covered:        ${fieldsCovered.size} / 8`);
+console.log(`  universities with QS world rank: ${universitiesWithWorldRank} / ${(uniRows ?? []).length}`);
+console.log(`  programs with QS subject rank:   ${programsWithSubjectRank} / ${(progRows ?? []).length}`);
+console.log("");
+console.log(`Top universities by QS rank:`);
+for (const u of (uniRows ?? []).slice(0, 5)) {
+  const rank = u.qs_world_rank == null ? "—" : `#${u.qs_world_rank}`;
+  console.log(`  ${rank.padStart(5)}  ${u.name} (${u.country})`);
+}
+
 console.log("");
 if (allOk) {
-  console.log("✓ Phase 3 database is healthy.");
+  console.log("✓ Database is healthy.");
   process.exit(0);
 } else {
   console.error("✗ One or more checks failed — see above.");
