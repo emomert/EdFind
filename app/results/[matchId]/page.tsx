@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
+  Award,
   CalendarDays,
   ExternalLink,
   GraduationCap,
@@ -55,7 +56,7 @@ export default async function ResultsPage({
   const programRes = await supabase
     .from("programs")
     .select(
-      "id, slug, name, degree, field_of_study, language, duration_months, tuition_per_year, currency, application_deadline, start_month, description, university_id",
+      "id, slug, name, degree, field_of_study, language, duration_months, tuition_per_year, currency, application_deadline, start_month, description, university_id, qs_subject_rank, qs_subject_area",
     )
     .eq("id", matchRes.data.program_id)
     .maybeSingle();
@@ -63,7 +64,7 @@ export default async function ResultsPage({
 
   const universityRes = await supabase
     .from("universities")
-    .select("name, country, city, website, description, is_partner")
+    .select("name, country, city, website, description, is_partner, qs_world_rank")
     .eq("id", programRes.data.university_id)
     .maybeSingle();
   if (universityRes.error || !universityRes.data) notFound();
@@ -84,6 +85,11 @@ export default async function ResultsPage({
       </h1>
       <p className="mt-2 text-base text-muted-foreground">
         {program.degree} · {university.name}
+        {university.qs_world_rank ? (
+          <span className="ml-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+            QS #{university.qs_world_rank} worldwide
+          </span>
+        ) : null}
         {university.is_partner ? (
           <span className="ml-2 inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
             Partner university
@@ -110,6 +116,11 @@ export default async function ResultsPage({
         {program.start_month ? (
           <Stat icon={<CalendarDays className="size-4" />} label="Starts">
             {program.start_month}
+          </Stat>
+        ) : null}
+        {program.qs_subject_rank && program.qs_subject_area ? (
+          <Stat icon={<Award className="size-4" />} label="Subject ranking">
+            #{program.qs_subject_rank} in {program.qs_subject_area}
           </Stat>
         ) : null}
       </div>
