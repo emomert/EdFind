@@ -12,7 +12,19 @@ import { z } from "zod";
 
 export const ANSWERS_VERSION = 1;
 
-export const DESTINATIONS = ["IT", "NL", "DE", "GB", "ANY"] as const;
+export const DESTINATIONS = [
+  "IT",
+  "NL",
+  "DE",
+  "GB",
+  "ES",
+  "FR",
+  "CH",
+  "SE",
+  "DK",
+  "IE",
+  "ANY",
+] as const;
 export type Destination = (typeof DESTINATIONS)[number];
 
 export const FIELDS_OF_STUDY = [
@@ -126,6 +138,12 @@ export const QUESTIONS: readonly Question[] = [
       { value: "NL", label: "Netherlands" },
       { value: "DE", label: "Germany" },
       { value: "GB", label: "United Kingdom" },
+      { value: "ES", label: "Spain" },
+      { value: "FR", label: "France" },
+      { value: "CH", label: "Switzerland" },
+      { value: "SE", label: "Sweden" },
+      { value: "DK", label: "Denmark" },
+      { value: "IE", label: "Ireland" },
       { value: "ANY", label: "No preference" },
     ],
   },

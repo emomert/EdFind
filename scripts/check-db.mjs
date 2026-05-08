@@ -32,12 +32,12 @@ const supabase = createClient(url, key, {
 
 console.log(`→ Connecting to ${url}`);
 
-// Baseline reflects the post-Phase-6 catalog (11 universities, 13 programs).
+// Baseline reflects the post-Phase-7 catalog (38 universities, 54 programs).
 // profiles + matches grow over time as users submit the quiz, so we just
 // require them to be non-negative rather than pinning to a snapshot.
 const checks = [
-  { table: "universities", expect: 11 },
-  { table: "programs", expect: 13 },
+  { table: "universities", expect: 38 },
+  { table: "programs", expect: 54 },
   { table: "profiles", expect: ">=0" },
   { table: "matches", expect: ">=0" },
 ];
