@@ -131,7 +131,12 @@ export async function matchProgramsToProfile(
     ],
     response_format: { type: "json_object" },
     temperature: 0.3,
-    max_tokens: 1200,
+    max_tokens: 2000,
+    // Disable V4's reasoning step. With thinking enabled the model burns the
+    // entire max_tokens budget on reasoning_content and finish_reason becomes
+    // "length" before any JSON is emitted. Matching is straightforward enough
+    // that direct mode is sufficient and the round-trip is faster + cheaper.
+    thinking: { type: "disabled" },
   };
 
   const res = await fetch(DEEPSEEK_API_URL, {
