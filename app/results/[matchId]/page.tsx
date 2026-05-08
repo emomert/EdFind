@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, RotateCw } from "lucide-react";
 
 import { createServiceClient } from "@/lib/supabase/server";
@@ -46,6 +46,37 @@ export default async function ResultsPage({
     .maybeSingle();
   if (profileRes.error || !profileRes.data) notFound();
   if (profileRes.data.client_id !== cookieClientId) notFound();
+
+  // Stale-URL redirect: if the user has retaken the quiz since this match was
+  // generated, the URL they landed on points at an old profile. Send them to
+  // their newest matches instead so they don't get confused by stale results
+  // from a previous session (the canonical confusion that drove the
+  // browser-back / "I see Polimi again" bug). Old rows stay in the DB for
+  // audit; only the canonical landing URL changes.
+  const latestProfileRes = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("client_id", cookieClientId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (
+    latestProfileRes.data &&
+    latestProfileRes.data.id !== matchRes.data.profile_id
+  ) {
+    const latestTopMatchRes = await supabase
+      .from("matches")
+      .select("id")
+      .eq("profile_id", latestProfileRes.data.id)
+      .order("score", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (latestTopMatchRes.data) {
+      redirect(`/results/${latestTopMatchRes.data.id}`);
+    }
+  }
 
   const allMatchesRes = await supabase
     .from("matches")
