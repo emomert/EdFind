@@ -10,7 +10,7 @@
 
 import { z } from "zod";
 
-export const ANSWERS_VERSION = 1;
+export const ANSWERS_VERSION = 2;
 
 export const DESTINATIONS = [
   "IT",
@@ -73,6 +73,17 @@ export const CAREER_GOALS = [
 ] as const;
 export type CareerGoal = (typeof CAREER_GOALS)[number];
 
+export const ACADEMIC_FOCUS = ["research", "applied", "balanced"] as const;
+export type AcademicFocus = (typeof ACADEMIC_FOCUS)[number];
+
+export const WORK_EXPERIENCES = [
+  "none",
+  "1-2_years",
+  "3-5_years",
+  "5_plus_years",
+] as const;
+export type WorkExperience = (typeof WORK_EXPERIENCES)[number];
+
 export type Answers = {
   destinations: Destination[];
   field_of_study: FieldOfStudy | null;
@@ -81,6 +92,8 @@ export type Answers = {
   english_level: EnglishLevel | null;
   scholarship_need: ScholarshipNeed | null;
   career_goal: CareerGoal | null;
+  academic_focus: AcademicFocus | null;
+  work_experience: WorkExperience | null;
 };
 
 export const EMPTY_ANSWERS: Answers = {
@@ -91,6 +104,8 @@ export const EMPTY_ANSWERS: Answers = {
   english_level: null,
   scholarship_need: null,
   career_goal: null,
+  academic_focus: null,
+  work_experience: null,
 };
 
 export type Option<T extends string> = {
@@ -124,7 +139,9 @@ export type Question =
   | SingleQuestion<"duration_preference", Duration>
   | SingleQuestion<"english_level", EnglishLevel>
   | SingleQuestion<"scholarship_need", ScholarshipNeed>
-  | SingleQuestion<"career_goal", CareerGoal>;
+  | SingleQuestion<"career_goal", CareerGoal>
+  | SingleQuestion<"academic_focus", AcademicFocus>
+  | SingleQuestion<"work_experience", WorkExperience>;
 
 export const QUESTIONS: readonly Question[] = [
   {
@@ -228,6 +245,43 @@ export const QUESTIONS: readonly Question[] = [
       { value: "unsure", label: "Not sure yet" },
     ],
   },
+  {
+    step: 8,
+    field: "academic_focus",
+    select: "single",
+    legend: "What style of master's appeals to you?",
+    helper: "We'll weigh research-heavy programs differently from job-oriented ones.",
+    options: [
+      {
+        value: "research",
+        label: "Research-heavy",
+        description: "Stepping stone to a PhD, theoretical depth, thesis-driven",
+      },
+      {
+        value: "applied",
+        label: "Industry-applied",
+        description: "Hands-on projects, internships, job-ready skills",
+      },
+      {
+        value: "balanced",
+        label: "Balanced",
+        description: "A bit of both — keep options open",
+      },
+    ],
+  },
+  {
+    step: 9,
+    field: "work_experience",
+    select: "single",
+    legend: "How much full-time work experience do you have?",
+    helper: "Some programs (like LBS MiM) prefer 1-3 years; others welcome fresh graduates.",
+    options: [
+      { value: "none", label: "None or under a year" },
+      { value: "1-2_years", label: "1-2 years" },
+      { value: "3-5_years", label: "3-5 years" },
+      { value: "5_plus_years", label: "5+ years" },
+    ],
+  },
 ];
 
 export const TOTAL_STEPS = QUESTIONS.length;
@@ -254,6 +308,8 @@ export const AnswersSchema = z.object({
   english_level: z.enum(ENGLISH_LEVELS),
   scholarship_need: z.enum(SCHOLARSHIP_NEEDS),
   career_goal: z.enum(CAREER_GOALS),
+  academic_focus: z.enum(ACADEMIC_FOCUS),
+  work_experience: z.enum(WORK_EXPERIENCES),
 }) satisfies z.ZodType<{
   // Compile-time guard: AnswersSchema's parsed shape must match Answers
   // (with non-null fields, since validation rejects null at submit time).
@@ -264,6 +320,8 @@ export const AnswersSchema = z.object({
   english_level: EnglishLevel;
   scholarship_need: ScholarshipNeed;
   career_goal: CareerGoal;
+  academic_focus: AcademicFocus;
+  work_experience: WorkExperience;
 }>;
 
 export type ValidatedAnswers = z.infer<typeof AnswersSchema>;

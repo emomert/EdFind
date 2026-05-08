@@ -1,6 +1,6 @@
 # Feature: Profile Quiz
 
-The "Build Your Study Profile" flow — the structured 7-question entry path into matching. The free-text "AI Search" entry is a separate feature, deferred.
+The "Build Your Study Profile" flow — the structured 9-question entry path into matching. The free-text "AI Search" entry is a separate feature, deferred.
 
 ## Goal
 
@@ -9,30 +9,32 @@ Collect enough structured signal about a student's preferences in ≤ 2 minutes 
 ## User journey
 
 1. From the landing page, the user clicks **Profile Quiz** (or `/quiz`).
-2. They answer 7 questions, one per screen, with a progress indicator.
+2. They answer 9 questions, one per screen, with a progress indicator.
 3. They see a "Creating your profile…" loading screen while the server stores the profile and runs the matcher.
 4. They land on the results page (`/results/:matchId`) with their best matches.
 
-## Question schema (v1)
+## Question schema (v2)
 
-These are the seven questions from the design PDF, formalized. Answer types and the field names below are the keys stored in `profiles.answers` (jsonb). `answers_version: 1`.
+`answers_version: 2` (bumped 1→2 in Phase 8 when `academic_focus` and `work_experience` were added). v1 profiles in the DB still validate at read time because we never destructive-migrate quiz data.
 
 | # | Question | Field | Type | Notes |
 |---|---|---|---|---|
-| 1 | _"Which destination feels right for your master's journey?"_ | `destinations` | array of country codes | Multi-select. Options: Italy, Netherlands, Germany, UK (initial set; expand later) plus "No preference". |
+| 1 | _"Which destination feels right for your master's journey?"_ | `destinations` | array of country codes | Multi-select. Options: IT, NL, DE, GB, ES, FR, CH, SE, DK, IE, plus "ANY" (No preference). |
 | 2 | _"What field of study are you drawn to?"_ | `field_of_study` | enum | Single-select. Uses the taxonomy in `data-model.md`. |
 | 3 | _"What's your budget per year?"_ | `budget_per_year` | enum bracket | `<10k`, `10-15k`, `15-20k`, `20-25k`, `25k+`, `flexible`. Stored as the bracket label, not a number. |
 | 4 | _"How long do you want your program to be?"_ | `duration_preference` | enum | `12mo`, `18mo`, `24mo`, `flexible`. |
-| 5 | _"What's your English level?"_ | `english_level` | enum | `intermediate`, `upper-intermediate`, `advanced`, `proficient`, plus optional test-score detail later. |
+| 5 | _"What's your English level?"_ | `english_level` | enum | `intermediate`, `upper-intermediate`, `advanced`, `proficient`. |
 | 6 | _"Do you need scholarship support?"_ | `scholarship_need` | enum | `required`, `helpful`, `not_needed`. |
 | 7 | _"What's your career goal after graduation?"_ | `career_goal` | enum | `work_in_europe`, `work_internationally`, `return_to_turkey`, `phd_research`, `entrepreneurship`, `unsure`. |
+| 8 | _"What style of master's appeals to you?"_ (added v2) | `academic_focus` | enum | `research`, `applied`, `balanced`. Lets the matcher distinguish PhD-track research masters from job-oriented professional masters. |
+| 9 | _"How much full-time work experience do you have?"_ (added v2) | `work_experience` | enum | `none`, `1-2_years`, `3-5_years`, `5_plus_years`. Some programmes (LBS MiM, MBA-style options) prefer 1-3+ years; helps the matcher avoid recommending experience-required programmes to fresh grads. |
 
 The schema is **versioned** (`answers_version`). When we add or change a question, we bump the version and keep old answers as-is — never destructive-migrate quiz data.
 
 ## UI requirements
 
 - One question per screen, large illustrated answer cards (per the design's question-1 mockup).
-- Sticky progress bar showing _"Question N of 7"_ and percentage complete.
+- Sticky progress bar showing _"Question N of 9"_ and percentage complete.
 - Back button on every screen except the first.
 - Mascot character in the corner with light supportive copy ("There's no right or wrong answer — just what feels right for you!").
 - Mobile: cards stack vertically, full-width tap targets ≥ 48px.
@@ -40,7 +42,7 @@ The schema is **versioned** (`answers_version`). When we add or change a questio
 
 ## State management
 
-- All seven answers held in client state during the quiz — no server roundtrip per question.
+- All nine answers held in client state during the quiz — no server roundtrip per question.
 - A draft is also persisted to `localStorage` under `edfind:quiz_draft:v1` so a refresh doesn't lose progress.
 - On submit, the client posts the full answers object to a Server Action `submitProfile(answers)`.
 

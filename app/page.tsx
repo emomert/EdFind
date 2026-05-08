@@ -1,52 +1,288 @@
 import Link from "next/link";
+import {
+  ArrowRight,
+  Award,
+  Compass,
+  GraduationCap,
+  MapPin,
+  Sparkles,
+} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Search } from "lucide-react";
+import { createServiceClient } from "@/lib/supabase/server";
 
-export default function HomePage() {
+type FeaturedUniversity = {
+  slug: string;
+  name: string;
+  country: string;
+  city: string;
+  qs_world_rank: number | null;
+  description: string | null;
+  program_count: number;
+};
+
+async function loadFeatured(): Promise<{
+  universities: FeaturedUniversity[];
+  totals: { universities: number; programs: number; countries: number };
+}> {
+  const supabase = createServiceClient();
+
+  const [uniRes, progRes, countriesRes] = await Promise.all([
+    supabase
+      .from("universities")
+      .select("slug, name, country, city, qs_world_rank, description")
+      .order("qs_world_rank", { ascending: true, nullsFirst: false })
+      .limit(6),
+    supabase.from("programs").select("id", { count: "exact", head: true }),
+    supabase.from("universities").select("country"),
+  ]);
+
+  const featuredSlugs = (uniRes.data ?? []).map((u) => u.slug);
+  const counts: Record<string, number> = {};
+
+  if (featuredSlugs.length > 0) {
+    const { data: progs } = await supabase
+      .from("programs")
+      .select("university_id, university:universities!inner(slug)")
+      .in("university.slug", featuredSlugs);
+    for (const row of progs ?? []) {
+      const slug = (row as unknown as { university: { slug: string } })
+        .university.slug;
+      counts[slug] = (counts[slug] ?? 0) + 1;
+    }
+  }
+
+  const universities: FeaturedUniversity[] = (uniRes.data ?? []).map((u) => ({
+    slug: u.slug,
+    name: u.name,
+    country: u.country,
+    city: u.city,
+    qs_world_rank: u.qs_world_rank,
+    description: u.description,
+    program_count: counts[u.slug] ?? 0,
+  }));
+
+  const uniqueCountries = new Set(
+    (countriesRes.data ?? []).map((row) => row.country),
+  );
+
+  return {
+    universities,
+    totals: {
+      universities: countriesRes.data?.length ?? 0,
+      programs: progRes.count ?? 0,
+      countries: uniqueCountries.size,
+    },
+  };
+}
+
+export default async function HomePage() {
+  const { universities, totals } = await loadFeatured();
+
   return (
-    <div className="mx-auto max-w-6xl px-6 py-16 sm:py-24">
-      <section className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Choose how you want to{" "}
-            <span className="text-primary">explore master&apos;s programs in Europe</span>
-          </h1>
-          <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-            AI-supported, neutral guidance for Turkish students to find the right
-            master&apos;s programs in Europe.
-          </p>
+    <div className="relative">
+      <DecorativeBackdrop />
 
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg">
-              <Link href="/quiz">
-                Start the Profile Quiz
-                <ArrowRight />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/search">
-                <Search />
-                AI Search
-              </Link>
-            </Button>
+      <section className="relative mx-auto max-w-6xl px-6 pb-12 pt-16 sm:pb-16 sm:pt-24">
+        <div className="grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:items-center">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-primary">
+              <Sparkles className="size-3.5" />
+              AI-curated, neutral guidance
+            </span>
+            <h1 className="mt-5 text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+              Find the right{" "}
+              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                master&apos;s in Europe
+              </span>{" "}
+              for you.
+            </h1>
+            <p className="mt-6 max-w-xl text-pretty text-lg text-muted-foreground">
+              EdFind matches Turkish students to vetted European master&apos;s programs
+              using a short quiz, your priorities, and an AI that explains{" "}
+              <em>why</em> each program fits — not just which ones rank highest.
+            </p>
+
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg">
+                <Link href="/quiz">
+                  Take the 9-question quiz
+                  <ArrowRight />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link href="#featured">
+                  Browse universities
+                </Link>
+              </Button>
+            </div>
+
+            <p className="mt-6 text-xs text-muted-foreground">
+              No sign-up required · Takes about 2 minutes · We never silently
+              boost partner universities
+            </p>
           </div>
 
-          <p className="mt-6 text-sm text-muted-foreground">
-            Phase 2 — the quiz works end-to-end on the client. Database wiring and
-            real matches land in Phase 3 and Phase 4.
+          <aside className="relative">
+            <div className="grid grid-cols-3 gap-3">
+              <Stat
+                icon={<GraduationCap className="size-4" />}
+                value={totals.universities}
+                label="universities"
+              />
+              <Stat
+                icon={<Award className="size-4" />}
+                value={totals.programs}
+                label="programs"
+              />
+              <Stat
+                icon={<MapPin className="size-4" />}
+                value={totals.countries}
+                label="countries"
+              />
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Compass className="size-4 text-primary" />
+                How it works
+              </p>
+              <ol className="mt-4 space-y-3 text-sm text-foreground">
+                <Step n={1}>
+                  Answer 9 questions about your goals, budget, and preferences.
+                </Step>
+                <Step n={2}>
+                  Our matcher (DeepSeek V4) ranks programs across all{" "}
+                  {totals.countries} countries we cover.
+                </Step>
+                <Step n={3}>
+                  See your top 3 matches with a personal rationale for each.
+                </Step>
+              </ol>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section
+        id="featured"
+        className="relative mx-auto max-w-6xl px-6 py-12 sm:py-16"
+      >
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            Featured universities
+          </h2>
+          <p className="hidden text-sm text-muted-foreground sm:block">
+            Top-ranked institutions in our catalog
           </p>
         </div>
 
-        <div className="rounded-2xl border bg-muted/40 p-8">
-          <p className="text-sm font-medium text-muted-foreground">Status</p>
-          <ul className="mt-4 space-y-2 text-sm">
-            <li>✓ Phase 0 — foundation docs</li>
-            <li>✓ Phase 1 — Next.js + Tailwind + shadcn scaffold</li>
-            <li>✓ Phase 2 — Profile quiz UI (7 questions, draft-saved, loading screen)</li>
-            <li className="text-muted-foreground">→ Next: Phase 3 — Supabase schema + seed</li>
-          </ul>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {universities.map((u) => (
+            <Link
+              key={u.slug}
+              href={`/universities/${u.slug}`}
+              className="group flex flex-col rounded-2xl border border-border bg-card p-5 transition-all hover:border-primary/40 hover:shadow-md"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {u.city}, {u.country}
+                </p>
+                {u.qs_world_rank ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                    <Award className="size-3" />
+                    QS #{u.qs_world_rank}
+                  </span>
+                ) : null}
+              </div>
+              <h3 className="mt-3 text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
+                {u.name}
+              </h3>
+              {u.description ? (
+                <p className="mt-2 line-clamp-3 flex-1 text-sm text-muted-foreground">
+                  {u.description}
+                </p>
+              ) : null}
+              <p className="mt-4 text-xs text-muted-foreground">
+                {u.program_count} program{u.program_count === 1 ? "" : "s"} in
+                catalog
+              </p>
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-8 text-center">
+          <Button asChild variant="outline">
+            <Link href="/quiz">
+              Take the quiz to get matched
+              <ArrowRight />
+            </Link>
+          </Button>
         </div>
       </section>
+    </div>
+  );
+}
+
+function Stat({
+  icon,
+  value,
+  label,
+}: {
+  icon: React.ReactNode;
+  value: number;
+  label: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-4">
+      <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {icon}
+        {label}
+      </div>
+      <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function Step({ n, children }: { n: number; children: React.ReactNode }) {
+  return (
+    <li className="flex gap-3">
+      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+        {n}
+      </span>
+      <span className="leading-relaxed text-foreground">{children}</span>
+    </li>
+  );
+}
+
+function DecorativeBackdrop() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-x-0 top-0 -z-10 overflow-hidden"
+    >
+      <div className="absolute -top-20 left-1/4 size-[500px] rounded-full bg-primary/10 opacity-60 blur-3xl" />
+      <div className="absolute right-1/4 top-40 size-[400px] rounded-full bg-secondary/40 blur-3xl" />
+      <svg
+        className="absolute inset-x-0 top-0 -z-10 h-64 w-full text-border/40 [mask-image:linear-gradient(to_bottom,white,transparent)]"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <pattern
+            id="hero-grid"
+            x="0"
+            y="0"
+            width="40"
+            height="40"
+            patternUnits="userSpaceOnUse"
+          >
+            <path d="M40 0H0V40" fill="none" stroke="currentColor" strokeWidth="0.5" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#hero-grid)" />
+      </svg>
     </div>
   );
 }

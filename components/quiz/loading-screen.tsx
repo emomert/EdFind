@@ -10,9 +10,9 @@ type Stage = {
 };
 
 const STAGES: Stage[] = [
-  { label: "Reading your preferences", durationMs: 500 },
-  { label: "Searching the database", durationMs: 500 },
-  { label: "Preparing your results", durationMs: 500 },
+  { label: "Reading your preferences", durationMs: 700 },
+  { label: "Searching the European master's catalog", durationMs: 900 },
+  { label: "Asking the AI matcher to rank your top 3", durationMs: 1200 },
 ];
 
 type Props = {
@@ -52,10 +52,11 @@ export function QuizLoadingScreen({ onComplete }: Props) {
     >
       <Loader2 className="size-12 animate-spin text-primary" aria-hidden="true" />
       <h2 className="mt-6 text-2xl font-semibold tracking-tight">
-        Creating your profile…
+        Matching you to programs…
       </h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        We&apos;re lining up programs that fit what you told us.
+        Our AI is comparing your answers against every program in the catalog.
+        This usually takes about 2 seconds.
       </p>
 
       <ol className="mt-8 w-full space-y-3 text-left">

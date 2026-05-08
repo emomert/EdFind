@@ -39,7 +39,7 @@ const MatcherOutputSchema = z.object({
       z.object({
         program_id: z.string().min(1),
         score: z.number().min(0).max(100),
-        rationale: z.string().min(1).max(400),
+        rationale: z.string().min(1).max(900),
       }),
     )
     .min(1)
@@ -52,18 +52,35 @@ Output strict JSON in this exact shape, with no markdown, no commentary, no extr
 
 {
   "matches": [
-    { "program_id": "<exact UUID from catalog>", "score": 0-100, "rationale": "one sentence, ≤ 200 chars, plain English" },
+    { "program_id": "<exact UUID from catalog>", "score": 0-100, "rationale": "<2-3 sentence personalised paragraph>" },
     ... (3 entries total, ordered highest score first)
   ]
 }
 
+Rationale style — REQUIRED:
+- Length: 70-130 words PER rationale (so the JSON output for 3 matches is ~250-400 words total). Do NOT compress. A one-sentence rationale is a failure of the format.
+- Address the student directly in second person ("You picked..." / "Your budget..." / "Since you have 1-2 years of experience..."). Quote at least two of their actual quiz answers.
+- Cite at least TWO concrete numbers from the program: tuition (with currency), duration, ranking, application deadline date, or English-test minimum.
+- Mention at least one meaningful caveat or trade-off (rate qualification, deadline timing, research vs. industry track, prestige vs. cost).
+- No marketing fluff. No exclamations. No emojis. No vague words like "great fit" — be specific.
+
+EXAMPLE OF A WELL-FORMED RATIONALE (this is the floor, not a ceiling):
+
+"You picked economics & finance and a €10-15k budget, and Mannheim's MSc Economics nails both: tuition is EUR 3,000/year at the non-EU rate, well under your cap, and the programme runs 24 months which matches your flexible duration. The application deadline is 31 May 2026, so you have a clear runway to assemble the GRE-recommended profile they want. One trade-off: Mannheim sits at QS #421 worldwide which is modest on prestige, but it ranks #51 in Economics & Econometrics specifically — the subject-level reputation is what employers and PhD programmes actually look at. With your 1-2 years of work experience and 'applied' academic focus, the empirical, problem-set-heavy core here will translate cleanly into your return-to-Turkey career goal."
+
 Matching rules:
 - Hard filters (a program failing any of these should never be in the top 3 unless nothing else qualifies):
   · Destination: if the student's destinations does NOT include "ANY", restrict to programs whose country is in the destinations list.
-  · Language: if english_level is "intermediate", prefer programs whose language is "en" with milder language requirements; never recommend a non-English program if the student's English is weak.
-  · Budget: "<10k" rules out anything above ~10,000 EUR/year (convert non-EUR rough: 1 GBP ≈ 1.18 EUR, 1 CHF ≈ 1.05 EUR, 1 SEK ≈ 0.09 EUR, 1 DKK ≈ 0.13 EUR). "10-15k" tolerates up to ~15,000 EUR/year. "flexible" applies no budget filter.
+  · Language: if english_level is "intermediate", prefer programs whose language is "en" with milder requirements; never recommend a non-English program if the student's English is weak.
+  · Budget: "<10k" rules out anything above ~10,000 EUR/year (convert non-EUR roughly: 1 GBP ≈ 1.18 EUR, 1 CHF ≈ 1.05 EUR, 1 SEK ≈ 0.09 EUR, 1 DKK ≈ 0.13 EUR, 1 NOK ≈ 0.085 EUR, 1 CZK ≈ 0.04 EUR, 1 PLN ≈ 0.23 EUR, 1 HUF ≈ 0.0026 EUR). "10-15k" tolerates up to ~15,000 EUR/year. "flexible" applies no budget filter.
   · Duration: respect duration_preference unless "flexible".
-- Soft fits: field_of_study match on the program; alignment between career_goal and the program's character (e.g. phd_research → research-oriented programs); ranking prestige (lower QS rank number = better); scholarship_need vs tuition affordability.
+- Soft fits:
+  · field_of_study match on the program
+  · academic_focus: "research" → favour research-led / thesis-heavy / PhD-track programs; "applied" → favour industry-linked / project-based / professional masters; "balanced" → either is fine
+  · work_experience: many MiM / MBA-style programmes expect ≥ 1-2 years; "none" students should be steered toward direct-from-undergrad masters where possible. "5_plus_years" students may benefit from MBA-adjacent or executive-style options when available.
+  · career_goal alignment with programme character (e.g. phd_research → research-oriented programmes; entrepreneurship → programmes with venture / innovation tracks; return_to_turkey → ranking & brand recognition matters more than EU placement networks)
+  · ranking prestige (lower QS rank number = better)
+  · scholarship_need vs tuition affordability
 - Diversity: if multiple strong candidates exist, prefer 3 substantively different options (different cities or different sub-fields) over 3 near-clones.
 
 Be decisive. Always return exactly 3 matches when the catalog allows it.`;
@@ -80,6 +97,8 @@ function buildUserMessage(
     english_level: answers.english_level,
     scholarship_need: answers.scholarship_need,
     career_goal: answers.career_goal,
+    academic_focus: answers.academic_focus,
+    work_experience: answers.work_experience,
   };
 
   const compactPrograms = programs.map((p) => ({
@@ -130,8 +149,8 @@ export async function matchProgramsToProfile(
       { role: "user", content: buildUserMessage(answers, programs) },
     ],
     response_format: { type: "json_object" },
-    temperature: 0.3,
-    max_tokens: 2000,
+    temperature: 0.55,
+    max_tokens: 3000,
     // Disable V4's reasoning step. With thinking enabled the model burns the
     // entire max_tokens budget on reasoning_content and finish_reason becomes
     // "length" before any JSON is emitted. Matching is straightforward enough

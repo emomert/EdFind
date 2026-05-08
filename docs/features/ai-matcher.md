@@ -43,9 +43,9 @@ The system prompt lives in `lib/ai/index.ts` as `SYSTEM_PROMPT`. It tells the mo
 - To apply soft fits: field-of-study match, career goal alignment, ranking prestige, scholarship need vs tuition
 - To prefer 3 substantively different options over near-clones
 
-The user message contains the profile (compact JSON) and a compressed catalog (program id, name, university, country, city, field, language, duration, tuition, currency, QS ranks, first 240 chars of description).
+The user message contains the profile (compact JSON, all 9 quiz fields including `academic_focus` and `work_experience`) and a compressed catalog (program id, name, university, country, city, field, language, duration, tuition, currency, QS ranks, first 240 chars of description). Temperature is **0.55** to leave room for prose-style rationales while keeping ranking decisions stable.
 
-At today's catalog size (54 programs) the request is roughly **12k input tokens / ~600 output tokens** — about **$0.002 per match**.
+At today's catalog size (99 programs) the request is roughly **16k input tokens / ~250 output tokens** — about **$0.003 per match**.
 
 ## Output validation
 

@@ -34,6 +34,8 @@ const sampleProfile = {
   english_level: "upper-intermediate",
   scholarship_need: "not_needed",
   career_goal: "return_to_turkey",
+  academic_focus: "applied",
+  work_experience: "1-2_years",
 };
 
 console.log("→ Loading catalog…");
@@ -121,8 +123,8 @@ const res = await fetch(DEEPSEEK_API_URL, {
       { role: "user", content: userMessage },
     ],
     response_format: { type: "json_object" },
-    temperature: 0.3,
-    max_tokens: 2000,
+    temperature: 0.55,
+    max_tokens: 3000,
     thinking: { type: "disabled" },
   }),
 });
