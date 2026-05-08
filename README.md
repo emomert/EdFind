@@ -34,22 +34,40 @@ EdFindAI/
 ├── Website UI Design Ver_1.pdf     v1 design reference
 ├── app/                            Next.js routes (Phase 1+)
 ├── components/                     (Phase 1+)
-├── lib/                            server-only logic, AI client, Supabase clients (Phase 1+)
-├── supabase/                       migrations + seed data (Phase 3+)
-└── package.json                    (Phase 1+)
+├── lib/                            server-only logic, AI client, Supabase clients
+├── supabase/
+│   ├── migrations/                 timestamped schema migrations
+│   └── seed.sql                    seed data (Politecnico di Milano)
+├── .env.example                    required env vars (copy to .env.local)
+└── package.json
 ```
 
 ## Quickstart
 
 ```bash
 npm install
-npm run dev          # http://localhost:3000
-npm run typecheck    # tsc --noEmit
-npm run lint         # eslint
-npm run build        # production build
+cp .env.example .env.local   # then fill in Supabase keys (Phase 3+)
+npm run dev                  # http://localhost:3000
+npm run typecheck            # tsc --noEmit
+npm run lint                 # eslint
+npm run build                # production build
 ```
 
 The quiz lives at `/quiz`. Drafts are saved to `localStorage` under `edfind:quiz_draft:v1`.
+
+### Supabase setup (Phase 3+)
+
+1. Create a Supabase project at [supabase.com](https://supabase.com).
+2. Copy the project URL, the `anon` public key, and the `service_role` key from
+   _Project Settings → API_ into `.env.local`.
+3. Apply the schema. Either:
+   - **Dashboard:** open the SQL editor and paste
+     `supabase/migrations/20260508120000_init_schema.sql`, then `supabase/seed.sql`.
+   - **CLI:** `supabase link --project-ref <ref>` then `supabase db push` and
+     `supabase db reset` (or `psql` the seed file).
+
+The `service_role` key bypasses RLS — only ever read it from server code
+(`lib/supabase/server.ts` enforces this with `import "server-only"`).
 
 ## Documentation
 

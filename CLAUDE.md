@@ -8,7 +8,7 @@ EdFind is a SaaS web app for graduating students in Turkey looking for master's 
 
 ## Phase
 
-We finished **Phase 0 (foundation docs)** and **Phase 1 (scaffold)** on 2026-05-07, and **Phase 2 (Profile Quiz UI)** on 2026-05-08. The repo now has Next.js 16 + Tailwind v4 + shadcn/ui, brand tokens, a top nav, and a working 7-question quiz with sticky progress bar, mascot, localStorage draft persistence, and a staged loading screen that routes to a placeholder `/results/[matchId]` page. We are about to start **Phase 3 (Database + seed)**. See `docs/architecture.md` for the full phased plan and current status.
+We finished **Phase 0 (foundation docs)** and **Phase 1 (scaffold)** on 2026-05-07, and **Phase 2 (Profile Quiz UI)** on 2026-05-08. **Phase 3 (Database + seed)** is in progress on 2026-05-08: the init migration, seed SQL, and Supabase helper modules (`lib/supabase/server.ts`, `lib/supabase/client.ts`) are written; we're waiting on the user to create a Supabase project and populate `.env.local` so the schema can actually be applied. See `docs/architecture.md` for the full phased plan and current status.
 
 ## Tech stack — do not deviate without an ADR
 

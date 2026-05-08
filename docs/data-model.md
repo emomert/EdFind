@@ -127,3 +127,9 @@ social_sciences
 ## Migrations
 
 Every schema change ships as a new file under `supabase/migrations/` named `YYYYMMDDHHMMSS_short_description.sql`. The matching update to this doc is part of the same change.
+
+| Filename | Adds |
+|---|---|
+| `20260508120000_init_schema.sql` | `set_updated_at()` helper, `universities`, `programs`, `profiles`, `matches` with RLS enabled and the policies described above |
+
+Seed data lives in `supabase/seed.sql`. Re-running it is idempotent (`ON CONFLICT DO NOTHING` on slug uniques).
