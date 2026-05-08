@@ -65,14 +65,22 @@ The quiz lives at `/quiz`. Drafts are saved to `localStorage` under `edfind:quiz
 1. Create a Supabase project at [supabase.com](https://supabase.com).
 2. Copy the project URL, the `anon` public key, and the `service_role` key from
    _Project Settings → API_ into `.env.local`.
-3. Apply the schema. Either:
-   - **Dashboard:** open the SQL editor and paste
-     `supabase/migrations/20260508120000_init_schema.sql`, then `supabase/seed.sql`.
-   - **CLI:** `supabase link --project-ref <ref>` then `supabase db push` and
-     `supabase db reset` (or `psql` the seed file).
-4. Verify with `node --env-file=.env.local scripts/check-db.mjs`. You should
-   see `✓ Phase 3 database is healthy.` along with the seeded Politecnico di
-   Milano + MSc Management Engineering rows.
+3. Add the Postgres connection URL too: _Project Settings → Database →
+   Connection string → URI_, paste into `SUPABASE_DB_URL` in `.env.local`.
+   Use the direct connection or session pooler URL — **not** the transaction
+   pooler (port 6543), which rejects schema-changing statements.
+4. Apply migrations and seed in one command:
+
+   ```bash
+   node --env-file=.env.local scripts/db-migrate.mjs
+   ```
+
+   The script walks `supabase/migrations/` in filename order, runs each one
+   in a transaction (skipping the ones already applied), then runs
+   `supabase/seed.sql` (which is upsert-based, so re-running converges
+   existing rows to the file).
+5. Verify with `node --env-file=.env.local scripts/check-db.mjs`. You should
+   see counts matching what the seed inserted.
 
 The `service_role` key bypasses RLS — only ever read it from server code
 (`lib/supabase/server.ts` enforces this with `import "server-only"`).
