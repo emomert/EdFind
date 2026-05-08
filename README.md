@@ -6,9 +6,14 @@ EdFind is a SaaS web app that helps graduating students in Turkey discover and a
 
 ## Status
 
-**Phase 4 — Wire it up complete (DB layer).** The quiz works end-to-end: the `submitProfile` Server Action validates answers with Zod, inserts a profile + match into Supabase, sets an httpOnly `edfind_client_id` cookie, and the real `/results/[matchId]` page renders the matched program. A browser walkthrough is the remaining check. Phase 5 (Vercel deploy) is next.
+**MVP shipped.** Live at **https://ed-find.vercel.app/**, hosted on Vercel, backed by Supabase (eu-west). The full end-to-end works in production: profile quiz → Server Action → Supabase profile + match → personalized results page. Real submissions verified on launch day (2026-05-08). What's next: more universities in the catalog, real AI matching, then auth and tier billing.
 
 See [`docs/architecture.md`](docs/architecture.md) for the phased roadmap.
+
+## Live
+
+- **Production:** https://ed-find.vercel.app/
+- **Repo:** https://github.com/emomert/EdFind
 
 ## Tech stack
 

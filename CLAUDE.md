@@ -8,7 +8,7 @@ EdFind is a SaaS web app for graduating students in Turkey looking for master's 
 
 ## Phase
 
-We finished **Phase 0 (foundation docs)** and **Phase 1 (scaffold)** on 2026-05-07, and **Phase 2 (Profile Quiz UI)**, **Phase 3 (Database + seed)**, and **Phase 4 (Wire it up)** on 2026-05-08. The Supabase project lives in `eu-west` (Ireland) and the quiz works end-to-end at the DB layer: the `submitProfile` Server Action validates answers with Zod, persists a profile + match, sets an `edfind_client_id` httpOnly cookie, and the real `/results/[matchId]` page reads via a cookie-authorized service-role join. `scripts/smoke-flow.mjs` exercises the full insert → read → cleanup path. The remaining check is a browser walkthrough; Phase 5 (Vercel deploy) is next. See `docs/architecture.md` for the full phased plan.
+The 5-phase MVP is complete. Phases 0–1 finished on 2026-05-07; Phases 2–5 finished on 2026-05-08. The product is **live at https://ed-find.vercel.app/**, hosted on Vercel, backed by the Supabase project in `eu-west` (Ireland). The end-to-end flow has been verified in production: the `submitProfile` Server Action validates with Zod, persists a profile + match, sets an `edfind_client_id` httpOnly cookie, and the real `/results/[matchId]` page reads via a cookie-authorized service-role join. Two real submissions were made through the live deploy on launch day. We are now past the original MVP plan — next work is Beyond-MVP (more universities, real AI matching, auth, university and program detail pages, application tracker, payments, Turkish localization). See `docs/architecture.md` for the full phased plan.
 
 ## Tech stack — do not deviate without an ADR
 

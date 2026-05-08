@@ -67,8 +67,8 @@ For the MVP placeholder matcher: no AI call yet. The matcher just returns the se
 | **1 — Scaffold** | Next.js 16 + TS + Tailwind v4 + shadcn init, brand tokens applied, top nav layout from design | Complete (2026-05-07) |
 | **2 — Profile quiz UI** | 7-question quiz with mascot + progress bar + loading screen, all client-side state | Complete (2026-05-08) |
 | **3 — Database + seed** | Supabase project, schema for `universities`/`programs`/`profiles`/`matches`, seed Politecnico di Milano | Complete (2026-05-08) — Supabase project provisioned (eu-west, Ireland), migration + seed applied, smoke-tested via `scripts/check-db.mjs` |
-| **4 — Wire it up** | Server Action submits quiz → stores profile → placeholder matcher → results page | Complete (2026-05-08) — `submitProfile` Server Action with Zod validation, httpOnly `edfind_client_id` cookie, real results page reads match → profile → program → university, smoke-tested via `scripts/smoke-flow.mjs`. Browser walkthrough still pending. |
-| **5 — Deploy** | Vercel deployment, end-to-end click-through with the user | Not started |
+| **4 — Wire it up** | Server Action submits quiz → stores profile → placeholder matcher → results page | Complete (2026-05-08) — `submitProfile` Server Action with Zod validation, httpOnly `edfind_client_id` cookie, real results page reads match → profile → program → university, smoke-tested via `scripts/smoke-flow.mjs`. Browser walkthrough verified live in Phase 5. |
+| **5 — Deploy** | Vercel deployment, end-to-end click-through with the user | Complete (2026-05-08) — live at https://ed-find.vercel.app/, two real submissions persisted to Supabase from the live Vercel-hosted Server Action |
 
 **Beyond MVP** (deferred, unordered): real matching, more universities, accounts/auth, payment tiers, university and program detail pages, application tracker + Kanban, community/reviews, scholarships, AI Search free-text entry, Turkish localization.
 
