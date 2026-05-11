@@ -4,7 +4,7 @@ If you are an AI agent (Claude Code, Cursor, etc.) opening this repo, **read thi
 
 ## Project in one paragraph
 
-EdFind is a SaaS web app for graduating students in Turkey looking for master's programs in Europe. It aggregates scattered university and program information into one searchable database and uses AI to match students to programs based on a personalized profile. The product has three pricing tiers (Free, Partner Universities, Full Access). Current state: live at https://ed-find.vercel.app/ with a 9-question profile quiz, a 58-university / 197-program catalog across 15 European countries, real AI matching via DeepSeek V4 Flash, and dedicated university + program detail pages.
+EdFind is a SaaS web app for graduating students in Turkey looking for master's programs in Europe. It aggregates scattered university and program information into one searchable database and uses AI to match students to programs based on a personalized profile. The product has three pricing tiers (Free, Partner Universities, Full Access). Current state: live at https://ed-find.vercel.app/ with a 9-question profile quiz, a 58-university / 196-program catalog across 15 European countries, real AI matching via DeepSeek V4 Flash, and dedicated university + program detail pages.
 
 ## Phase
 
