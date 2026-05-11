@@ -1,24 +1,19 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { createServiceClient } from "@/lib/supabase/server";
-import { CLIENT_ID_COOKIE } from "@/lib/quiz/client-id";
+import { requireUser } from "@/lib/supabase/auth";
 
 // `/results` (no id) is the canonical entry point for "show me my latest
-// matches". Resolves the cookie's client_id, finds their newest profile,
-// and redirects to the top match of that profile. If the user has no
-// cookie or has never submitted the quiz, send them to /quiz.
+// matches". Finds the signed-in user's newest profile and redirects to the
+// top match of that profile. If they have no matches yet, send them to /quiz.
 export default async function ResultsIndexPage() {
-  const cookieStore = await cookies();
-  const cookieClientId = cookieStore.get(CLIENT_ID_COOKIE)?.value;
-  if (!cookieClientId) redirect("/quiz");
-
+  const user = await requireUser("/results");
   const supabase = createServiceClient();
 
   const latestProfileRes = await supabase
     .from("profiles")
     .select("id")
-    .eq("client_id", cookieClientId)
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();

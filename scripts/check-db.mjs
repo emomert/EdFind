@@ -40,6 +40,8 @@ const checks = [
   { table: "programs", expect: 99 },
   { table: "profiles", expect: ">=0" },
   { table: "matches", expect: ">=0" },
+  { table: "saved_programs", expect: ">=0" },
+  { table: "applications", expect: ">=0" },
 ];
 
 let allOk = true;

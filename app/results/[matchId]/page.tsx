@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, RotateCw } from "lucide-react";
 
 import { createServiceClient } from "@/lib/supabase/server";
-import { CLIENT_ID_COOKIE } from "@/lib/quiz/client-id";
+import { requireUser } from "@/lib/supabase/auth";
 import { Button } from "@/components/ui/button";
 import {
   HeroMatchCard,
@@ -26,9 +25,7 @@ export default async function ResultsPage({
   params: Promise<Params>;
 }) {
   const { matchId } = await params;
-  const cookieStore = await cookies();
-  const cookieClientId = cookieStore.get(CLIENT_ID_COOKIE)?.value;
-  if (!cookieClientId) notFound();
+  const user = await requireUser(`/results/${matchId}`);
 
   const supabase = createServiceClient();
 
@@ -41,22 +38,19 @@ export default async function ResultsPage({
 
   const profileRes = await supabase
     .from("profiles")
-    .select("client_id")
+    .select("user_id")
     .eq("id", matchRes.data.profile_id)
     .maybeSingle();
   if (profileRes.error || !profileRes.data) notFound();
-  if (profileRes.data.client_id !== cookieClientId) notFound();
+  if (profileRes.data.user_id !== user.id) notFound();
 
   // Stale-URL redirect: if the user has retaken the quiz since this match was
   // generated, the URL they landed on points at an old profile. Send them to
-  // their newest matches instead so they don't get confused by stale results
-  // from a previous session (the canonical confusion that drove the
-  // browser-back / "I see Polimi again" bug). Old rows stay in the DB for
-  // audit; only the canonical landing URL changes.
+  // their newest matches instead.
   const latestProfileRes = await supabase
     .from("profiles")
     .select("id")
-    .eq("client_id", cookieClientId)
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -81,7 +75,7 @@ export default async function ResultsPage({
   const allMatchesRes = await supabase
     .from("matches")
     .select(
-      `id, score, rationale,
+      `id, score, rationale, program_id,
        program:programs(
          slug, name, degree, field_of_study, language, duration_months,
          tuition_per_year, currency, application_deadline, start_month,
@@ -102,9 +96,23 @@ export default async function ResultsPage({
     notFound();
   }
 
-  const valid = (allMatchesRes.data as unknown as MatchCardData[]).filter(
-    (m) => m.program !== null,
+  const rawMatches = allMatchesRes.data as unknown as Array<
+    Omit<MatchCardData, "is_saved">
+  >;
+  const programIds = rawMatches.map((m) => m.program_id);
+
+  const savedRes = await supabase
+    .from("saved_programs")
+    .select("program_id")
+    .eq("user_id", user.id)
+    .in("program_id", programIds);
+  const savedSet = new Set<string>(
+    (savedRes.data ?? []).map((r) => r.program_id as string),
   );
+
+  const valid: MatchCardData[] = rawMatches
+    .filter((m) => m.program !== null)
+    .map((m) => ({ ...m, is_saved: savedSet.has(m.program_id) }));
   if (valid.length === 0) notFound();
 
   const top = valid[0];

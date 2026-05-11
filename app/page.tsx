@@ -10,6 +10,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { createServiceClient } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/auth";
 
 type FeaturedUniversity = {
   slug: string;
@@ -77,7 +78,11 @@ async function loadFeatured(): Promise<{
 }
 
 export default async function HomePage() {
-  const { universities, totals } = await loadFeatured();
+  const [{ universities, totals }, user] = await Promise.all([
+    loadFeatured(),
+    getUser(),
+  ]);
+  const isAuthed = Boolean(user);
 
   return (
     <div className="relative">
@@ -104,22 +109,40 @@ export default async function HomePage() {
             </p>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-              <Button asChild size="lg">
-                <Link href="/quiz">
-                  Take the 9-question quiz
-                  <ArrowRight />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="#featured">
-                  Browse universities
-                </Link>
-              </Button>
+              {isAuthed ? (
+                <>
+                  <Button asChild size="lg">
+                    <Link href="/quiz">
+                      Take the 9-question quiz
+                      <ArrowRight />
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link href="/search">
+                      <Sparkles />
+                      Search with AI
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild size="lg">
+                    <Link href="/login?next=/quiz">
+                      Sign in to get started
+                      <ArrowRight />
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link href="#featured">Browse universities</Link>
+                  </Button>
+                </>
+              )}
             </div>
 
             <p className="mt-6 text-xs text-muted-foreground">
-              No sign-up required · Takes about 2 minutes · We never silently
-              boost partner universities
+              {isAuthed
+                ? "Signed in — your matches travel with you across devices."
+                : "Sign in with Google · Takes about 2 minutes · We never silently boost partner universities"}
             </p>
           </div>
 

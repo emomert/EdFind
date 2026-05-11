@@ -1,8 +1,11 @@
 # Phase 9 — implementation plan
 
-> **Status:** planned, not started · Drafted 2026-05-08
+> **Status:** implemented 2026-05-11 (all four sub-phases). Pending: apply the 3 new migrations in Supabase, configure Google OAuth in Supabase Auth + Google Cloud Console.
 >
-> When you're ready, say "implement Phase 9" (or any individual sub-phase, e.g. "implement Phase 9.2") and the agent should pick up from this doc.
+> Open-question answers chosen during implementation:
+>   1. Reset scope → wipe everything for the current user (applications + saved_programs + profiles + matches; cookie stays).
+>   2. Search URL → reuses `/results/[matchId]` (free-text searches land on the same results page as the quiz).
+>   3. Auth → **required**. All functional routes gate behind `/login`.
 
 Phase 9 adds four features on top of the post-Phase-8 product:
 

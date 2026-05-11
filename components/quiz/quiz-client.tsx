@@ -167,6 +167,11 @@ export function QuizClient() {
       return;
     }
 
+    if (result.needsAuth) {
+      router.push(`/login?next=${encodeURIComponent("/quiz")}`);
+      return;
+    }
+
     setErrorMessage(result.error);
     setPhase("error");
   }, [answers, router]);

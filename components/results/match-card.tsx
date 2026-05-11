@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { SaveButton } from "@/components/shortlist/save-button";
 
 export type MatchCardProgram = {
   slug: string;
@@ -46,6 +47,8 @@ export type MatchCardData = {
   score: number | string | null;
   rationale: string | null;
   program: MatchCardProgram;
+  program_id: string;
+  is_saved: boolean;
 };
 
 const FIELD_LABELS: Record<string, string> = {
@@ -243,6 +246,10 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
               </a>
             </Button>
           ) : null}
+          <SaveButton
+            programId={match.program_id}
+            initiallySaved={match.is_saved}
+          />
         </div>
       </div>
     </motion.section>
@@ -270,8 +277,15 @@ export function SiblingMatchCard({
         delay: 0.15 + index * 0.08,
       }}
       whileHover={{ y: -2 }}
-      className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition-shadow hover:border-primary/40 hover:shadow-md"
+      className="group relative flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition-shadow hover:border-primary/40 hover:shadow-md"
     >
+      <div className="absolute right-3 top-3 z-10">
+        <SaveButton
+          programId={match.program_id}
+          initiallySaved={match.is_saved}
+          variant="icon"
+        />
+      </div>
       <Link
         href={`/programs/${u.slug}/${program.slug}`}
         className="flex flex-1 flex-col"

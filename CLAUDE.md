@@ -8,13 +8,18 @@ EdFind is a SaaS web app for graduating students in Turkey looking for master's 
 
 ## Phase
 
-The 5-phase MVP is complete. Phases 0–1 finished on 2026-05-07; Phases 2–5 finished on 2026-05-08. The product is **live at https://ed-find.vercel.app/**, hosted on Vercel, backed by the Supabase project in `eu-west` (Ireland). Beyond-MVP work also landed on 2026-05-08:
+The 5-phase MVP is complete. Phases 0–1 finished on 2026-05-07; Phases 2–5 finished on 2026-05-08. The product is **live at https://ed-find.vercel.app/**, hosted on Vercel, backed by the Supabase project in `eu-west` (Ireland).
 
-- **Phase 6 / 7** — catalog grew to **38 universities / 54 programs** across 11 European countries via 4+5 parallel Claude Code research agents.
+- **Phase 6 / 7** — catalog grew to **38 universities / 54 programs** across 11 European countries.
 - **Real AI matching** with **DeepSeek V4 Flash** (`deepseek-v4-flash`). The legacy `deepseek-chat`/`deepseek-reasoner` retire 2026-07-24, so V4 is mandatory not optional. V4 Flash defaults to reasoning mode which burns the entire `max_tokens` budget on `reasoning_content` before emitting JSON — disable with `thinking: { type: "disabled" }`. Matcher returns ranked top 3 with score (0-100) and personalised rationale.
-- **Phase 8** — catalog grew to **58 universities / 99 programs across 15 countries** (added NO/CZ/PL/EE plus deepening across existing countries) via 4 parallel research agents. Quiz expanded from 7 to 9 questions (`academic_focus`, `work_experience` added; `ANSWERS_VERSION` bumped 1→2). New `/universities/[slug]` and `/programs/[universitySlug]/[programSlug]` detail pages. Results page redesigned with score-bar visualisations and Framer Motion entrance animations. Home page replaced with a polished hero + featured-universities grid.
+- **Phase 8** — catalog grew to **58 universities / 99 programs across 15 countries**. Quiz expanded 7→9 questions (`academic_focus`, `work_experience` added; `ANSWERS_VERSION` bumped 1→2). Added `/universities/[slug]` and `/programs/[universitySlug]/[programSlug]` detail pages, score-bar visualisations, Framer Motion entrance animations.
+- **Phase 9** (2026-05-11) — four features in one drop:
+  - **9.1 Free-text search** at `/search`. DeepSeek parses the query into `ValidatedAnswers`, then the same matcher path runs. `lib/server/persist-and-match.ts` is now the shared backend for `/quiz` and `/search`.
+  - **9.2 Shortlist + compare** at `/shortlist` and `/compare?ids=…`. `SaveButton` lives on results / program / university pages.
+  - **9.3 Application tracker** at `/applications` — kanban view, status/notes/deadline per program, gated by `NEXT_PUBLIC_ENABLE_APPLICATIONS` for clean future removal (forward + rollback migrations both kept in `supabase/migrations/`). Includes a "Reset all progress" testing button that wipes everything for the current user.
+  - **9.4 Google auth — required**. `/quiz`, `/search`, `/results*`, `/shortlist`, `/applications`, `/compare` redirect to `/login`. Public surfaces: `/`, `/login`, `/universities/*`, `/programs/*`. OAuth callback (`app/auth/callback/route.ts`) attaches any pre-auth rows with the same cookie `client_id` to the new `user_id`.
 
-Next: auth, application tracker, payments / tier billing, Turkish localization. See `docs/architecture.md` for the full phased plan.
+Next: Stripe / tier billing, Turkish localization. See `docs/architecture.md` for the full phased plan.
 
 ## Tech stack — do not deviate without an ADR
 

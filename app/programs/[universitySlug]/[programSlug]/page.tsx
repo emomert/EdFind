@@ -18,6 +18,10 @@ import {
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { getUser } from "@/lib/supabase/auth";
+import { SaveButton } from "@/components/shortlist/save-button";
+import { APPLICATIONS_ENABLED } from "@/lib/feature-flags";
+import { TrackButton } from "@/components/applications/track-button";
 
 type Params = { universitySlug: string; programSlug: string };
 
@@ -88,7 +92,7 @@ export default async function ProgramPage({
   const progRes = await supabase
     .from("programs")
     .select(
-      "slug, name, degree, field_of_study, language, duration_months, tuition_per_year, currency, application_deadline, start_month, description, requirements, qs_subject_rank, qs_subject_area",
+      "id, slug, name, degree, field_of_study, language, duration_months, tuition_per_year, currency, application_deadline, start_month, description, requirements, qs_subject_rank, qs_subject_area",
     )
     .eq("university_id", u.id)
     .eq("slug", programSlug)
@@ -97,6 +101,29 @@ export default async function ProgramPage({
 
   const p = progRes.data;
   const requirements: Requirements = (p.requirements as Requirements) ?? {};
+
+  const user = await getUser();
+  let isSaved = false;
+  let isTracked = false;
+  if (user) {
+    const savedRes = await supabase
+      .from("saved_programs")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("program_id", p.id)
+      .maybeSingle();
+    isSaved = Boolean(savedRes.data);
+
+    if (APPLICATIONS_ENABLED) {
+      const trackedRes = await supabase
+        .from("applications")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("program_id", p.id)
+        .maybeSingle();
+      isTracked = Boolean(trackedRes.data);
+    }
+  }
 
   const peersRes = await supabase
     .from("programs")
@@ -263,6 +290,10 @@ export default async function ProgramPage({
             See all programs at {u.name}
           </Link>
         </Button>
+        <SaveButton programId={p.id} initiallySaved={isSaved} />
+        {APPLICATIONS_ENABLED ? (
+          <TrackButton programId={p.id} initiallyTracked={isTracked} />
+        ) : null}
       </div>
 
       {peers.length > 0 ? (

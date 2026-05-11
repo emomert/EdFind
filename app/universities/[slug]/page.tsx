@@ -14,10 +14,13 @@ import {
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { getUser } from "@/lib/supabase/auth";
+import { SaveButton } from "@/components/shortlist/save-button";
 
 type Params = { slug: string };
 
 type ProgramSummary = {
+  id: string;
   slug: string;
   name: string;
   degree: string;
@@ -77,12 +80,28 @@ export default async function UniversityPage({
   const programsRes = await supabase
     .from("programs")
     .select(
-      "slug, name, degree, field_of_study, language, duration_months, tuition_per_year, currency, qs_subject_rank, qs_subject_area",
+      "id, slug, name, degree, field_of_study, language, duration_months, tuition_per_year, currency, qs_subject_rank, qs_subject_area",
     )
     .eq("university_id", u.id)
     .order("qs_subject_rank", { ascending: true, nullsFirst: false });
 
   const programs: ProgramSummary[] = programsRes.data ?? [];
+
+  const user = await getUser();
+  let savedSet = new Set<string>();
+  if (user && programs.length > 0) {
+    const savedRes = await supabase
+      .from("saved_programs")
+      .select("program_id")
+      .eq("user_id", user.id)
+      .in(
+        "program_id",
+        programs.map((p) => p.id),
+      );
+    savedSet = new Set(
+      (savedRes.data ?? []).map((r) => r.program_id as string),
+    );
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
@@ -191,33 +210,41 @@ export default async function UniversityPage({
         {programs.length > 0 ? (
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {programs.map((p) => (
-              <Link
-                key={p.slug}
-                href={`/programs/${u.slug}/${p.slug}`}
-                className="group rounded-2xl border border-border bg-card p-5 transition-all hover:border-primary/40 hover:bg-accent/30 hover:shadow-md"
-              >
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  {formatField(p.field_of_study)}
-                </p>
-                <h3 className="mt-1 text-base font-semibold leading-snug tracking-tight group-hover:text-primary">
-                  {p.name}
-                </h3>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {p.degree} · {p.duration_months} months ·{" "}
-                  {formatLanguage(p.language)}
-                </p>
-                <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-                  <span className="rounded-full bg-muted px-2 py-1">
-                    {formatTuition(p.tuition_per_year, p.currency)}
-                  </span>
-                  {p.qs_subject_rank ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 font-medium text-primary">
-                      <Award className="size-3" />
-                      QS #{p.qs_subject_rank} {p.qs_subject_area ?? ""}
+              <div key={p.slug} className="relative">
+                <Link
+                  href={`/programs/${u.slug}/${p.slug}`}
+                  className="group block rounded-2xl border border-border bg-card p-5 pr-14 transition-all hover:border-primary/40 hover:bg-accent/30 hover:shadow-md"
+                >
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    {formatField(p.field_of_study)}
+                  </p>
+                  <h3 className="mt-1 text-base font-semibold leading-snug tracking-tight group-hover:text-primary">
+                    {p.name}
+                  </h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {p.degree} · {p.duration_months} months ·{" "}
+                    {formatLanguage(p.language)}
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+                    <span className="rounded-full bg-muted px-2 py-1">
+                      {formatTuition(p.tuition_per_year, p.currency)}
                     </span>
-                  ) : null}
+                    {p.qs_subject_rank ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 font-medium text-primary">
+                        <Award className="size-3" />
+                        QS #{p.qs_subject_rank} {p.qs_subject_area ?? ""}
+                      </span>
+                    ) : null}
+                  </div>
+                </Link>
+                <div className="absolute right-3 top-3">
+                  <SaveButton
+                    programId={p.id}
+                    initiallySaved={savedSet.has(p.id)}
+                    variant="icon"
+                  />
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         ) : null}

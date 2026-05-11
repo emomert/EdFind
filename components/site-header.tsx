@@ -1,15 +1,29 @@
 import Link from "next/link";
+import { LogOut } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
+import { APPLICATIONS_ENABLED } from "@/lib/feature-flags";
+import { getUser } from "@/lib/supabase/auth";
 
-const navLinks = [
-  { href: "/quiz", label: "Find My Best Master Programs" },
-  { href: "/track", label: "Track My Process" },
-  { href: "/community", label: "Community" },
+const baseNavLinks = [
+  { href: "/quiz", label: "Quiz" },
+  { href: "/search", label: "AI Search" },
+  { href: "/shortlist", label: "Shortlist" },
 ];
 
-export function SiteHeader() {
+const navLinks = APPLICATIONS_ENABLED
+  ? [...baseNavLinks, { href: "/applications", label: "Applications" }]
+  : baseNavLinks;
+
+export async function SiteHeader() {
+  const user = await getUser();
+  const displayName =
+    (user?.user_metadata?.name as string | undefined) ??
+    (user?.user_metadata?.full_name as string | undefined) ??
+    user?.email ??
+    null;
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -31,12 +45,26 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href="/sign-in">Sign In</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link href="/get-started">Get Started</Link>
-          </Button>
+          {user ? (
+            <>
+              <span
+                className="hidden max-w-[180px] truncate text-xs text-muted-foreground sm:inline"
+                title={displayName ?? undefined}
+              >
+                {displayName}
+              </span>
+              <form action="/auth/sign-out" method="post">
+                <Button type="submit" variant="outline" size="sm">
+                  <LogOut className="size-3.5" />
+                  Sign out
+                </Button>
+              </form>
+            </>
+          ) : (
+            <Button asChild size="sm">
+              <Link href="/login">Sign in</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>
