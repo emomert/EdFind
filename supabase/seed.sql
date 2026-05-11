@@ -2787,20 +2787,25 @@ on conflict (university_id, slug) do update set
   description = excluded.description, requirements = excluded.requirements,
   qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
 
--- RWTH Aachen · MSc Mechanical Engineering
+-- RWTH Aachen · MSc Automotive Engineering
+-- Replaced the prior MSc Mechanical Engineering entry on 2026-05-11: the main
+-- RWTH Maschinenbau MSc is taught in German only, so the English-tagged record
+-- was wrong. Automotive Engineering is RWTH's English-taught counterpart in
+-- the mechanical-engineering family — free for all students, North-Rhine-
+-- Westphalia public tuition rules apply (semester contribution only).
 insert into public.programs (
   university_id, slug, name, degree, field_of_study, language,
   duration_months, tuition_per_year, currency, application_deadline, start_month,
   description, requirements, qs_subject_rank, qs_subject_area
 )
 select u.id,
-  'msc-mechanical-engineering',
-  'MSc Mechanical Engineering',
+  'msc-automotive-engineering',
+  'MSc Automotive Engineering',
   'MSc', 'engineering', 'en',
   24, 600.00, 'EUR', date '2026-03-01', 'October',
-  'A two-year master''s at RWTH''s Faculty of Mechanical Engineering — Germany''s largest — with specialisation tracks across automotive engineering, energy technology, production engineering, plastics technology, and computational engineering science. Strong industrial collaboration with the German automotive and high-tech sectors. North Rhine-Westphalia does not charge tuition fees; students pay only a per-semester contribution (~EUR 300/semester).',
+  'A two-year English-taught master''s at RWTH''s Faculty of Mechanical Engineering — Germany''s largest — covering vehicle dynamics, powertrains, automotive electronics, autonomous driving, and production. Close ties with the German and European automotive industry, including substantial industrial-thesis opportunities. North Rhine-Westphalia does not charge tuition fees; students pay only a per-semester contribution (~EUR 300/semester).',
   jsonb_build_object(
-    'gpa_min', 'Bachelor in mechanical engineering or a closely related discipline with B+ average',
+    'gpa_min', 'Bachelor in mechanical or electrical engineering or a closely related discipline with B+ average',
     'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
     'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Proof of English proficiency')
   ),
@@ -4281,7 +4286,7 @@ select u.id,
   'msc-informatics-programming-system-architecture',
   'MSc in Informatics: Programming and System Architecture',
   'MSc', 'computer_science_ai', 'en',
-  24, 130000.00, 'NOK', date '2026-03-01', 'August',
+  24, 286000.00, 'NOK', date '2026-03-01', 'August',
   'A two-year research-oriented programme at the Department of Informatics covering programming languages, distributed systems, software engineering, and verification. Students choose between thesis tracks in modelling, language design, or large-scale system architecture. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
   jsonb_build_object(
     'gpa_min', 'C (ECTS) or equivalent in a relevant bachelor',
@@ -5077,6 +5082,1087 @@ select u.id,
   ),
   null, 'Business & Management Studies'
 from public.universities u where u.slug = 'essec-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- Phase 9 catalog expansion — round 2: 36 additional programs across 18
+-- universities that had only 2 each. Researched 2026-05-11 by parallel
+-- agents. Each uni now reaches 4 programs.
+-- ─────────────────────────────────────────────────────────────────────────
+
+
+-- ── round 2 / uk-it ─────────────────────────────
+-- Seed additions: round 2 for UK + Italy.
+-- Adds 2 new English-taught master's programmes for each of:
+--   Cambridge, Manchester, Warwick, Bocconi, Sapienza, Bologna.
+-- Brings each university from 2 to 4 programmes in the catalog so students
+-- have a meaningful set to compare. All figures verified against official
+-- university pages where possible (Cambridge postgraduate course directory,
+-- Manchester course pages, WBS / Warwick PG pages, Bocconi MSc pages,
+-- Sapienza and Bologna corsi pages) on 2026-05-11.
+
+-- =========================================================================
+-- University of Cambridge (already: MPhil ML & MI, MPhil Public Policy)
+-- =========================================================================
+
+-- Cambridge · MPhil in Finance and Economics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'mphil-finance-and-economics',
+  'MPhil in Finance and Economics',
+  'MPhil', 'economics_finance', 'en',
+  9, 42500.00, 'GBP', date '2025-11-18', 'October',
+  'A nine-month, full-time research-oriented master''s offered jointly by the Faculty of Economics and Cambridge Judge Business School. Designed for students with strong quantitative training, it combines rigorous core modules in asset pricing, corporate finance, and econometrics with electives in advanced topics and a research dissertation. A frequent stepping stone into PhD programmes and quantitative roles at top investment banks, hedge funds, and central banks.',
+  jsonb_build_object(
+    'gpa_min', 'First-class honours (UK 1st) or equivalent in economics, finance, mathematics, or a strongly quantitative discipline',
+    'language_tests', jsonb_build_array('IELTS 7.5 (7.0 per component)', 'TOEFL iBT 110 (25 per component)'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Statement of interest', 'Two academic references', 'GRE General (recommended)')
+  ),
+  null, 'Economics & Econometrics'
+from public.universities u where u.slug = 'university-of-cambridge'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Cambridge · MPhil in Advanced Computer Science
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'mphil-advanced-computer-science',
+  'MPhil in Advanced Computer Science',
+  'MPhil', 'computer_science_ai', 'en',
+  9, 48200.00, 'GBP', date '2026-02-26', 'October',
+  'A nine-month research-oriented master''s at the Department of Computer Science and Technology aimed at outstanding students who want to deepen their research training before a PhD or top industry lab. The taught core covers advanced algorithms, systems, programming languages, and machine learning; the bulk of the year is spent on a substantial individual research project supervised by a Cambridge faculty member. Highly selective, with a strong emphasis on prior research aptitude.',
+  jsonb_build_object(
+    'gpa_min', 'First-class honours (UK 1st) or equivalent in computer science or a closely related discipline',
+    'language_tests', jsonb_build_array('IELTS 7.5 (7.0 per component)', 'TOEFL iBT 110 (25 per component)'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Research proposal', 'Two academic references', 'Sample of written work')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'university-of-cambridge'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- =========================================================================
+-- University of Manchester (already: MSc Data Science, MSc Management)
+-- =========================================================================
+
+-- Manchester · MSc Finance
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-finance',
+  'MSc Finance',
+  'MSc', 'economics_finance', 'en',
+  12, 37800.00, 'GBP', date '2026-07-05', 'September',
+  'A 12-month full-time master''s at Alliance Manchester Business School designed for graduates who want a rigorous, quantitative foundation for careers in investment banking, asset management, and corporate finance. Curriculum covers corporate finance, financial econometrics, derivatives, portfolio theory, and financial statement analysis, with optional electives and a final dissertation or applied project. Manchester operates a staged admissions process with four rounds across the year.',
+  jsonb_build_object(
+    'gpa_min', '2:1 (UK Upper Second) or international equivalent in a quantitative discipline',
+    'language_tests', jsonb_build_array('IELTS 7.0 (6.5 per component)', 'TOEFL iBT 100 (22 per component)'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Two references', 'GMAT/GRE (recommended)')
+  ),
+  null, 'Finance'
+from public.universities u where u.slug = 'university-of-manchester'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Manchester · MSc Artificial Intelligence
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-artificial-intelligence',
+  'MSc Artificial Intelligence',
+  'MSc', 'computer_science_ai', 'en',
+  12, 39400.00, 'GBP', null, 'September',
+  'A 12-month full-time master''s in the Department of Computer Science, training students in the foundations and applications of modern AI. Core modules cover machine learning, deep learning, natural language processing, and decision-making under uncertainty, with electives in computer vision, robotics, and AI ethics. Includes a substantial individual research project, often in collaboration with Manchester''s AI research groups or industry partners. Manchester operates staged admissions; the course is in high demand and frequently closes early.',
+  jsonb_build_object(
+    'gpa_min', '2:1 (UK Upper Second) or international equivalent in computer science, mathematics, or a closely related discipline',
+    'language_tests', jsonb_build_array('IELTS 6.5 (6.0 per component)', 'TOEFL iBT 90 (20 per component)'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Two references')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'university-of-manchester'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- =========================================================================
+-- University of Warwick (already: MSc Business Analytics & AI, MSc Economics)
+-- =========================================================================
+
+-- Warwick · MSc Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-management',
+  'MSc Management',
+  'MSc', 'business_management', 'en',
+  12, 38570.00, 'GBP', date '2026-08-02', 'September',
+  'A 12-month full-time pre-experience master''s at Warwick Business School designed for graduates from any discipline who want a broad foundation in business. Core modules cover strategy, marketing, accounting, finance, operations, and organisational behaviour, paired with electives, a consulting project, and a capstone dissertation. Strong corporate partnerships and an active careers team support placements into consulting, FMCG, and technology firms.',
+  jsonb_build_object(
+    'gpa_min', '2:1 (UK Upper Second) or international equivalent',
+    'language_tests', jsonb_build_array('IELTS 7.0 (6.5 per component)', 'TOEFL iBT 100 (22 per component)'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Two references')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'university-of-warwick'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Warwick · MSc Computer Science
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-computer-science',
+  'MSc Computer Science',
+  'MSc', 'computer_science_ai', 'en',
+  12, 37460.00, 'GBP', date '2026-08-02', 'September',
+  'A 12-month full-time taught master''s at Warwick''s Department of Computer Science aimed at students with a quantitative background who want to deepen their CS skills or pivot into the field. Compulsory modules in algorithms, data analytics, and research methodology are paired with electives spanning machine learning, computer security, programming languages, and high-performance computing, capped by an individual research project.',
+  jsonb_build_object(
+    'gpa_min', '2:1 (UK Upper Second) or international equivalent in computer science, mathematics, engineering, or a strongly quantitative discipline',
+    'language_tests', jsonb_build_array('IELTS 6.5 (6.0 per component)', 'TOEFL iBT 92 (22 per component)'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Two references')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'university-of-warwick'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- =========================================================================
+-- Bocconi University (already: MSc Finance, MSc Marketing Management)
+-- =========================================================================
+
+-- Bocconi · MSc Data Science and Business Analytics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-data-science-and-business-analytics',
+  'MSc in Data Science and Business Analytics',
+  'MSc', 'data_science', 'en',
+  24, 18550.00, 'EUR', date '2026-04-29', 'September',
+  'A two-year, fully English-taught master''s combining statistics, computer science, and managerial decision-making. The first year builds rigorous foundations in machine learning, statistical inference, optimisation, and data engineering; the second year offers tracks across business analytics, AI, and applied data science with electives and a thesis or company-based project. Bocconi runs five admission rounds per year; applying earlier improves both admission and scholarship chances.',
+  jsonb_build_object(
+    'gpa_min', 'Strong undergraduate record in a quantitative discipline (mathematics, statistics, computer science, engineering, or economics)',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 88', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Two reference letters', 'GMAT or GRE')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'bocconi-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Bocconi · MSc International Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-international-management',
+  'MSc in International Management',
+  'MSc', 'business_management', 'en',
+  24, 18550.00, 'EUR', date '2026-04-29', 'September',
+  'A two-year, fully English-taught general-management master''s with a strongly international cohort and a curriculum built around comparative business contexts. Core modules cover strategy, finance, marketing, organisation, and operations, supplemented by electives, an international experience, and access to selective tracks including the CEMS MIM, Asia–China MIM, and double degrees with ESSEC. One of the most prestigious pre-experience management programmes in Europe.',
+  jsonb_build_object(
+    'gpa_min', 'Strong undergraduate record in any discipline',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 88', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Two reference letters', 'GMAT or GRE')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'bocconi-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- =========================================================================
+-- Sapienza Università di Roma (already: MSc Architecture, MSc Data Science)
+-- =========================================================================
+
+-- Sapienza · MSc in Cybersecurity
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-cybersecurity',
+  'MSc in Cybersecurity',
+  'MSc', 'computer_science_ai', 'en',
+  24, 2900.00, 'EUR', date '2026-05-15', 'September',
+  'A two-year (120 ECTS) fully English-taught master''s jointly delivered by Sapienza''s engineering and computer science departments, structured around three study plans: Software, Processes and Governance, and Infrastructures and Systems. Curriculum covers cryptography, secure software engineering, network and system security, risk management, and digital forensics, capped by a thesis project. Tuition shown is the approximate maximum non-EU contribution; the actual fee for most students is income-based via the ISEE and significantly lower.',
+  jsonb_build_object(
+    'gpa_min', 'Strong undergraduate degree in computer science, computer engineering, or a closely related discipline',
+    'language_tests', jsonb_build_array('IELTS 6.0', 'TOEFL iBT 78', 'Cambridge B2 First'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Reference letters')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'sapienza-universita-di-roma'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Sapienza · MSc in Economics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-economics',
+  'MSc in Economics',
+  'MSc', 'economics_finance', 'en',
+  24, 2800.00, 'EUR', date '2026-05-15', 'September',
+  'A two-year (120 ECTS) fully English-taught Laurea Magistrale at Sapienza''s Faculty of Economics, providing a rigorous foundation in microeconomics, macroeconomics, and econometrics, paired with applied electives across labour, development, public, and financial economics. An international cohort and interdisciplinary curriculum prepare graduates for roles at central banks, multilateral institutions, consultancies, and doctoral programmes. Tuition shown is the approximate maximum non-EU contribution; actual fees are income-based via the ISEE and typically lower.',
+  jsonb_build_object(
+    'gpa_min', 'Strong undergraduate degree in economics, statistics, mathematics, or a closely related quantitative discipline',
+    'language_tests', jsonb_build_array('IELTS 6.0', 'TOEFL iBT 78', 'Cambridge B2 First'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Reference letters')
+  ),
+  null, 'Economics & Econometrics'
+from public.universities u where u.slug = 'sapienza-universita-di-roma'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- =========================================================================
+-- University of Bologna (already: MSc Artificial Intelligence, MSc International Relations)
+-- =========================================================================
+
+-- Bologna · MSc in Quantitative Finance
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-quantitative-finance',
+  'MSc in Quantitative Finance',
+  'MSc', 'economics_finance', 'en',
+  24, 3000.00, 'EUR', date '2026-04-30', 'September',
+  'A two-year, fully English-taught Laurea Magistrale (LM-16) developed by Bologna''s Department of Statistical Sciences, training students in the mathematical, statistical, and computational tools used in modern quantitative finance. Curriculum covers asset pricing, stochastic calculus, financial econometrics, risk management, and machine learning for finance, with a thesis or applied project as the capstone. Tuition shown is a representative maximum; the actual fee is income-based via the ISEE and ranges from full exemption to around €3,000 per year.',
+  jsonb_build_object(
+    'gpa_min', 'Strong undergraduate degree in economics, finance, statistics, mathematics, physics, or a closely related quantitative discipline',
+    'language_tests', jsonb_build_array('IELTS 6.0', 'TOEFL iBT 78', 'Cambridge B2 First', 'Oxford Online Placement Test B2'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Reference letters')
+  ),
+  null, 'Finance'
+from public.universities u where u.slug = 'university-of-bologna'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Bologna · MSc in Computer Science
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-computer-science',
+  'MSc in Computer Science',
+  'MSc', 'computer_science_ai', 'en',
+  24, 3000.00, 'EUR', null, 'September',
+  'A two-year, fully English-taught Laurea Magistrale at the Department of Computer Science and Engineering (DISI) in Bologna, training students as research-oriented computer scientists. Curriculum spans algorithms, programming languages, distributed systems, machine learning, and human–computer interaction, with optional concentrations and a research thesis. Tuition shown is a representative maximum; the actual fee is income-based via the ISEE and ranges from full exemption to around €3,000 per year.',
+  jsonb_build_object(
+    'gpa_min', 'Strong undergraduate degree in computer science, computer engineering, mathematics, or a closely related discipline',
+    'language_tests', jsonb_build_array('IELTS 6.0', 'TOEFL iBT 78', 'Cambridge B2 First', 'Oxford Online Placement Test B2'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Reference letters')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'university-of-bologna'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ── round 2 / nordic ─────────────────────────────
+-- Seed additions: Nordic round 2 (2026-05-11)
+-- Adds 2 new programs each to Aalto, KTH, NTNU and DTU so they reach 4 programs apiece.
+-- All programs verified against each university's official postgraduate pages.
+
+-- ============================================================================
+-- Aalto University (Espoo, FI)
+-- ============================================================================
+
+-- Aalto · MSc Finance
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-finance',
+  'Master''s Programme in Finance',
+  'MSc', 'economics_finance', 'en',
+  24, 15000.00, 'EUR', date '2026-01-02', 'August',
+  'A two-year English-taught programme at the Aalto School of Business that builds rigorous, quantitative expertise in corporate finance, asset pricing, financial markets and risk management. Strong CFA-aligned curriculum with close ties to the Nordic banking and asset-management industry. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'B (upper second class) in a relevant business or economics bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5 (no band below 5.5)', 'TOEFL iBT 92'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'GMAT/GRE recommended', 'Reference letters')
+  ),
+  null, 'Accounting & Finance'
+from public.universities u where u.slug = 'aalto-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Aalto · MSc Industrial Engineering and Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-industrial-engineering-and-management',
+  'Master''s Programme in Industrial Engineering and Management',
+  'MSc', 'business_management', 'en',
+  24, 15000.00, 'EUR', date '2026-01-02', 'August',
+  'A two-year English-taught programme that combines an engineering bachelor''s background with advanced training in operations management, strategy, business analytics and leadership. Designed for graduates who want to lead technology-driven organisations across consulting, manufacturing and digital industries. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'B (upper second class) in an engineering or technology bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5 (no band below 5.5)', 'TOEFL iBT 92'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Reference letters')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'aalto-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ============================================================================
+-- KTH Royal Institute of Technology (Stockholm, SE)
+-- ============================================================================
+
+-- KTH · MSc Machine Learning
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-machine-learning',
+  'MSc in Machine Learning',
+  'MSc', 'computer_science_ai', 'en',
+  24, 155000.00, 'SEK', date '2026-01-15', 'August',
+  'A two-year English-taught programme at the School of Electrical Engineering and Computer Science covering deep learning, probabilistic modelling, reinforcement learning and large-scale data analysis. Tight integration with research groups in vision, NLP and robotics and with Stockholm''s AI industry. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'B (upper second class) in a relevant bachelor with strong maths',
+    'language_tests', jsonb_build_array('IELTS 6.5 (no band below 5.5)', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency', 'Application fee receipt')
+  ),
+  39, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'kth-royal-institute-of-technology'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- KTH · MSc Aerospace Engineering
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-aerospace-engineering',
+  'MSc in Aerospace Engineering',
+  'MSc', 'engineering', 'en',
+  24, 180000.00, 'SEK', date '2026-01-15', 'August',
+  'A two-year English-taught programme covering aerodynamics, flight mechanics, lightweight structures, space technology and systems engineering. Strong links to Sweden''s aerospace and defence industries and to ESA collaborations. Tuition shown is the non-EU/EEA annual rate (SEK 360,000 total); EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'B (upper second class) in an engineering bachelor with strong maths',
+    'language_tests', jsonb_build_array('IELTS 6.5 (no band below 5.5)', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency', 'Application fee receipt')
+  ),
+  null, 'Engineering — Mechanical, Aeronautical & Manufacturing'
+from public.universities u where u.slug = 'kth-royal-institute-of-technology'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ============================================================================
+-- NTNU (Trondheim, NO)
+-- ============================================================================
+
+-- NTNU · MSc Marine Technology
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-marine-technology',
+  'MSc in Marine Technology',
+  'MSc', 'engineering', 'en',
+  24, 380000.00, 'NOK', date '2026-03-01', 'August',
+  'A two-year English-taught programme delivered by the Department of Marine Technology, one of the world''s leading centres for ship design, marine hydrodynamics, offshore structures and underwater technology. Close collaboration with the Norwegian maritime cluster and SINTEF Ocean. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'B (upper second class) in a relevant engineering bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5 (no band below 5.5)', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency', 'Proof of financing')
+  ),
+  null, 'Engineering — Mechanical, Aeronautical & Manufacturing'
+from public.universities u where u.slug = 'ntnu'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- NTNU · MSc Globalisation and Sustainable Development
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-globalisation-and-sustainable-development',
+  'MSc in Globalisation and Sustainable Development',
+  'MSc', 'social_sciences', 'en',
+  24, 350000.00, 'NOK', date '2026-03-01', 'August',
+  'A two-year English-taught interdisciplinary programme that analyses the political, economic, cultural and environmental dimensions of globalisation. Combines geography, political science, sociology and history to prepare graduates for careers in development cooperation, policy and international organisations. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'B (upper second class) in a relevant social science bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5 (no band below 5.5)', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency', 'Proof of financing')
+  ),
+  null, 'Development Studies'
+from public.universities u where u.slug = 'ntnu'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ============================================================================
+-- Technical University of Denmark — DTU (Kongens Lyngby, DK)
+-- ============================================================================
+
+-- DTU · MSc Mathematical Modelling and Computation
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-mathematical-modelling-and-computation',
+  'MSc in Mathematical Modelling and Computation',
+  'MSc', 'data_science', 'en',
+  24, 16250.00, 'EUR', date '2026-01-15', 'September',
+  'A two-year English-taught engineering programme that blends applied mathematics, statistics, scientific computing and machine learning. Students build models for problems across industry, life sciences and finance with five study lines including Computer Science Engineering and Statistics. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'B (upper second class) in a quantitative engineering, maths or science bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 88'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Two reference letters', 'Proof of English proficiency')
+  ),
+  null, 'Mathematics'
+from public.universities u where u.slug = 'technical-university-of-denmark'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- DTU · MSc Environmental Engineering
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-environmental-engineering',
+  'MSc in Environmental Engineering',
+  'MSc', 'engineering', 'en',
+  24, 16250.00, 'EUR', date '2026-01-15', 'September',
+  'A two-year English-taught engineering programme covering water resources, urban water systems, environmental chemistry, residual resource engineering and climate adaptation. Strong industry placements and lab work at DTU Sustain, ranked among Europe''s top environmental engineering departments. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'B (upper second class) in a relevant engineering or science bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 88'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Two reference letters', 'Proof of English proficiency')
+  ),
+  null, 'Engineering — Civil & Structural'
+from public.universities u where u.slug = 'technical-university-of-denmark'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ── round 2 / west ─────────────────────────────
+-- ═════════════════════════════════════════════════════════════════════════
+-- seed-additions-west-r2.sql
+-- Adds 2 new master's programs to each of:
+--   - KU Leuven (BE)
+--   - Institut Polytechnique de Paris (FR)
+--   - WU Vienna (AT)
+--   - IE University (ES)
+-- Total: 8 new programs. Each university grows from 2 → 4 programs.
+-- Idempotent: relies on on-conflict (university_id, slug) upsert.
+-- ═════════════════════════════════════════════════════════════════════════
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- KU Leuven · Master of Statistics and Data Science
+-- ─────────────────────────────────────────────────────────────────────────
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'master-of-statistics-and-data-science',
+  'Master of Statistics and Data Science',
+  'MSc', 'data_science', 'en',
+  24, 7800.00, 'EUR', date '2026-03-01', 'September',
+  'An interuniversity English-taught master''s organised by the Leuven Statistics Research Centre, training students in modern statistical methodology, machine learning, and data science across applied tracks such as biometrics, business analytics, and official statistics. Graduates are equipped to design experiments, build predictive models, and communicate quantitative findings in industry and research. Tuition shown is the indicative non-EEA rate; EU/EEA students pay around EUR 1,100/year.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor''s degree with strong quantitative background (mathematics, statistics, economics, engineering, or sciences)',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 87'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Reference letters')
+  ),
+  null, 'Statistics & Operational Research'
+from public.universities u where u.slug = 'ku-leuven'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- KU Leuven · Master of Mechanical Engineering
+-- ─────────────────────────────────────────────────────────────────────────
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'master-of-mechanical-engineering',
+  'Master of Mechanical Engineering',
+  'MSc', 'engineering', 'en',
+  24, 8800.00, 'EUR', date '2026-03-01', 'September',
+  'A two-year English-taught master''s at the Faculty of Engineering Science covering the full breadth of mechanical engineering, from thermomechanics and design to mechatronics, materials, and energy systems. Students choose an in-depth option such as Aeronautics, Automotive, Energy, Mechatronics, or Production Engineering, and complete a substantial thesis with strong links to industry and KU Leuven research groups. Tuition shown is the indicative non-EEA rate; EU/EEA students pay around EUR 1,100/year.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor of Engineering (mechanical, electromechanical or related) with strong grades',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 87'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Reference letters')
+  ),
+  null, 'Engineering - Mechanical, Aeronautical & Manufacturing'
+from public.universities u where u.slug = 'ku-leuven'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- IP Paris · MSc&T Artificial Intelligence & Advanced Visual Computing
+-- ─────────────────────────────────────────────────────────────────────────
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msct-artificial-intelligence-and-advanced-visual-computing',
+  'MSc&T Artificial Intelligence and Advanced Visual Computing',
+  'MSc', 'computer_science_ai', 'en',
+  24, 16200.00, 'EUR', date '2026-04-15', 'September',
+  'A two-year English-taught Master of Science & Technology run by École Polytechnique with partners across IP Paris, training students in modern machine learning, deep learning, and visual computing including computer vision, 3D graphics, AR/VR and generative models. The curriculum blends rigorous mathematical foundations with hands-on labs and a six-month industry or research internship. Standard tuition is around EUR 16,200/year; partial scholarships are available based on academic record.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor''s degree in computer science, mathematics, or engineering with strong academic record',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Two reference letters', 'Interview')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'institut-polytechnique-de-paris'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- IP Paris · MSc&T Internet of Things: Innovation and Management
+-- ─────────────────────────────────────────────────────────────────────────
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msct-internet-of-things-innovation-and-management',
+  'MSc&T Internet of Things: Innovation and Management',
+  'MSc', 'engineering', 'en',
+  24, 18200.00, 'EUR', date '2026-04-15', 'September',
+  'A two-year English-taught Master of Science & Technology jointly delivered by École Polytechnique and Télécom Paris, training future leaders to design, build, and commercialise connected products and IoT platforms. Coursework spans embedded systems, wireless networks, cloud and edge computing, data analytics, cybersecurity, and entrepreneurship, capped by a long industry project. Standard tuition is around EUR 18,200/year for non-EU students; EU/EEA students pay around EUR 14,600/year.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor''s degree in computer science, electrical or telecommunications engineering with strong academic record',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Two reference letters', 'Interview')
+  ),
+  null, 'Engineering - Electrical & Electronic'
+from public.universities u where u.slug = 'institut-polytechnique-de-paris'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- WU Vienna · MSc Marketing
+-- ─────────────────────────────────────────────────────────────────────────
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-marketing',
+  'MSc Marketing',
+  'MSc', 'business_management', 'en',
+  24, 1500.00, 'EUR', date '2026-03-15', 'September',
+  'A two-year English-taught master''s at WU Vienna training students in evidence-based marketing decision-making, consumer behaviour, digital marketing, branding, marketing analytics, and strategy. The program blends quantitative methods with applied corporate projects and offers majors in areas such as Digital Marketing, Customer Centricity, and International Marketing. Tuition shown is the indicative annual amount for non-EU/EEA students (EUR 727/semester plus ÖH fees); EU/EEA students pay only ÖH fees of around EUR 52/year.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor''s degree in business, economics or social sciences with strong academic record',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'GMAT/GRE recommended', 'Two reference letters')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'wu-vienna'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- WU Vienna · MSc Information Systems
+-- ─────────────────────────────────────────────────────────────────────────
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-information-systems',
+  'MSc Information Systems',
+  'MSc', 'computer_science_ai', 'en',
+  24, 1500.00, 'EUR', date '2026-03-15', 'September',
+  'A two-year English-taught master''s at WU Vienna sitting at the intersection of business and computing, training students to design and govern enterprise information systems, data architectures, and digital business models. Core areas include data engineering, software analytics, business process management, IT consulting, and information security. Tuition shown is the indicative annual amount for non-EU/EEA students (EUR 727/semester plus ÖH fees); EU/EEA students pay only ÖH fees of around EUR 52/year.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor''s degree in business informatics, computer science, information systems or related discipline',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Two reference letters')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'wu-vienna'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- IE University · Master in Finance
+-- ─────────────────────────────────────────────────────────────────────────
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'master-in-finance',
+  'Master in Finance',
+  'MSc', 'economics_finance', 'en',
+  10, 39200.00, 'EUR', null, 'September',
+  'A pre-experience English-taught master''s at IE Business School preparing graduates for careers in investment banking, asset management, corporate finance, private equity, and FinTech. The curriculum spans corporate finance, financial markets, valuation, financial modelling, derivatives, and applied analytics, with extensive networking and recruiting events in Madrid. IE operates rolling admissions; both a September and an April intake are offered. Tuition shown is the indicative full-program fee for the September 2026 intake; an additional EUR 1,200 IE Foundation contribution applies.',
+  jsonb_build_object(
+    'gpa_min', 'Strong undergraduate record in a quantitative discipline (finance, economics, engineering, mathematics, business)',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Essays', 'GMAT/GRE/IE Admissions Test', 'Two references', 'Interview')
+  ),
+  null, 'Accounting & Finance'
+from public.universities u where u.slug = 'ie-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- IE University · Master in International Relations
+-- ─────────────────────────────────────────────────────────────────────────
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'master-in-international-relations',
+  'Master in International Relations',
+  'MA', 'social_sciences', 'en',
+  10, 34500.00, 'EUR', null, 'September',
+  'An English-taught master''s at the IE School of Politics, Economics & Global Affairs preparing students for careers in diplomacy, international organisations, policy analysis, geopolitical risk, and global advocacy. The curriculum spans international political economy, security studies, regional studies, negotiation, and quantitative methods, taught by a faculty mixing scholars and practitioners. IE operates rolling admissions; tuition shown is the indicative full-program fee for the September 2026 intake, plus a one-off EUR 1,200 IE Foundation contribution.',
+  jsonb_build_object(
+    'gpa_min', 'Strong undergraduate record in any discipline; background in political science, economics, history or law is advantageous',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Essays', 'IE Admissions Test', 'Two references', 'Interview')
+  ),
+  null, 'Politics'
+from public.universities u where u.slug = 'ie-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ── round 2 / iberia-cee ─────────────────────────────
+-- ─────────────────────────────────────────────────────────────────────────
+-- Seed additions · Iberia + CEE round 2
+-- Adds 2 new programs each (8 total) to four universities that were sitting
+-- at 2 programs in the catalog: Nova SBE, UC3M, Charles University, UW.
+-- All facts (programme name, duration, indicative fees, language, deadlines)
+-- are cross-checked against official university pages or reputable
+-- aggregators (Mastersportal / TopUniversities / Study.eu) as of 2026-05-11.
+-- ─────────────────────────────────────────────────────────────────────────
+
+
+-- NOVA SBE · Master in Economics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'master-in-economics',
+  'Master in Economics',
+  'MSc', 'economics_finance', 'en',
+  18, 13500.00, 'EUR', date '2026-04-30', 'September',
+  'A three-semester (18-month) English-taught economics master''s with a rigorous quantitative core (micro, macro, econometrics) and elective tracks in economic policy, behavioural economics, and data-driven economics. Strong placement into PhD programmes, central banks, and economic consultancies across Europe.',
+  jsonb_build_object(
+    'gpa_min', 'Strong quantitative undergraduate record',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'GMAT/GRE/NOVA SBE Admission Test', 'Two references')
+  ),
+  null, 'Economics & Econometrics'
+from public.universities u where u.slug = 'nova-school-of-business-and-economics'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+
+-- NOVA SBE · Master in Business Analytics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'master-in-business-analytics',
+  'Master in Business Analytics',
+  'MSc', 'data_science', 'en',
+  16, 14000.00, 'EUR', date '2026-04-30', 'September',
+  'An English-taught Master in Business Analytics combining statistics, machine learning, and programming with a business-decisions lens; designed for graduates from STEM, economics, or quantitative business backgrounds. Includes a capstone Field Lab with a partner company and the option of an international exchange semester.',
+  jsonb_build_object(
+    'gpa_min', 'Strong quantitative undergraduate record (mathematics and programming exposure)',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'GMAT/GRE/NOVA SBE Admission Test', 'Two references')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'nova-school-of-business-and-economics'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+
+-- UC3M · Master in Finance
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'master-in-finance',
+  'Master in Finance',
+  'MSc', 'economics_finance', 'en',
+  12, 3800.00, 'EUR', date '2026-06-15', 'September',
+  'A one-year English-taught Master in Finance at UC3M''s Department of Business Administration covering corporate finance, asset pricing, derivatives, and risk management with a strongly quantitative orientation. Public-university fees keep it among the most cost-competitive options in Madrid; non-EU students pay a moderate surcharge.',
+  jsonb_build_object(
+    'gpa_min', 'Strong quantitative undergraduate record',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Two reference letters')
+  ),
+  null, 'Economics & Econometrics'
+from public.universities u where u.slug = 'universidad-carlos-iii-de-madrid'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+
+-- UC3M · Master in Cybersecurity
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'master-in-cybersecurity',
+  'Master in Cybersecurity',
+  'MSc', 'computer_science_ai', 'en',
+  12, 7200.00, 'EUR', date '2026-06-15', 'September',
+  'A twelve-month English-taught technical master''s in cybersecurity organised around two elective tracks: Secure Systems Engineer and Cybersecurity Analyst. Heavy on hands-on labs, seminars, and an industry-oriented final project; aimed at graduates of computer engineering, telecommunications, or related ICT degrees.',
+  jsonb_build_object(
+    'gpa_min', 'Engineering / Computer Engineering / Telecommunications degree (or equivalent ICT background)',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Two reference letters')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'universidad-carlos-iii-de-madrid'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+
+-- Charles University · MSc Computer Science
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-computer-science',
+  'MSc Computer Science',
+  'MSc', 'computer_science_ai', 'en',
+  24, 7100.00, 'EUR', date '2026-04-30', 'October',
+  'A two-year English-taught MSc in Computer Science at the Faculty of Mathematics and Physics with specialisation tracks in areas such as artificial intelligence, theoretical computer science, software systems, and computational linguistics. EU students pay roughly EUR 4,200 per year; non-EU students approximately EUR 7,100 per year.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor''s in computer science or closely related field',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Take-home assignment', 'Reference letters')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'charles-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+
+-- Charles University · MA European Politics and Society (Václav Havel Joint Programme)
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-european-politics-and-society',
+  'MA European Politics and Society – Václav Havel Joint Master Programme',
+  'MA', 'social_sciences', 'en',
+  24, 5500.00, 'EUR', date '2026-04-30', 'October',
+  'A two-year Erasmus Mundus joint master''s degree run by Charles University with partner universities in Krakow, Leiden, and Barcelona, covering European politics, contemporary history, international relations, and policymaking. Students rotate across at least two consortium cities; Erasmus Mundus scholarships are available for top applicants.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor''s in political science, international relations, history, or related social science',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Reference letters', 'Research proposal / writing sample')
+  ),
+  null, 'Politics & International Studies'
+from public.universities u where u.slug = 'charles-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+
+-- University of Warsaw · MA International Relations
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-international-relations',
+  'MA International Relations',
+  'MA', 'social_sciences', 'en',
+  24, 4300.00, 'EUR', date '2026-06-30', 'October',
+  'A two-year English-taught Master''s in International Relations at the Faculty of Political Science and International Studies, blending international politics, security studies, international economics, and area studies. Warsaw''s position as a regional capital makes the programme particularly strong on EU, Eastern European, and trans-Atlantic issues.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor''s in social sciences, humanities, or related field',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 87', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Reference letters')
+  ),
+  null, 'Politics & International Studies'
+from public.universities u where u.slug = 'university-of-warsaw'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+
+-- University of Warsaw · MA Cognitive Science
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-cognitive-science',
+  'MA Cognitive Science',
+  'MA', 'social_sciences', 'en',
+  24, 3000.00, 'EUR', date '2026-06-30', 'October',
+  'A two-year English-taught Master''s in Cognitive Science run jointly by the Faculty of Psychology and the Institute of Philosophy, combining psychology, computer science, philosophy of mind, and neurobiology. EU/EEA citizens study free of charge; non-EU students pay a modest annual fee. Admission is by a written entrance exam in English.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor''s in psychology, philosophy, computer science, linguistics, or related field',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 87', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Reference letters', 'Entrance exam result')
+  ),
+  null, 'Psychology'
+from public.universities u where u.slug = 'university-of-warsaw'
 on conflict (university_id, slug) do update set
   name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
   language = excluded.language, duration_months = excluded.duration_months,

@@ -4,7 +4,7 @@ If you are an AI agent (Claude Code, Cursor, etc.) opening this repo, **read thi
 
 ## Project in one paragraph
 
-EdFind is a SaaS web app for graduating students in Turkey looking for master's programs in Europe. It aggregates scattered university and program information into one searchable database and uses AI to match students to programs based on a personalized profile. The product has three pricing tiers (Free, Partner Universities, Full Access). Current state: live at https://ed-find.vercel.app/ with a 9-question profile quiz, a 58-university / 99-program catalog across 15 European countries, real AI matching via DeepSeek V4 Flash, and dedicated university + program detail pages.
+EdFind is a SaaS web app for graduating students in Turkey looking for master's programs in Europe. It aggregates scattered university and program information into one searchable database and uses AI to match students to programs based on a personalized profile. The product has three pricing tiers (Free, Partner Universities, Full Access). Current state: live at https://ed-find.vercel.app/ with a 9-question profile quiz, a 58-university / 197-program catalog across 15 European countries, real AI matching via DeepSeek V4 Flash, and dedicated university + program detail pages.
 
 ## Phase
 
@@ -12,7 +12,7 @@ The 5-phase MVP is complete. Phases 0–1 finished on 2026-05-07; Phases 2–5 f
 
 - **Phase 6 / 7** — catalog grew to **38 universities / 54 programs** across 11 European countries.
 - **Real AI matching** with **DeepSeek V4 Flash** (`deepseek-v4-flash`). The legacy `deepseek-chat`/`deepseek-reasoner` retire 2026-07-24, so V4 is mandatory not optional. V4 Flash defaults to reasoning mode which burns the entire `max_tokens` budget on `reasoning_content` before emitting JSON — disable with `thinking: { type: "disabled" }`. Matcher returns ranked top 3 with score (0-100) and personalised rationale.
-- **Phase 8** — catalog grew to **58 universities / 99 programs across 15 countries**. Quiz expanded 7→9 questions (`academic_focus`, `work_experience` added; `ANSWERS_VERSION` bumped 1→2). Added `/universities/[slug]` and `/programs/[universitySlug]/[programSlug]` detail pages, score-bar visualisations, Framer Motion entrance animations.
+- **Phase 8** — catalog grew to **58 universities / 99 programs across 15 countries** (later expanded to 197 programs in Phase 9 catalog round; see Phase 9 notes). Quiz expanded 7→9 questions (`academic_focus`, `work_experience` added; `ANSWERS_VERSION` bumped 1→2). Added `/universities/[slug]` and `/programs/[universitySlug]/[programSlug]` detail pages, score-bar visualisations, Framer Motion entrance animations.
 - **Phase 9** (2026-05-11) — four features in one drop:
   - **9.1 Free-text search** at `/search`. DeepSeek parses the query into `ValidatedAnswers`, then the same matcher path runs. `lib/server/persist-and-match.ts` is now the shared backend for `/quiz` and `/search`.
   - **9.2 Shortlist + compare** at `/shortlist` and `/compare?ids=…`. `SaveButton` lives on results / program / university pages.
