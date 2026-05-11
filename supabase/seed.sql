@@ -3388,3 +3388,1699 @@ on conflict (university_id, slug) do update set
   application_deadline = excluded.application_deadline, start_month = excluded.start_month,
   description = excluded.description, requirements = excluded.requirements,
   qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- Phase 9 catalog expansion — 62 additional English-taught master's
+-- programs (2 per university) across 31 universities that previously had
+-- only one program each. Researched 2026-05-11 by parallel agents from
+-- each university's official postgraduate pages. Tuition figures are
+-- point-in-time — refresh annually.
+-- ─────────────────────────────────────────────────────────────────────────
+
+
+-- ── uk-ie ─────────────────────────────────
+-- Edinburgh · MSc Artificial Intelligence
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-artificial-intelligence',
+  'Artificial Intelligence MSc',
+  'MSc', 'computer_science_ai', 'en',
+  12, 45410, 'GBP', date '2026-03-31', 'September',
+  'Taught at the UK''s longest-established academic centre for AI research, this programme delivers a research-led curriculum spanning machine learning, natural language processing, computer vision and robotics. Designed for students with strong programming and mathematics backgrounds who want to build technical depth before entering AI research or industry roles.',
+  jsonb_build_object(
+    'gpa_min', 'A-',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Reference letters')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'university-of-edinburgh'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Edinburgh · MSc Data Science
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-data-science',
+  'Data Science MSc',
+  'MSc', 'data_science', 'en',
+  12, 45410, 'GBP', date '2026-03-31', 'September',
+  'A flagship programme from the School of Informatics covering statistical machine learning, data management, large-scale analytics and applied projects with industry. Suits graduates from computer science, mathematics or quantitative fields who want a rigorous foundation for careers as data scientists, ML engineers or applied researchers.',
+  jsonb_build_object(
+    'gpa_min', 'A-',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Reference letters')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'university-of-edinburgh'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- King's College London · MSc Artificial Intelligence
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-artificial-intelligence',
+  'Artificial Intelligence MSc',
+  'MSc', 'computer_science_ai', 'en',
+  12, 40450, 'GBP', date '2026-07-25', 'September',
+  'Delivered by the Department of Informatics, this programme builds in-depth knowledge across core AI areas including machine learning, knowledge representation, planning and AI engineering. Aimed at computer science graduates who want hands-on, research-informed training for AI roles in industry or further study.',
+  jsonb_build_object(
+    'gpa_min', 'B+',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Reference letters')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'kings-college-london'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- King's College London · MSc International Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-international-management',
+  'International Management MSc',
+  'MSc', 'business_management', 'en',
+  12, 40450, 'GBP', null, 'September',
+  'A King''s Business School programme that blends rigorous management theory with hands-on consulting projects, exposing students to global business across multiple sectors. Designed for recent graduates without management experience who want a strong launchpad into international careers in consulting, finance or industry.',
+  jsonb_build_object(
+    'gpa_min', 'B+',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Reference letters')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'kings-college-london'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- LSE · MSc Finance
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-finance',
+  'Finance MSc (Full-time)',
+  'MSc', 'economics_finance', 'en',
+  10, 51000, 'GBP', null, 'September',
+  'One of the world''s leading generalist finance master''s programmes, run by LSE''s Department of Finance with deep coverage of corporate finance, asset pricing and financial markets. Targets exceptional, quantitatively strong graduates aiming for front-office roles in investment banking, asset management or consulting.',
+  jsonb_build_object(
+    'gpa_min', 'A-',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'GMAT or GRE score', 'Reference letters')
+  ),
+  null, 'Finance'
+from public.universities u where u.slug = 'london-school-of-economics'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- LSE · MSc Data Science
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-data-science',
+  'Data Science MSc',
+  'MSc', 'data_science', 'en',
+  12, 39000, 'GBP', null, 'September',
+  'Run by LSE''s Department of Statistics, this programme combines machine learning, statistical modelling and computational methods with a strong emphasis on real-world data problems in social science, finance and policy. Suits quantitatively able graduates who want a data science career in industry, government or research.',
+  jsonb_build_object(
+    'gpa_min', 'A-',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Reference letters')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'london-school-of-economics'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- London Business School · Masters in Financial Analysis
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-financial-analysis',
+  'Masters in Financial Analysis',
+  'MSc', 'economics_finance', 'en',
+  12, 52950, 'GBP', null, 'September',
+  'A pre-experience finance programme designed for graduates with 0-2 years of work experience who want to launch careers in investment banking, asset management or financial advisory. Combines technical training in valuation, modelling and trading with LBS''s strong recruiter network across the City and beyond.',
+  jsonb_build_object(
+    'gpa_min', 'A-',
+    'language_tests', jsonb_build_array('IELTS 7.5', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Essays', 'GMAT or GRE score', 'Reference letters')
+  ),
+  null, 'Finance'
+from public.universities u where u.slug = 'london-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- London Business School · Masters in Analytics and Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-analytics-and-management',
+  'Masters in Analytics and Management',
+  'MSc', 'data_science', 'en',
+  12, 52950, 'GBP', null, 'September',
+  'A pre-experience programme blending business fundamentals with applied analytics, machine learning and data-driven decision-making. Designed for graduates with quantitative undergraduate backgrounds who want to pivot into analytics-heavy roles in consulting, tech and finance.',
+  jsonb_build_object(
+    'gpa_min', 'A-',
+    'language_tests', jsonb_build_array('IELTS 7.5', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Essays', 'GMAT or GRE score', 'Reference letters')
+  ),
+  null, 'Business Analytics'
+from public.universities u where u.slug = 'london-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Royal College of Art · MA Digital Direction
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-digital-direction',
+  'Digital Direction MA',
+  'MA', 'design', 'en',
+  12, 38650, 'GBP', null, 'September',
+  'A studio-based programme exploring storytelling across digital art, film, immersive technologies and emerging platforms such as VR, AR, AI and spatial sound. Aimed at designers, filmmakers and artists who want to push narrative practice in critically engaged, contemporary directions.',
+  jsonb_build_object(
+    'gpa_min', 'B+',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 92'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Portfolio', 'Reference letters')
+  ),
+  null, 'Art & Design'
+from public.universities u where u.slug = 'royal-college-of-art'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Royal College of Art · MA Information Experience Design
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-information-experience-design',
+  'Information Experience Design MA',
+  'MA', 'design', 'en',
+  12, 38650, 'GBP', null, 'September',
+  'A multidisciplinary design programme at the intersection of art, science and technology, where students translate complex information into immersive, sensory experiences. Suits designers, artists and researchers who want to work across moving image, sound, interaction and emerging media.',
+  jsonb_build_object(
+    'gpa_min', 'B+',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 92'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Portfolio', 'Reference letters')
+  ),
+  null, 'Art & Design'
+from public.universities u where u.slug = 'royal-college-of-art'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Goldsmiths · MSc Data Science
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-data-science',
+  'Data Science MSc',
+  'MSc', 'data_science', 'en',
+  12, 22000, 'GBP', null, 'September',
+  'A practical programme equipping students with technical and statistical skills to analyse large-scale data across business and science contexts. Students work with industry-standard tools such as Apache Hadoop and Spark, completing a real-world data project alongside core training in machine learning and analytics.',
+  jsonb_build_object(
+    'gpa_min', 'B',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Reference letters')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'goldsmiths-university-of-london'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Goldsmiths · MA Cultural Studies
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-cultural-studies',
+  'Cultural Studies MA',
+  'MA', 'social_sciences', 'en',
+  12, 21000, 'GBP', null, 'September',
+  'A flagship Goldsmiths programme rooted in the critical traditions that shaped the field, exploring culture, power, identity and media in contemporary societies. Suits humanities and social science graduates interested in research-oriented careers in media, the arts, education or policy.',
+  jsonb_build_object(
+    'gpa_min', 'B',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Writing sample', 'Reference letters')
+  ),
+  null, 'Sociology'
+from public.universities u where u.slug = 'goldsmiths-university-of-london'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Trinity College Dublin · MSc Computer Science - Data Science
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-computer-science-data-science',
+  'Computer Science - Data Science MSc',
+  'MSc', 'data_science', 'en',
+  12, 26989, 'EUR', null, 'September',
+  'Run by Trinity''s School of Computer Science and Statistics, this programme combines statistics, cloud and security technologies with large-scale data management and machine learning. Suits computer science and quantitative graduates who want a technical, research-informed pathway into data science roles.',
+  jsonb_build_object(
+    'gpa_min', 'B+',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Reference letters')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'trinity-college-dublin'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Trinity College Dublin · MSc Business Analytics and AI for Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-business-analytics-and-ai-for-management',
+  'Business Analytics and AI for Management MSc',
+  'MSc', 'business_management', 'en',
+  12, 23950, 'EUR', null, 'September',
+  'A Trinity Business School programme that blends analytics, AI and management to prepare graduates for data-driven leadership roles. Combines technical training in modelling and machine learning with strategy, ethics and applied consulting projects for industry clients.',
+  jsonb_build_object(
+    'gpa_min', 'B+',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Personal statement', 'Reference letters')
+  ),
+  null, 'Business Analytics'
+from public.universities u where u.slug = 'trinity-college-dublin'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ── dach ─────────────────────────────────
+-- =============================================================================
+-- Phase 9 catalog expansion: German-speaking Europe (DACH)
+-- 16 additional English-taught master's programs across 8 existing universities
+-- =============================================================================
+
+-- LMU Munich · MSc Quantitative Economics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-quantitative-economics',
+  'Master in Quantitative Economics (MQE)',
+  'MSc', 'economics_finance', 'en',
+  24, 300.00, 'EUR', date '2026-07-15', 'October',
+  'A research-oriented English-taught master''s offering training comparable to the first two years of top PhD programmes in the US and UK. The curriculum pairs rigorous core economics with advanced mathematical and statistical methods, preparing graduates for doctoral studies, central banks, and quantitative roles in industry. LMU is a public university; EU and non-EU students pay only a modest semester contribution.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor in economics with at least "good" (B+) and strong quantitative coursework',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 88'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'GRE quantitative 75th percentile (or LMU admission test)')
+  ),
+  null, 'Economics & Econometrics'
+from public.universities u where u.slug = 'ludwig-maximilian-university-of-munich'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- LMU Munich · MA Eastern European Studies
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-eastern-european-studies',
+  'MA Eastern European Studies',
+  'MA', 'social_sciences', 'en',
+  24, 300.00, 'EUR', date '2026-07-15', 'October',
+  'An interdisciplinary English-taught master''s combining history, political science, cultural studies, and area studies to make sense of imperial, national, religious, and regional identities across Central, Eastern, and Southeastern Europe. Ideal for students aiming at careers in diplomacy, journalism, think tanks, NGOs, and research on the post-Soviet space. LMU charges only a semester contribution.',
+  jsonb_build_object(
+    'gpa_min', 'B / Good bachelor in a relevant humanities or social sciences discipline',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 88'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Writing sample', 'Reference letter')
+  ),
+  null, 'Politics & International Studies'
+from public.universities u where u.slug = 'ludwig-maximilian-university-of-munich'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- KIT · MSc Optics and Photonics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-optics-and-photonics',
+  'MSc in Optics and Photonics',
+  'MSc', 'engineering', 'en',
+  24, 3000.00, 'EUR', date '2026-06-15', 'October',
+  'An interdisciplinary English-taught master''s run by the Karlsruhe School of Optics & Photonics (KSOP), covering optical materials, photonic devices, biomedical photonics, solar energy, and optical systems. The graduate school admits around 40 international students per cohort and prepares them for careers in industry or doctoral research. Baden-Württemberg charges non-EU international students EUR 1,500 per semester (EUR 3,000/year); EU students pay only the semester contribution.',
+  jsonb_build_object(
+    'gpa_min', 'B+ bachelor in physics, electrical engineering, mechanical engineering, chemistry, or a related discipline',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Two reference letters', 'Proof of English proficiency')
+  ),
+  null, 'Engineering & Technology'
+from public.universities u where u.slug = 'karlsruhe-institute-of-technology'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- KIT · MSc Information Systems Engineering and Management (HECTOR School)
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-information-systems-engineering-and-management',
+  'MSc in Information Systems Engineering and Management',
+  'MSc', 'business_management', 'en',
+  20, 24000.00, 'EUR', null, 'October',
+  'An executive English-taught master''s offered by KIT''s HECTOR School of Engineering and Management for working professionals. Five engineering and five management modules of two weeks each prepare graduates to drive the digital transformation of products, services, and organisations with both IT depth and managerial breadth. Total programme fee is approximately EUR 36,000 over 20 months and applications run on a rolling basis.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor or Master in a relevant discipline plus at least two years of professional experience',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Academic transcripts', 'CV', 'Motivation letter', 'Proof of work experience', 'Employer reference')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'karlsruhe-institute-of-technology'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- RWTH Aachen · MSc Data Science
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-data-science',
+  'MSc in Data Science',
+  'MSc', 'data_science', 'en',
+  24, 600.00, 'EUR', date '2026-03-01', 'October',
+  'A fully English-taught master''s jointly offered by RWTH''s Faculty of Computer Science and the Department of Mathematics. The two-year programme equips students with rigorous foundations in machine learning, data management, statistics, and large-scale systems engineering, with electives spanning AI, optimisation, and applied domains. RWTH charges no tuition fees; students pay only the ~EUR 300 per semester social and student-body contribution.',
+  jsonb_build_object(
+    'gpa_min', 'B+ bachelor in mathematics, computer science, physics, or a closely related quantitative discipline',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Module descriptions for math and CS courses', 'Proof of English proficiency')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'rwth-aachen-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- RWTH Aachen · MSc Management and Engineering in Production Systems (MME-PS)
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-management-and-engineering-in-production-systems',
+  'MSc in Management and Engineering in Production Systems (MME-PS)',
+  'MSc', 'business_management', 'en',
+  24, 600.00, 'EUR', date '2026-03-01', 'October',
+  'An interdisciplinary English-taught master''s run jointly by the Laboratory for Machine Tools and Production Engineering (WZL) and the RWTH School of Business and Economics. Students develop a global mindset to manage industrial projects while building deep, application-oriented expertise in planning new production technologies and systems. RWTH charges no tuition; only the ~EUR 300 per semester social contribution applies.',
+  jsonb_build_object(
+    'gpa_min', 'B+ bachelor in mechanical engineering, industrial engineering, or a related discipline with relevant work experience',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'Proof of at least six months of relevant work experience', 'Reference letter')
+  ),
+  null, 'Engineering — Mechanical, Aeronautical & Manufacturing'
+from public.universities u where u.slug = 'rwth-aachen-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Mannheim · Mannheim Master in Management (MMM)
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-mannheim-master-in-management',
+  'Mannheim Master in Management (MMM)',
+  'MSc', 'business_management', 'en',
+  24, 3000.00, 'EUR', date '2026-05-15', 'September',
+  'Mannheim''s flagship four-semester Master in Management — consistently ranked among the top MiM programmes in continental Europe by the Financial Times. The fully English-taught curriculum combines a rigorous business core with electives in finance, marketing, operations, accounting, and management, plus a mandatory international semester. Baden-Württemberg charges non-EU international students EUR 1,500 per semester (EUR 3,000/year); EU students pay only the semester contribution.',
+  jsonb_build_object(
+    'gpa_min', 'B+ bachelor in business administration or a closely related discipline',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'GMAT or GRE', 'Two reference letters')
+  ),
+  21, 'Business & Management Studies'
+from public.universities u where u.slug = 'university-of-mannheim'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Mannheim · MSc Business Informatics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-business-informatics',
+  'MSc in Business Informatics',
+  'MSc', 'computer_science_ai', 'en',
+  24, 3000.00, 'EUR', date '2026-05-31', 'September',
+  'A four-semester English-taught master''s combining computer science and business administration, with a flagship 12-ECTS Team Project carried out with a research chair and often an industry partner. Specialisations cover data and web science, software systems, enterprise systems, and economic informatics — preparing graduates for analyst, consultant, and product roles in tech-driven companies. Baden-Württemberg charges non-EU international students EUR 1,500 per semester (EUR 3,000/year); EU students pay only the semester contribution.',
+  jsonb_build_object(
+    'gpa_min', 'B+ bachelor with at least 30 ECTS in informatics, 30 ECTS in business, and 18 ECTS in mathematics or statistics',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript with module breakdown', 'CV', 'Motivation letter', 'Proof of programming coursework (8 ECTS)')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'university-of-mannheim'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- TU Wien · MSc Embedded Computing Systems
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-embedded-computing-systems',
+  'MSc in Embedded Computing Systems',
+  'MSc', 'engineering', 'en',
+  24, 1500.00, 'EUR', date '2026-07-31', 'October',
+  'A 120-ECTS English-taught master''s jointly offered by the faculties of Informatics and Electrical Engineering at TU Wien. Students gain the theoretical and practical engineering skills to design advanced circuits and build tomorrow''s embedded and cyber-physical systems, with research areas spanning real-time systems, hardware-software co-design, dependable computing, and IoT. EU/EEA students pay only the ~EUR 20 union fee per semester; non-EU students pay ~EUR 726/semester (~EUR 1,500/year).',
+  jsonb_build_object(
+    'gpa_min', 'B / Good bachelor in computer engineering, electrical engineering, computer science, or a related discipline',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 88'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Course descriptions for ECTS equivalence check', 'Proof of English proficiency')
+  ),
+  null, 'Engineering — Electrical & Electronic'
+from public.universities u where u.slug = 'tu-wien'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- TU Wien · MSc Logic and Computation
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-logic-and-computation',
+  'MSc in Logic and Computation',
+  'MSc', 'computer_science_ai', 'en',
+  24, 1500.00, 'EUR', date '2026-07-31', 'October',
+  'A 120-ECTS English-taught master''s focused on mathematical logic, formal methods, and theoretical computer science — covering verification, automated reasoning, knowledge representation, security, and programming-language design. TU Wien''s logic group is one of the strongest in Europe and the programme is ideal for students aiming at research careers or work on safety-critical software. EU/EEA students pay only the ~EUR 20 union fee per semester; non-EU students pay ~EUR 726/semester.',
+  jsonb_build_object(
+    'gpa_min', 'B / Good bachelor in computer science, mathematics, or a related discipline',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 88'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Course descriptions', 'Proof of English proficiency')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'tu-wien'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Hertie School · Master of International Affairs (MIA)
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-master-of-international-affairs',
+  'Master of International Affairs (MIA)',
+  'MA', 'social_sciences', 'en',
+  24, 19250.00, 'EUR', date '2026-05-31', 'September',
+  'A two-year, 120-ECTS English-taught master''s designed for future leaders in diplomacy, international organisations, NGOs, and global policy roles. The curriculum blends international relations, economics, law, political science, and data methods, with concentrations such as security & sustainability, international political economy, or human rights & global governance. Total tuition is EUR 38,500 across the two years; about half of students receive partial or full scholarships.',
+  jsonb_build_object(
+    'gpa_min', 'Strong undergraduate degree (typically B+/2:1) in a relevant social science or humanities discipline',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Statement of motivation', 'Two letters of recommendation', 'GRE optional but recommended')
+  ),
+  null, 'Politics & International Studies'
+from public.universities u where u.slug = 'hertie-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Hertie School · Master of Data Science for Public Policy (MDS)
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-master-of-data-science-for-public-policy',
+  'Master of Data Science for Public Policy (MDS)',
+  'MSc', 'data_science', 'en',
+  24, 19250.00, 'EUR', date '2026-05-31', 'September',
+  'A two-year, 120-ECTS English-taught master''s combining the technical skills of a data scientist with the analytical and ethical training of a policy professional. Students learn machine learning, causal inference, data engineering, and policy analysis to inform decisions in government, international organisations, and civil society. Total tuition is EUR 38,500 across the programme; substantial need- and merit-based scholarships are available.',
+  jsonb_build_object(
+    'gpa_min', 'Strong undergraduate degree (typically B+/2:1) with demonstrable quantitative or programming background',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Statement of motivation', 'Two letters of recommendation', 'Evidence of quantitative or coding coursework')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'hertie-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Geneva Graduate Institute · Master in Development Studies
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-master-in-development-studies',
+  'Master in Development Studies',
+  'MA', 'social_sciences', 'en',
+  24, 8000.00, 'CHF', date '2026-01-15', 'September',
+  'A two-year, multidisciplinary English-taught master''s drawing on anthropology, political science, economics, history, and international law to examine global development challenges — inequality, conflict, migration, climate, health, and gender. Students select a specialisation track and benefit from the Institute''s deep links with international organisations and NGOs across "international Geneva". Tuition is CHF 8,000 per year (CHF 5,000 for Swiss residents); generous financial aid is available.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor''s degree with a strong academic record in a relevant discipline (social sciences, humanities, law, economics)',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Statement of motivation', 'Two academic references')
+  ),
+  null, 'Sociology'
+from public.universities u where u.slug = 'geneva-graduate-institute'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Geneva Graduate Institute · Master in International Economics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-master-in-international-economics',
+  'Master in International Economics',
+  'MSc', 'economics_finance', 'en',
+  24, 8000.00, 'CHF', date '2026-01-15', 'September',
+  'A two-year English-taught master''s offering rigorous training in modern economics — microeconomics, macroeconomics, econometrics, international trade, and development economics — with a strong policy orientation thanks to the Institute''s proximity to the WTO, UNCTAD, and other Geneva-based organisations. Graduates pursue careers in international organisations, central banks, consulting, and PhD programmes. Tuition is CHF 8,000 per year (CHF 5,000 for Swiss residents).',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor in economics or a quantitative discipline with solid mathematics and statistics background',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Statement of motivation', 'Two academic references', 'GRE strongly recommended')
+  ),
+  null, 'Economics & Econometrics'
+from public.universities u where u.slug = 'geneva-graduate-institute'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- St. Gallen · Master in Strategy and International Management (SIM-HSG)
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-master-in-strategy-and-international-management',
+  'Master in Strategy and International Management (SIM-HSG)',
+  'MA', 'business_management', 'en',
+  18, 9987.00, 'CHF', date '2026-04-30', 'September',
+  'HSG''s flagship 90-ECTS Master in Management — ranked #1 in the Financial Times Global Masters in Management ranking for many consecutive years. The fully English-taught programme builds elite generalists through a rigorous core in strategy and international management, a mandatory international internship, and a global exchange semester. Tuition is approximately CHF 6,500 per year for Swiss students and CHF 9,987 per year for international students.',
+  jsonb_build_object(
+    'gpa_min', 'Top-tier bachelor in business or economics with quantitative coursework',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'GMAT or GRE', 'Two letters of recommendation', 'SIM admission essays')
+  ),
+  1, 'Business & Management Studies'
+from public.universities u where u.slug = 'university-of-st-gallen'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- St. Gallen · Master in International Affairs and Governance (MIA-HSG)
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-master-in-international-affairs-and-governance',
+  'Master in International Affairs and Governance (MIA-HSG)',
+  'MA', 'social_sciences', 'en',
+  24, 9987.00, 'CHF', date '2026-04-30', 'September',
+  'A fully English-taught master''s that complements HSG''s strong business and economics tradition with political science and law, designed to produce flexible generalists able to tackle complex problems across diplomacy, defence, and development. The integrated curriculum spans international relations, economics, business administration, and law, and is delivered in a small-cohort, internationally diverse environment. Tuition is approximately CHF 6,500 per year for Swiss students and CHF 9,987 per year for international students.',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor in a relevant discipline (political science, economics, law, business, history)',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100', 'Cambridge C1 Advanced'),
+    'documents', jsonb_build_array('Bachelor''s transcript', 'CV', 'Motivation letter', 'GRE or GMAT (if available)', 'Two letters of recommendation')
+  ),
+  null, 'Politics & International Studies'
+from public.universities u where u.slug = 'university-of-st-gallen'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ── nordics-cee ─────────────────────────────────
+-- Lund · MSc Finance
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-finance',
+  'MSc in Finance',
+  'MSc', 'economics_finance', 'en',
+  24, 130000.00, 'SEK', date '2026-01-15', 'August',
+  'A two-year English-taught programme at Lund School of Economics and Management focused on corporate finance, asset pricing, and financial econometrics. Students develop strong quantitative skills for careers in investment banking, asset management, and corporate financial strategy. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'Above-average results in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5 (no band below 5.5)', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency')
+  ),
+  null, 'Finance'
+from public.universities u where u.slug = 'lund-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Lund · MSc Sustainability Science (LUMES)
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-sustainability-science',
+  'MSc in Environmental Studies and Sustainability Science (LUMES)',
+  'MSc', 'social_sciences', 'en',
+  24, 120000.00, 'SEK', date '2026-01-15', 'August',
+  'An interdisciplinary two-year programme bridging natural and social sciences to tackle complex sustainability challenges. Students engage with climate policy, ecological economics, and systems thinking through project-based learning and a research thesis. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'Above-average results in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5 (no band below 5.5)', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency')
+  ),
+  null, 'Sociology'
+from public.universities u where u.slug = 'lund-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- UiO · MSc Informatics: Programming and System Architecture
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-informatics-programming-system-architecture',
+  'MSc in Informatics: Programming and System Architecture',
+  'MSc', 'computer_science_ai', 'en',
+  24, 130000.00, 'NOK', date '2026-03-01', 'August',
+  'A two-year research-oriented programme at the Department of Informatics covering programming languages, distributed systems, software engineering, and verification. Students choose between thesis tracks in modelling, language design, or large-scale system architecture. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'C (ECTS) or equivalent in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'university-of-oslo'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- UiO · MA European and International Relations
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-european-international-relations',
+  'MA in European and International Studies',
+  'MA', 'social_sciences', 'en',
+  24, 110000.00, 'NOK', date '2026-03-01', 'August',
+  'A two-year interdisciplinary programme combining political science, history, and law to analyse European integration and global governance. Coursework spans EU institutions, foreign policy, and international political economy, with a substantial thesis component. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'C (ECTS) or equivalent in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency')
+  ),
+  null, 'Politics & International Studies'
+from public.universities u where u.slug = 'university-of-oslo'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Tartu · MSc Software Engineering
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-software-engineering',
+  'MSc in Software Engineering',
+  'MSc', 'computer_science_ai', 'en',
+  24, 6000.00, 'EUR', date '2026-03-15', 'September',
+  'A joint two-year programme delivered together with Tallinn University of Technology, covering software architecture, enterprise systems, and secure systems engineering. Students complete an industry-linked thesis and benefit from Estonia''s strong digital-government ecosystem. EU/EEA/Swiss citizens are not charged tuition.',
+  jsonb_build_object(
+    'gpa_min', 'Above-average results in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.0', 'TOEFL iBT 75'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency')
+  ),
+  null, 'Computer Science & Information Systems'
+from public.universities u where u.slug = 'university-of-tartu'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Tartu · MA International Law and Human Rights
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-international-law-and-human-rights',
+  'MA in International Law and Human Rights',
+  'MA', 'social_sciences', 'en',
+  24, 5000.00, 'EUR', date '2026-03-15', 'September',
+  'A two-year programme at one of the oldest law schools in Northern Europe, focusing on public international law, EU law, and human-rights protection mechanisms. Combines doctrinal study with moot courts and a research-based master''s thesis. EU/EEA/Swiss citizens are not charged tuition.',
+  jsonb_build_object(
+    'gpa_min', 'Above-average results in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.0', 'TOEFL iBT 75'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency')
+  ),
+  null, 'Politics & International Studies'
+from public.universities u where u.slug = 'university-of-tartu'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- BI · MSc Finance
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-finance',
+  'MSc in Finance',
+  'MSc', 'economics_finance', 'en',
+  24, 155600.00, 'NOK', null, 'August',
+  'A two-year programme at BI''s Oslo campus offering rigorous training in corporate finance, asset pricing, and quantitative methods. Strong industry links with Nordic banks and investment firms support internships and career placement across European financial centres.',
+  jsonb_build_object(
+    'gpa_min', 'B (ECTS) or equivalent in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'GMAT/GRE recommended', 'Proof of English proficiency')
+  ),
+  null, 'Finance'
+from public.universities u where u.slug = 'bi-norwegian-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- BI · MSc Strategic Marketing Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-strategic-marketing-management',
+  'MSc in Strategic Marketing Management',
+  'MSc', 'business_management', 'en',
+  24, 159700.00, 'NOK', null, 'August',
+  'A two-year programme combining consumer behaviour theory with digital marketing analytics and brand strategy. Students work on live cases with Nordic and international companies and complete a capstone research thesis.',
+  jsonb_build_object(
+    'gpa_min', 'B (ECTS) or equivalent in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'GMAT/GRE recommended', 'Proof of English proficiency')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'bi-norwegian-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- SSE · MSc Business and Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-business-and-management',
+  'MSc in Business and Management',
+  'MSc', 'business_management', 'en',
+  24, 174000.00, 'SEK', date '2026-01-15', 'August',
+  'SSE''s flagship general management programme combining strategy, organisation, and leadership with strong analytical training. Cohort-based teaching, an integrated CEMS option, and an extensive corporate-partner network make it one of the top MiM programmes in Europe.',
+  jsonb_build_object(
+    'gpa_min', 'B+ or equivalent in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'GMAT/GRE required', 'Reference letters')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'stockholm-school-of-economics'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- SSE · MSc Accounting, Valuation and Financial Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-accounting-valuation-financial-management',
+  'MSc in Accounting, Valuation and Financial Management',
+  'MSc', 'economics_finance', 'en',
+  24, 180000.00, 'SEK', date '2026-01-15', 'August',
+  'A specialised two-year programme blending advanced financial accounting, corporate valuation, and management control. Graduates pursue careers in audit, equity research, corporate finance, and Big-Four advisory across Europe.',
+  jsonb_build_object(
+    'gpa_min', 'B+ or equivalent in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'GMAT/GRE required', 'Reference letters')
+  ),
+  null, 'Accounting & Finance'
+from public.universities u where u.slug = 'stockholm-school-of-economics'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- CBS · MSc Applied Economics and Finance
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-applied-economics-and-finance',
+  'MSc in Economics and Finance — Applied Economics and Finance',
+  'MSc', 'economics_finance', 'en',
+  24, 16000.00, 'EUR', date '2026-01-15', 'September',
+  'A two-year programme integrating microeconomics, econometrics, and corporate finance for evidence-based business decision-making. Students develop the quantitative toolkit needed for careers in consulting, asset management, and economic policy. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'B+ or equivalent in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Reference letters', 'Proof of English proficiency')
+  ),
+  null, 'Economics & Econometrics'
+from public.universities u where u.slug = 'copenhagen-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- CBS · MSc Business Administration and Information Systems
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-business-administration-information-systems',
+  'MSc in Business Administration and Information Systems',
+  'MSc', 'business_management', 'en',
+  24, 15000.00, 'EUR', date '2026-01-15', 'September',
+  'A two-year programme at the intersection of management, digital transformation, and information-systems design. Students learn to lead technology-driven change in organisations, with tracks in e-business, IT management, and process innovation. Tuition shown is the non-EU/EEA annual rate; EU/EEA/Swiss citizens pay no tuition.',
+  jsonb_build_object(
+    'gpa_min', 'B+ or equivalent in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Reference letters', 'Proof of English proficiency')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'copenhagen-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- CTU · MSc Cybernetics and Robotics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-cybernetics-and-robotics',
+  'MSc in Cybernetics and Robotics',
+  'MSc', 'engineering', 'en',
+  24, 4400.00, 'EUR', date '2026-03-31', 'September',
+  'A two-year programme at the Faculty of Electrical Engineering covering control systems, mobile and industrial robotics, sensors, and intelligent automation. Students work in modern laboratories alongside research groups active in autonomous vehicles, drones, and computer vision.',
+  jsonb_build_object(
+    'gpa_min', 'B (ECTS) or equivalent in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.0', 'TOEFL iBT 75'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency')
+  ),
+  null, 'Engineering — Electrical & Electronic'
+from public.universities u where u.slug = 'czech-technical-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- CTU · MSc Nuclear Engineering
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-nuclear-engineering',
+  'MSc in Nuclear Engineering',
+  'MSc', 'engineering', 'en',
+  24, 4400.00, 'EUR', date '2026-03-31', 'September',
+  'A two-year programme at the Faculty of Nuclear Sciences and Physical Engineering covering reactor physics, nuclear fuel cycles, radiation protection, and energy systems. Strong ties with Czech and European nuclear research centres support thesis work in both fission and emerging fusion technologies.',
+  jsonb_build_object(
+    'gpa_min', 'B (ECTS) or equivalent in a relevant bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.0', 'TOEFL iBT 75'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Proof of English proficiency')
+  ),
+  null, 'Engineering & Technology'
+from public.universities u where u.slug = 'czech-technical-university'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ── bnl-fr-es ─────────────────────────────────
+-- Benelux / France / Spain catalog expansion: 2 additional English-taught master's
+-- programs per university across the 9 unis listed below.
+
+-- UvA · MSc Artificial Intelligence
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-artificial-intelligence',
+  'MSc Artificial Intelligence',
+  'MSc', 'computer_science_ai', 'en',
+  24, 19910.00, 'EUR', date '2026-04-01', 'September',
+  'A two-year research-oriented programme covering machine learning, computer vision, natural language processing, and intelligent autonomous systems. Built around UvA''s Informatics Institute and AMLab, with electives from the joint AI master with VU Amsterdam and projects with companies in the Amsterdam Science Park ecosystem.',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor (8/10 Dutch equivalent) in CS, AI, mathematics or related',
+    'language_tests', jsonb_build_array('IELTS 6.5 (min 6.0 per section)', 'TOEFL iBT 92'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Two letters of recommendation', 'Proof of mathematics and programming background')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'university-of-amsterdam'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- UvA · MSc Econometrics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-econometrics',
+  'MSc Econometrics',
+  'MSc', 'economics_finance', 'en',
+  12, 19800.00, 'EUR', date '2026-04-01', 'September',
+  'A one-year quantitative economics master at the Amsterdam School of Economics with tracks in Econometrics, Mathematical Economics, Data Analytics, and Free Track. Combines rigorous training in statistics, optimisation, and machine learning with applied work on financial markets, policy evaluation, and big-data problems.',
+  jsonb_build_object(
+    'gpa_min', 'Bachelor in econometrics, economics, mathematics or related with strong quantitative grades',
+    'language_tests', jsonb_build_array('IELTS 6.5 (min 6.0 per section)', 'TOEFL iBT 92'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'GRE General Test (recommended)', 'Reference letters')
+  ),
+  null, 'Economics & Econometrics'
+from public.universities u where u.slug = 'university-of-amsterdam'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- TU/e · MSc Data Science and Artificial Intelligence
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-data-science-and-artificial-intelligence',
+  'MSc Data Science and Artificial Intelligence',
+  'MSc', 'data_science', 'en',
+  24, 21700.00, 'EUR', date '2026-04-01', 'September',
+  'A two-year engineering master that fuses data science, AI, and decision-making, with signature TU/e specialisations in process mining, visual analytics, and knowledge management. Combines core coursework with an industry-oriented graduation project, often in collaboration with partners in the Eindhoven Brainport ecosystem.',
+  jsonb_build_object(
+    'gpa_min', 'Equivalent to a Dutch 7/10 in a related bachelor (CS, AI, data science, mathematics)',
+    'language_tests', jsonb_build_array('IELTS 6.5 (min 6.0 per section)', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Letters of recommendation', 'Passport copy')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'tu-eindhoven'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- TU/e · MSc Embedded Systems
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-embedded-systems',
+  'MSc Embedded Systems',
+  'MSc', 'engineering', 'en',
+  24, 21700.00, 'EUR', date '2026-04-01', 'September',
+  'A joint two-year programme of TU/e, TU Delft and University of Twente preparing engineers to design complex hardware/software systems. Specialisation tracks cover Systems on Chip, Embedded Software, Embedded Networking, and Cyber-Physical Systems, with a graduation project typically run with industrial partners.',
+  jsonb_build_object(
+    'gpa_min', 'Equivalent to a Dutch 7/10 in electrical/computer engineering, computer science or related',
+    'language_tests', jsonb_build_array('IELTS 6.5 (min 6.0 per section)', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'Letters of recommendation', 'Passport copy')
+  ),
+  null, 'Engineering — Electrical & Electronic'
+from public.universities u where u.slug = 'tu-eindhoven'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- EUR / RSM · MSc Finance & Investments
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-finance-and-investments',
+  'MSc Finance & Investments',
+  'MSc', 'economics_finance', 'en',
+  12, 25800.00, 'EUR', date '2026-05-15', 'September',
+  'A one-year, CFA-affiliated finance master at Rotterdam School of Management covering corporate finance, asset pricing, risk management, and quantitative methods. Strong placement into investment banking, asset management, and consulting through RSM''s career services and Rotterdam''s proximity to Amsterdam''s financial hub.',
+  jsonb_build_object(
+    'gpa_min', 'Top 30% of bachelor class in finance, economics, business or quantitative discipline',
+    'language_tests', jsonb_build_array('IELTS 7.0 (min 6.5 per section)', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'GMAT/GRE score', 'Reference letter')
+  ),
+  null, 'Finance'
+from public.universities u where u.slug = 'erasmus-university-rotterdam'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- EUR / RSM · MSc International Management / CEMS
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-international-management-cems',
+  'MSc International Management / CEMS',
+  'MSc', 'business_management',  'en',
+  18, 22500.00, 'EUR', date '2026-05-15', 'September',
+  'An 18-month double-degree combining RSM''s MSc International Management with the CEMS Master in International Management offered by the alliance of 34 leading business schools worldwide. Includes a mandatory exchange semester at a CEMS partner school, multinational consulting projects, and an internship abroad.',
+  jsonb_build_object(
+    'gpa_min', 'Top tier of bachelor class in business, economics or management',
+    'language_tests', jsonb_build_array('IELTS 7.0 (min 6.5 per section)', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation letter', 'GMAT/GRE score', 'Proof of additional language at B2', 'Reference letter')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'erasmus-university-rotterdam'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- UPF · MSc in Economics (Barcelona School of Economics)
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-in-economics-bse',
+  'MSc in Economics',
+  'MSc', 'economics_finance', 'en',
+  10, 19000.00, 'EUR', date '2026-07-02', 'September',
+  'An intensive nine-month master delivered by the Barcelona School of Economics, jointly run with UPF, UAB and CREI. Provides rigorous training in micro, macro, and econometrics aimed at both academic PhD pathways and analytical roles in policy institutions, central banks, and consulting firms.',
+  jsonb_build_object(
+    'gpa_min', 'Strong undergraduate record in economics, mathematics or related quantitative field',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Statement of purpose', 'Two letters of recommendation', 'GRE General Test (recommended)')
+  ),
+  null, 'Economics & Econometrics'
+from public.universities u where u.slug = 'universitat-pompeu-fabra'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- UPF · MA in Political Philosophy
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'ma-political-philosophy',
+  'MA in Political Philosophy',
+  'MA', 'social_sciences', 'en',
+  12, 3300.00, 'EUR', null, 'September',
+  'A one-year, English-taught master coordinated by the Department of Political and Social Sciences with contributions from Law and Humanities faculty. Trains students in contemporary political theory, normative analysis, and methodology, and is designed as a strong springboard into top international PhD programmes.',
+  jsonb_build_object(
+    'gpa_min', 'Above-average results in a humanities, social science or law bachelor',
+    'language_tests', jsonb_build_array('IELTS 6.5', 'TOEFL iBT 90'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Statement of purpose', 'Writing sample', 'Two letters of recommendation')
+  ),
+  null, 'Politics'
+from public.universities u where u.slug = 'universitat-pompeu-fabra'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Esade · MSc in International Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-in-international-management',
+  'MSc in International Management',
+  'MSc', 'business_management', 'en',
+  12, 37500.00, 'EUR', null, 'September',
+  'A one-year general-management master for young graduates run from Esade''s Sant Cugat campus, with an optional CEMS double-degree extension. Combines core management, international electives, real-company consulting projects, and access to a global alumni network across Europe, Latin America, and Asia.',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor degree, any field',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation essays', 'GMAT/GRE or Esade test', 'Two letters of recommendation', 'Admissions interview')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'esade-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- Esade · MSc in Business Analytics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-in-business-analytics',
+  'MSc in Business Analytics',
+  'MSc', 'data_science', 'en',
+  12, 37500.00, 'EUR', null, 'September',
+  'A one-year programme blending data analytics, machine learning, and business strategy for graduates aiming for analytics, data science, and consulting roles. Heavy emphasis on Python, SQL, visualisation, and business storytelling, with a capstone project run with a real company.',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor degree with quantitative coursework',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Motivation essays', 'GMAT/GRE or Esade test', 'Two letters of recommendation', 'Admissions interview')
+  ),
+  null, 'Business Analytics'
+from public.universities u where u.slug = 'esade-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- IESE · Master in Finance
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'master-in-finance',
+  'Master in Finance',
+  'MSc', 'economics_finance', 'en',
+  11, 47000.00, 'EUR', null, 'September',
+  'An eleven-month finance master in Barcelona for young graduates with up to three years of work experience, taught by IESE faculty alongside guest speakers from leading financial institutions. Covers corporate finance, investments, derivatives, fintech, and private equity, with electives in New York and London weeks.',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor degree with quantitative grounding',
+    'language_tests', jsonb_build_array('IELTS 7.5', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Application essays', 'GMAT or GRE score', 'Two letters of recommendation', 'Admissions interview')
+  ),
+  null, 'Finance'
+from public.universities u where u.slug = 'iese-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- IESE · MBA
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'mba',
+  'MBA',
+  'MSc', 'business_management', 'en',
+  19, 60000.00, 'EUR', date '2026-05-06', 'September',
+  'A 19-month full-time MBA in Barcelona delivered with IESE''s case-method approach, blending core management, electives in New York, Sao Paulo, Munich and Shanghai, and a summer internship. Tuition for the full programme is approximately EUR 114,000; figure here reflects an indicative per-year rate.',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor degree with 2+ years of full-time work experience',
+    'language_tests', jsonb_build_array('IELTS 7.5', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Application essays', 'GMAT/GRE/Executive Assessment score', 'Two letters of recommendation', 'Admissions interview')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'iese-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- HEC Paris · Master in International Finance
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'master-in-international-finance',
+  'Master in International Finance',
+  'MSc', 'economics_finance', 'en',
+  12, 44550.00, 'EUR', date '2026-04-09', 'August',
+  'A pre-experience finance master ranked #1 worldwide by the Financial Times, designed for high-performing graduates targeting investment banking, asset management, and private equity. Combines an intensive core in corporate finance, asset pricing, and quantitative methods with electives, a capstone, and a tailored career services programme.',
+  jsonb_build_object(
+    'gpa_min', 'Top of class in a quantitative undergraduate degree',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Application essays', 'GMAT/GRE score', 'Two letters of recommendation', 'Admissions interview')
+  ),
+  null, 'Finance'
+from public.universities u where u.slug = 'hec-paris'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- HEC Paris · MSc in Strategic Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-in-strategic-management',
+  'MSc in Strategic Management',
+  'MSc', 'business_management', 'en',
+  12, 29950.00, 'EUR', date '2026-04-09', 'September',
+  'A one-year strategy master ranked #1 worldwide in the QS Business Masters Rankings, with electives delivered jointly with Oxford Saïd Business School. Trains students for careers in strategy consulting, corporate strategy, and venture capital through case-based teaching, company challenges, and an applied research project.',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor degree from a recognised institution',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Application essays', 'GMAT/GRE/TAGE-MAGE score', 'Two letters of recommendation', 'Admissions interview')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'hec-paris'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ESCP · MSc in Finance
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-in-finance',
+  'MSc in Finance',
+  'MSc', 'economics_finance', 'en',
+  15, 31800.00, 'EUR', null, 'September',
+  'A 15-month, multi-campus finance master delivered between Paris and London, with strong placement into investment banking, M&A, asset management, and consulting. Combines a rigorous quantitative core, electives in fintech and ESG, professional certifications, and a final-thesis internship.',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor with quantitative grounding',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Application essays', 'GMAT/GRE/TAGE-MAGE score', 'Two letters of recommendation', 'Admissions interview')
+  ),
+  null, 'Finance'
+from public.universities u where u.slug = 'escp-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ESCP · MSc in International Sustainability Management
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'msc-in-international-sustainability-management',
+  'MSc in International Sustainability Management',
+  'MSc', 'business_management', 'en',
+  24, 16650.00, 'EUR', null, 'September',
+  'A two-year master jointly delivered on the Berlin and Paris campuses, training future leaders to embed sustainability into corporate strategy, supply chains, and finance. Covers ESG reporting, climate strategy, sustainable finance, and circular economy, with a six-month thesis-track internship.',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor degree, any field',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Application essays', 'GMAT/GRE/TAGE-MAGE score (recommended)', 'Two letters of recommendation', 'Admissions interview')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'escp-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ESSEC · Master in Data Sciences & Business Analytics
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'master-in-data-sciences-and-business-analytics',
+  'Master in Data Sciences & Business Analytics',
+  'MSc', 'data_science', 'en',
+  15, 31200.00, 'EUR', null, 'September',
+  'A 15-month joint programme with CentraleSupélec ranked among the top three worldwide by QS, combining engineering-grade data science training with business strategy. Three tracks (Data Sciences, Business Analytics, Digital Strategy), a Silicon Valley study trip, and an internship round out the curriculum.',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor in a quantitative discipline (engineering, CS, math, statistics, economics)',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Application essays', 'GMAT/GRE/TAGE-MAGE score', 'Two letters of recommendation', 'Admissions interview')
+  ),
+  null, 'Data Science & Artificial Intelligence'
+from public.universities u where u.slug = 'essec-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
+
+-- ESSEC · Global MBA
+insert into public.programs (
+  university_id, slug, name, degree, field_of_study, language,
+  duration_months, tuition_per_year, currency, application_deadline, start_month,
+  description, requirements, qs_subject_rank, qs_subject_area
+)
+select u.id,
+  'global-mba',
+  'Global MBA',
+  'MSc', 'business_management', 'en',
+  12, 49500.00, 'EUR', null, 'September',
+  'A 12-month full-time MBA in Cergy and Singapore for professionals with 3-10 years of work experience, with specialisations in Strategy & Digital Leadership, Luxury Brand Management, and International Business. Mixes core management, a high-impact capstone consulting project, and an international study trip.',
+  jsonb_build_object(
+    'gpa_min', 'Strong bachelor degree with 3+ years of full-time work experience',
+    'language_tests', jsonb_build_array('IELTS 7.0', 'TOEFL iBT 100'),
+    'documents', jsonb_build_array('Bachelor''s transcript and diploma', 'CV', 'Application essays', 'GMAT/GRE/Executive Assessment score', 'Two letters of recommendation', 'Admissions interview')
+  ),
+  null, 'Business & Management Studies'
+from public.universities u where u.slug = 'essec-business-school'
+on conflict (university_id, slug) do update set
+  name = excluded.name, degree = excluded.degree, field_of_study = excluded.field_of_study,
+  language = excluded.language, duration_months = excluded.duration_months,
+  tuition_per_year = excluded.tuition_per_year, currency = excluded.currency,
+  application_deadline = excluded.application_deadline, start_month = excluded.start_month,
+  description = excluded.description, requirements = excluded.requirements,
+  qs_subject_rank = excluded.qs_subject_rank, qs_subject_area = excluded.qs_subject_area;
