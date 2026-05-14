@@ -53,25 +53,23 @@ export function ApplicationsClient({
         profile={profile}
       />
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-5">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.45 }}
-          className="lg:col-span-2"
-        >
-          <ApplicationsOverview items={items} setItems={setItems} />
-        </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.45 }}
+        className="mt-6"
+      >
+        <ApplicationsOverview items={items} tasks={tasks} setItems={setItems} />
+      </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.45 }}
-          className="lg:col-span-3"
-        >
-          <KanbanBoard tasks={tasks} setTasks={setTasks} />
-        </motion.div>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.45 }}
+        className="mt-8"
+      >
+        <KanbanBoard tasks={tasks} setTasks={setTasks} applications={items} />
+      </motion.div>
 
       <div className="mt-8">
         <AiRecommendationsPanel items={recommendations} />

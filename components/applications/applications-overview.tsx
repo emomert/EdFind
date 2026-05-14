@@ -14,15 +14,18 @@ import {
   APPLICATION_STATUS_LABELS,
   STATUS_PROGRESS_WEIGHT,
   type ApplicationItem,
+  type TaskItem,
 } from "./types";
 
 type SortKey = "recent" | "deadline" | "status";
 
 export function ApplicationsOverview({
   items,
+  tasks,
   setItems,
 }: {
   items: ApplicationItem[];
+  tasks: TaskItem[];
   setItems: React.Dispatch<React.SetStateAction<ApplicationItem[]>>;
 }) {
   const [query, setQuery] = useState("");
@@ -131,20 +134,30 @@ export function ApplicationsOverview({
               key="empty"
             />
           ) : (
-            filtered.map((it) => (
-              <ApplicationCard
-                key={it.id}
-                item={it}
-                onChange={(next) =>
-                  setItems((prev) =>
-                    prev.map((p) => (p.id === next.id ? next : p)),
-                  )
-                }
-                onRemove={(id) =>
-                  setItems((prev) => prev.filter((p) => p.id !== id))
-                }
-              />
-            ))
+            filtered.map((it) => {
+              const taskTotal = tasks.filter(
+                (t) => t.application_id === it.id,
+              ).length;
+              const taskDone = tasks.filter(
+                (t) => t.application_id === it.id && t.status === "done",
+              ).length;
+              return (
+                <ApplicationCard
+                  key={it.id}
+                  item={it}
+                  taskTotal={taskTotal}
+                  taskDone={taskDone}
+                  onChange={(next) =>
+                    setItems((prev) =>
+                      prev.map((p) => (p.id === next.id ? next : p)),
+                    )
+                  }
+                  onRemove={(id) =>
+                    setItems((prev) => prev.filter((p) => p.id !== id))
+                  }
+                />
+              );
+            })
           )}
         </AnimatePresence>
       </div>

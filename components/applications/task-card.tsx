@@ -14,16 +14,23 @@ import {
   CircleDashed,
   Trash2,
   Check,
+  GitBranch,
+  Unlink,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
   deleteTask,
   moveTask,
+  updateTask,
   type TaskCategory,
   type TaskStatus,
 } from "@/app/applications/actions";
-import { TASK_CATEGORY_LABELS, type TaskItem } from "./types";
+import {
+  TASK_CATEGORY_LABELS,
+  type ApplicationItem,
+  type TaskItem,
+} from "./types";
 
 const CATEGORY_ICON: Record<TaskCategory, React.ReactNode> = {
   documents: <FileText className="size-3.5" />,
@@ -45,10 +52,12 @@ const CATEGORY_TONE: Record<TaskCategory, string> = {
 
 export function TaskCard({
   task,
+  application,
   onChange,
   onRemove,
 }: {
   task: TaskItem;
+  application: ApplicationItem | null;
   onChange: (next: TaskItem) => void;
   onRemove: (id: string) => void;
 }) {
@@ -60,6 +69,15 @@ export function TaskCard({
     onChange({ ...task, status: to });
     startTransition(async () => {
       const res = await moveTask({ id: task.id, status: to });
+      if (!res.ok) onChange(prev);
+    });
+  };
+
+  const unlinkApp = () => {
+    const prev = task;
+    onChange({ ...task, application_id: null });
+    startTransition(async () => {
+      const res = await updateTask({ id: task.id, applicationId: null });
       if (!res.ok) onChange(prev);
     });
   };
@@ -119,6 +137,31 @@ export function TaskCard({
       >
         {task.title}
       </p>
+
+      {application && (
+        <motion.div
+          layout
+          className="mt-2 flex items-center gap-1.5 rounded-md bg-teal-50/70 px-2 py-1 text-[11px] text-teal-800 ring-1 ring-inset ring-teal-100"
+        >
+          <GitBranch className="size-3 text-teal-600" />
+          <span className="min-w-0 flex-1 truncate" title={application.program.name}>
+            <span className="font-medium">{application.program.name}</span>
+            <span className="ml-1 text-teal-600/80">
+              · {application.program.university.name}
+            </span>
+          </span>
+          <button
+            type="button"
+            onClick={unlinkApp}
+            disabled={pending}
+            className="-mr-0.5 inline-flex size-4 items-center justify-center rounded text-teal-700/70 opacity-0 transition-opacity hover:bg-teal-100 hover:text-teal-900 group-hover:opacity-100"
+            aria-label="Unlink from program"
+            title="Unlink from program"
+          >
+            <Unlink className="size-3" />
+          </button>
+        </motion.div>
+      )}
 
       {due && (
         <div

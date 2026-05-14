@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Plus, Sparkles } from "lucide-react";
+import { GitBranch, Plus, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
@@ -14,6 +14,7 @@ import { TaskCard } from "./task-card";
 import {
   TASK_CATEGORY_LABELS,
   TASK_STATUS_LABELS,
+  type ApplicationItem,
   type TaskItem,
 } from "./types";
 
@@ -52,19 +53,44 @@ const SUGGESTIONS: ReadonlyArray<{ title: string; category: TaskCategory }> = [
   { title: "Submit application portal", category: "admin" },
 ];
 
+type AppFilter = "all" | "unassigned" | string;
+
 export function KanbanBoard({
   tasks,
   setTasks,
+  applications,
 }: {
   tasks: TaskItem[];
   setTasks: React.Dispatch<React.SetStateAction<TaskItem[]>>;
+  applications: ApplicationItem[];
 }) {
   const [pending, startTransition] = useTransition();
-  const [draft, setDraft] = useState<{ title: string; category: TaskCategory } | null>(
-    null,
-  );
+  const [draft, setDraft] = useState<{
+    title: string;
+    category: TaskCategory;
+    applicationId: string | null;
+  } | null>(null);
+  const [appFilter, setAppFilter] = useState<AppFilter>("all");
 
-  const addTask = (title: string, category: TaskCategory, status: TaskStatus = "todo") => {
+  const appsById = useMemo(() => {
+    const m: Record<string, ApplicationItem> = {};
+    for (const a of applications) m[a.id] = a;
+    return m;
+  }, [applications]);
+
+  const visibleTasks = useMemo(() => {
+    if (appFilter === "all") return tasks;
+    if (appFilter === "unassigned")
+      return tasks.filter((t) => !t.application_id);
+    return tasks.filter((t) => t.application_id === appFilter);
+  }, [tasks, appFilter]);
+
+  const addTask = (
+    title: string,
+    category: TaskCategory,
+    applicationId: string | null,
+    status: TaskStatus = "todo",
+  ) => {
     const t = title.trim();
     if (!t) return;
     const optimistic: TaskItem = {
@@ -73,13 +99,18 @@ export function KanbanBoard({
       category,
       status,
       due_at: null,
-      application_id: null,
+      application_id: applicationId,
       sort_order: Number.MAX_SAFE_INTEGER,
     };
     setTasks((prev) => [...prev, optimistic]);
     setDraft(null);
     startTransition(async () => {
-      const res = await createTask({ title: t, category, status });
+      const res = await createTask({
+        title: t,
+        category,
+        status,
+        applicationId: applicationId ?? null,
+      });
       setTasks((prev) =>
         prev.map((task) =>
           task.id === optimistic.id
@@ -94,7 +125,7 @@ export function KanbanBoard({
 
   const buckets = COLUMNS.map((col) => ({
     col,
-    items: tasks
+    items: visibleTasks
       .filter((t) => t.status === col.key)
       .sort((a, b) => a.sort_order - b.sort_order),
   }));
@@ -107,13 +138,21 @@ export function KanbanBoard({
             Your task board
           </h2>
           <p className="text-sm text-slate-500">
-            Small steps, one at a time. Move cards through the columns to feel the progress.
+            Small steps, one at a time. Link tasks to a specific program when it
+            helps, or keep them general.
           </p>
         </div>
         <button
           type="button"
           onClick={() =>
-            setDraft({ title: "", category: "other" })
+            setDraft({
+              title: "",
+              category: "other",
+              applicationId:
+                appFilter === "unassigned" || appFilter === "all"
+                  ? null
+                  : appFilter,
+            })
           }
           disabled={pending}
           className="inline-flex items-center gap-1.5 rounded-full bg-teal-600 px-3.5 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-teal-700 disabled:opacity-50"
@@ -123,8 +162,27 @@ export function KanbanBoard({
         </button>
       </header>
 
+      {applications.length > 0 && (
+        <AppFilterStrip
+          applications={applications}
+          tasks={tasks}
+          value={appFilter}
+          onChange={setAppFilter}
+        />
+      )}
+
       {tasks.length === 0 && !draft && (
-        <SuggestionStrip onAdd={addTask} />
+        <SuggestionStrip
+          onAdd={(title, category) =>
+            addTask(
+              title,
+              category,
+              appFilter !== "all" && appFilter !== "unassigned"
+                ? appFilter
+                : null,
+            )
+          }
+        />
       )}
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -142,7 +200,10 @@ export function KanbanBoard({
               <DraftTaskCard
                 draft={draft}
                 setDraft={setDraft}
-                onCommit={(title, category) => addTask(title, category, "todo")}
+                applications={applications}
+                onCommit={(title, category, appId) =>
+                  addTask(title, category, appId, "todo")
+                }
                 onCancel={() => setDraft(null)}
               />
             )}
@@ -151,6 +212,9 @@ export function KanbanBoard({
                 <TaskCard
                   key={task.id}
                   task={task}
+                  application={
+                    task.application_id ? appsById[task.application_id] : null
+                  }
                   onChange={(next) =>
                     setTasks((prev) =>
                       prev.map((t) => (t.id === next.id ? next : t)),
@@ -171,6 +235,83 @@ export function KanbanBoard({
         ))}
       </div>
     </section>
+  );
+}
+
+function AppFilterStrip({
+  applications,
+  tasks,
+  value,
+  onChange,
+}: {
+  applications: ApplicationItem[];
+  tasks: TaskItem[];
+  value: AppFilter;
+  onChange: (v: AppFilter) => void;
+}) {
+  const counts = useMemo(() => {
+    const c: Record<string, number> = {
+      all: tasks.length,
+      unassigned: tasks.filter((t) => !t.application_id).length,
+    };
+    for (const a of applications) {
+      c[a.id] = tasks.filter((t) => t.application_id === a.id).length;
+    }
+    return c;
+  }, [tasks, applications]);
+
+  const chips: Array<{ key: AppFilter; label: string; subtle?: boolean }> = [
+    { key: "all", label: "All tasks" },
+    { key: "unassigned", label: "Unassigned", subtle: true },
+    ...applications.map((a) => ({ key: a.id, label: a.program.name })),
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="flex items-center gap-2"
+    >
+      <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-slate-500">
+        <GitBranch className="size-3.5" />
+        Branch:
+      </span>
+      <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto">
+        {chips.map((chip) => {
+          const active = value === chip.key;
+          const count = counts[chip.key] ?? 0;
+          return (
+            <button
+              key={chip.key}
+              type="button"
+              onClick={() => onChange(chip.key)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition",
+                active
+                  ? "border-teal-300 bg-teal-50 text-teal-800 shadow-sm"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-800",
+                chip.subtle && !active && "text-slate-500",
+              )}
+            >
+              <span className="max-w-[18ch] truncate">{chip.label}</span>
+              {count > 0 && (
+                <span
+                  className={cn(
+                    "rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums",
+                    active
+                      ? "bg-teal-100 text-teal-800"
+                      : "bg-slate-100 text-slate-600",
+                  )}
+                >
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </motion.div>
   );
 }
 
@@ -230,12 +371,22 @@ function KanbanColumn({
 function DraftTaskCard({
   draft,
   setDraft,
+  applications,
   onCommit,
   onCancel,
 }: {
-  draft: { title: string; category: TaskCategory };
-  setDraft: (d: { title: string; category: TaskCategory }) => void;
-  onCommit: (title: string, category: TaskCategory) => void;
+  draft: { title: string; category: TaskCategory; applicationId: string | null };
+  setDraft: (d: {
+    title: string;
+    category: TaskCategory;
+    applicationId: string | null;
+  }) => void;
+  applications: ApplicationItem[];
+  onCommit: (
+    title: string,
+    category: TaskCategory,
+    applicationId: string | null,
+  ) => void;
   onCancel: () => void;
 }) {
   return (
@@ -255,7 +406,7 @@ function DraftTaskCard({
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
-            onCommit(draft.title, draft.category);
+            onCommit(draft.title, draft.category, draft.applicationId);
           } else if (e.key === "Escape") {
             onCancel();
           }
@@ -263,36 +414,61 @@ function DraftTaskCard({
         placeholder="What needs to get done?"
         className="w-full bg-transparent text-sm font-medium leading-snug text-slate-900 placeholder:text-slate-400 focus:outline-none"
       />
-      <div className="mt-2 flex items-center justify-between">
+
+      <div className="mt-2 grid grid-cols-1 gap-1.5">
         <select
-          value={draft.category}
+          value={draft.applicationId ?? ""}
           onChange={(e) =>
-            setDraft({ ...draft, category: e.target.value as TaskCategory })
+            setDraft({
+              ...draft,
+              applicationId: e.target.value === "" ? null : e.target.value,
+            })
           }
-          className="rounded-md bg-slate-50 px-1.5 py-1 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-100"
+          className="w-full rounded-md bg-slate-50 px-1.5 py-1 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-100"
         >
-          {(Object.keys(TASK_CATEGORY_LABELS) as TaskCategory[]).map((c) => (
-            <option key={c} value={c}>
-              {TASK_CATEGORY_LABELS[c]}
+          <option value="">No program (general task)</option>
+          {applications.map((a) => (
+            <option key={a.id} value={a.id}>
+              ↳ {a.program.name} · {a.program.university.name}
             </option>
           ))}
         </select>
-        <div className="flex gap-1">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+        <div className="flex items-center justify-between gap-2">
+          <select
+            value={draft.category}
+            onChange={(e) =>
+              setDraft({
+                ...draft,
+                category: e.target.value as TaskCategory,
+              })
+            }
+            className="rounded-md bg-slate-50 px-1.5 py-1 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-100"
           >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={() => onCommit(draft.title, draft.category)}
-            disabled={!draft.title.trim()}
-            className="rounded-md bg-teal-600 px-2.5 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-teal-700 disabled:opacity-50"
-          >
-            Add
-          </button>
+            {(Object.keys(TASK_CATEGORY_LABELS) as TaskCategory[]).map((c) => (
+              <option key={c} value={c}>
+                {TASK_CATEGORY_LABELS[c]}
+              </option>
+            ))}
+          </select>
+          <div className="flex gap-1">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                onCommit(draft.title, draft.category, draft.applicationId)
+              }
+              disabled={!draft.title.trim()}
+              className="rounded-md bg-teal-600 px-2.5 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-teal-700 disabled:opacity-50"
+            >
+              Add
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>

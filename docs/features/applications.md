@@ -16,25 +16,34 @@ route — keeps the feature cleanly removable.
 
 ## Layout
 
+Stacked single column — applications at the top, kanban below, AI panel at
+the bottom. Earlier revisions had apps + kanban side-by-side; the user asked
+for the stack so each section gets the full width.
+
 ```
 ┌────────────────────────────────────────────────────────────────────┐
 │  StudentProgressCard                                               │
 │   · avatar · greeting · status badge · target countries · field    │
 │   · overall progress bar (computed from per-app status weights)    │
 └────────────────────────────────────────────────────────────────────┘
-┌──────────────────────────┐  ┌────────────────────────────────────┐
-│  ApplicationsOverview    │  │  KanbanBoard                       │
-│   · search + filter +    │  │   · To Do / Doing / Done           │
-│     sort (deadline /     │  │   · per-task category + due date   │
-│     recent / progress)   │  │   · click-to-move (arrow buttons)  │
-│   · ApplicationCard rows │  │   · suggestion chips when empty    │
-└──────────────────────────┘  └────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│  ApplicationsOverview                                              │
+│   · search + filter + sort (deadline / recent / progress)          │
+│   · ApplicationCard rows                                           │
+│     · "X / Y tasks" badge (counts linked application_tasks)        │
+└────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│  KanbanBoard                                                       │
+│   · Branch filter: All tasks · Unassigned · <each application>     │
+│   · To Do / Doing / Done columns                                   │
+│   · TaskCard:                                                      │
+│     · category badge + due date                                    │
+│     · linked program chip (with unlink button)                     │
+│     · click-to-move (arrow buttons)                                │
+│   · Suggestion strip for first-time users                          │
+└────────────────────────────────────────────────────────────────────┘
 ┌────────────────────────────────────────────────────────────────────┐
 │  AiRecommendationsPanel  — heuristic, no AI call                   │
-│   · "Pick your top 3 and start drafting"                           │
-│   · "X deadlines in the next 30 days"                              │
-│   · "Book a language test early"                                   │
-│   · etc.                                                           │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -172,16 +181,33 @@ the dashboard. Order of deletions: `application_tasks → applications →
 saved_programs → profiles`. The session cookie is preserved so the user can
 immediately re-take the quiz.
 
+## Task ↔ application linking ("branching")
+
+Tasks can optionally branch off a specific application:
+
+- **Creating a task:** the draft card has a "No program (general task)"
+  dropdown listing every tracked application. Picking one persists
+  `application_id` on insert.
+- **On the task card:** linked tasks show a teal chip with the program +
+  university name. Hover reveals an unlink button that nulls
+  `application_id` via `updateTask`.
+- **Filtering:** the kanban header has a "Branch:" chip strip — "All tasks",
+  "Unassigned", and one chip per tracked application. Each chip shows its
+  task count. Picking a non-default branch also pre-fills the application
+  link when adding a new task.
+- **On the application card:** a "X / Y tasks" badge renders when at least
+  one task is linked; turns emerald when all are done.
+
+Tasks that aren't linked to a program stay valid — useful for cross-cutting
+prep like "Book IELTS" or "Translate transcript".
+
 ## What's intentionally not done
 
 - **Drag-and-drop.** Click-to-move covers the use case; sort_order is in place
   so adding `@dnd-kit/sortable` later is the only change needed.
-- **Tasks linked to applications.** The schema supports it (`application_id`
-  nullable FK); the UI doesn't surface it yet. Add a per-app "task panel"
-  drawer when there are enough power users to justify the complexity.
 - **Real AI guidance.** Heuristics are predictable and cheap. Swap for a
   DeepSeek call once we have signal data on what users actually do after
   reading a recommendation.
-- **Mobile-specific layout polish.** The grid collapses to a single column
-  under `lg`, but the kanban could use a horizontally-scrolling carousel on
-  small screens. Backlog.
+- **Mobile-specific layout polish.** Kanban columns stack vertically below
+  `md`. A horizontally-scrolling carousel would feel nicer on small phones.
+  Backlog.

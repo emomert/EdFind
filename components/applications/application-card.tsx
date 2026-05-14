@@ -5,8 +5,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   CalendarDays,
+  CheckCircle2,
   ChevronDown,
   ExternalLink,
+  ListChecks,
   MoreHorizontal,
   Trash2,
 } from "lucide-react";
@@ -79,10 +81,14 @@ function formatDeadline(dateStr: string): string {
 
 export function ApplicationCard({
   item,
+  taskTotal,
+  taskDone,
   onChange,
   onRemove,
 }: {
   item: ApplicationItem;
+  taskTotal: number;
+  taskDone: number;
   onChange: (next: ApplicationItem) => void;
   onRemove: (id: string) => void;
 }) {
@@ -174,6 +180,25 @@ export function ApplicationCard({
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <StatusPill status={item.status} />
+            {taskTotal > 0 && (
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset",
+                  taskDone === taskTotal
+                    ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+                    : "bg-teal-50 text-teal-700 ring-teal-200",
+                )}
+                title={`${taskDone} of ${taskTotal} task${taskTotal === 1 ? "" : "s"} done`}
+              >
+                {taskDone === taskTotal ? (
+                  <CheckCircle2 className="size-3" />
+                ) : (
+                  <ListChecks className="size-3" />
+                )}
+                {taskDone} / {taskTotal}{" "}
+                {taskTotal === 1 ? "task" : "tasks"}
+              </span>
+            )}
             {effectiveDeadline && (
               <span
                 className={cn(
