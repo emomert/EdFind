@@ -16,7 +16,7 @@ The 5-phase MVP is complete. Phases 0–1 finished on 2026-05-07; Phases 2–5 f
 - **Phase 9** (2026-05-11) — four features in one drop:
   - **9.1 Free-text search** at `/search`. DeepSeek parses the query into `ValidatedAnswers`, then the same matcher path runs. `lib/server/persist-and-match.ts` is now the shared backend for `/quiz` and `/search`.
   - **9.2 Shortlist + compare** at `/shortlist` and `/compare?ids=…`. `SaveButton` lives on results / program / university pages.
-  - **9.3 Application tracker** at `/applications` — kanban view, status/notes/deadline per program, gated by `NEXT_PUBLIC_ENABLE_APPLICATIONS` for clean future removal (forward + rollback migrations both kept in `supabase/migrations/`). Includes a "Reset all progress" testing button that wipes everything for the current user.
+  - **9.3 Application tracker** at `/applications` — gated by `NEXT_PUBLIC_ENABLE_APPLICATIONS`. Originally a 4-column applications kanban (Phase 9.3); redesigned 2026-05-14 into a split-view dashboard with `StudentProgressCard` header (avatar + target countries + field + progress bar), an `ApplicationsOverview` list with search/filter/sort, a separate task `KanbanBoard` (todo/doing/done) backed by a new `application_tasks` table, and a heuristic `AiRecommendationsPanel` (no AI call yet — see `lib/applications/recommendations.ts`). Drop migration lives in `supabase/uninstall/` so `db-migrate.mjs` doesn't auto-run it. Full spec in `docs/features/applications.md`.
   - **9.4 Google auth — required**. `/quiz`, `/search`, `/results*`, `/shortlist`, `/applications`, `/compare` redirect to `/login`. Public surfaces: `/`, `/login`, `/universities/*`, `/programs/*`. OAuth callback (`app/auth/callback/route.ts`) attaches any pre-auth rows with the same cookie `client_id` to the new `user_id`.
 
 Next: Stripe / tier billing, Turkish localization. See `docs/architecture.md` for the full phased plan.
@@ -54,15 +54,15 @@ If you find yourself reaching for an alternative (Firebase, Express backend, MUI
 
 ## Where to find things
 
-| What | Where |
-|---|---|
-| System overview, request/data flow, deploy topology | `docs/architecture.md` |
-| Postgres schema | `docs/data-model.md` (kept in sync with `supabase/migrations/`) |
-| Why we picked X | `docs/decisions/` |
-| Brand colors, typography, voice | `docs/design/brand.md` |
-| Per-feature specs | `docs/features/` |
-| v1 visual reference | `Website UI Design Ver_1.pdf` (repo root) |
-| Long-term memory across sessions (Claude Code) | `~/.claude/projects/.../memory/` |
+| What                                                | Where                                                           |
+| --------------------------------------------------- | --------------------------------------------------------------- |
+| System overview, request/data flow, deploy topology | `docs/architecture.md`                                          |
+| Postgres schema                                     | `docs/data-model.md` (kept in sync with `supabase/migrations/`) |
+| Why we picked X                                     | `docs/decisions/`                                               |
+| Brand colors, typography, voice                     | `docs/design/brand.md`                                          |
+| Per-feature specs                                   | `docs/features/`                                                |
+| v1 visual reference                                 | `Website UI Design Ver_1.pdf` (repo root)                       |
+| Long-term memory across sessions (Claude Code)      | `~/.claude/projects/.../memory/`                                |
 
 ## Don'ts
 

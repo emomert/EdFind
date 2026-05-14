@@ -19,6 +19,19 @@ const APPLICATION_STATUSES = [
 ] as const;
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
 
+const TASK_STATUSES = ["todo", "doing", "done"] as const;
+export type TaskStatus = (typeof TASK_STATUSES)[number];
+
+const TASK_CATEGORIES = [
+  "documents",
+  "language_test",
+  "writing",
+  "finance",
+  "admin",
+  "other",
+] as const;
+export type TaskCategory = (typeof TASK_CATEGORIES)[number];
+
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
 const TrackInputSchema = z.object({
@@ -47,6 +60,30 @@ const RemoveInputSchema = z.object({
 
 const ResetInputSchema = z.object({
   clientId: z.string().uuid(),
+});
+
+const CreateTaskSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  category: z.enum(TASK_CATEGORIES).default("other"),
+  status: z.enum(TASK_STATUSES).default("todo"),
+  dueAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  applicationId: z.string().uuid().nullable().optional(),
+});
+
+const UpdateTaskSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().trim().min(1).max(200).optional(),
+  category: z.enum(TASK_CATEGORIES).optional(),
+  status: z.enum(TASK_STATUSES).optional(),
+  dueAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  applicationId: z.string().uuid().nullable().optional(),
+});
+
+const DeleteTaskSchema = z.object({ id: z.string().uuid() });
+
+const MoveTaskSchema = z.object({
+  id: z.string().uuid(),
+  status: z.enum(TASK_STATUSES),
 });
 
 export type ActionResult =
@@ -313,6 +350,15 @@ export async function resetAllProgress(
   // matches.profile_id → profiles.id has ON DELETE CASCADE, so deleting the
   // profiles row also clears matches. We touch each other table explicitly
   // so a failure surfaces a clear error.
+  const tasksByUser = await supabase
+    .from("application_tasks")
+    .delete()
+    .eq("user_id", user.id);
+  if (tasksByUser.error) {
+    console.error("[resetAllProgress] application_tasks failed", tasksByUser.error);
+    return { ok: false, error: "Couldn't reset progress. Try again." };
+  }
+
   const appsByUser = await supabase
     .from("applications")
     .delete()
@@ -362,5 +408,184 @@ export async function resetAllProgress(
   revalidatePath("/applications");
   revalidatePath("/shortlist");
   revalidatePath("/results");
+  return { ok: true };
+}
+
+async function loadTaskForUser(
+  taskId: string,
+  userId: string,
+): Promise<{ id: string } | null> {
+  const supabase = createServiceClient();
+  const res = await supabase
+    .from("application_tasks")
+    .select("id, user_id")
+    .eq("id", taskId)
+    .maybeSingle();
+  if (res.error || !res.data) return null;
+  const row = res.data as { id: string; user_id: string | null };
+  if (row.user_id !== userId) return null;
+  return { id: row.id };
+}
+
+export type CreatedTaskResult =
+  | { ok: true; id: string }
+  | { ok: false; error: string; needsAuth?: boolean };
+
+export async function createTask(
+  rawInput: unknown,
+): Promise<CreatedTaskResult> {
+  const parsed = CreateTaskSchema.safeParse(rawInput);
+  if (!parsed.success) return { ok: false, error: "Invalid input." };
+
+  const user = await getUser();
+  if (!user) {
+    return {
+      ok: false,
+      error: "Please sign in to add tasks.",
+      needsAuth: true,
+    };
+  }
+
+  const supabase = createServiceClient();
+  // Place new tasks at the end of their column.
+  const tail = await supabase
+    .from("application_tasks")
+    .select("sort_order")
+    .eq("user_id", user.id)
+    .eq("status", parsed.data.status)
+    .order("sort_order", { ascending: false })
+    .limit(1);
+  const nextOrder =
+    tail.data && tail.data[0]
+      ? (tail.data[0] as { sort_order: number }).sort_order + 1
+      : 0;
+
+  const ins = await supabase
+    .from("application_tasks")
+    .insert({
+      user_id: user.id,
+      title: parsed.data.title,
+      category: parsed.data.category,
+      status: parsed.data.status,
+      due_at: parsed.data.dueAt ?? null,
+      application_id: parsed.data.applicationId ?? null,
+      sort_order: nextOrder,
+    })
+    .select("id")
+    .single();
+  if (ins.error || !ins.data) {
+    console.error("[createTask] insert failed", ins.error);
+    return { ok: false, error: "Couldn't create task." };
+  }
+  revalidatePath("/applications");
+  return { ok: true, id: (ins.data as { id: string }).id };
+}
+
+export async function updateTask(rawInput: unknown): Promise<ActionResult> {
+  const parsed = UpdateTaskSchema.safeParse(rawInput);
+  if (!parsed.success) return { ok: false, error: "Invalid input." };
+
+  const user = await getUser();
+  if (!user) {
+    return {
+      ok: false,
+      error: "Please sign in to update tasks.",
+      needsAuth: true,
+    };
+  }
+
+  const task = await loadTaskForUser(parsed.data.id, user.id);
+  if (!task) return { ok: false, error: "Not authorized." };
+
+  const patch: Record<string, unknown> = {};
+  if (parsed.data.title !== undefined) patch.title = parsed.data.title;
+  if (parsed.data.category !== undefined) patch.category = parsed.data.category;
+  if (parsed.data.status !== undefined) patch.status = parsed.data.status;
+  if (parsed.data.dueAt !== undefined) patch.due_at = parsed.data.dueAt;
+  if (parsed.data.applicationId !== undefined)
+    patch.application_id = parsed.data.applicationId;
+
+  if (Object.keys(patch).length === 0) return { ok: true };
+
+  const supabase = createServiceClient();
+  const upd = await supabase
+    .from("application_tasks")
+    .update(patch)
+    .eq("id", parsed.data.id);
+  if (upd.error) {
+    console.error("[updateTask] update failed", upd.error);
+    return { ok: false, error: "Couldn't update task." };
+  }
+  revalidatePath("/applications");
+  return { ok: true };
+}
+
+export async function moveTask(rawInput: unknown): Promise<ActionResult> {
+  const parsed = MoveTaskSchema.safeParse(rawInput);
+  if (!parsed.success) return { ok: false, error: "Invalid input." };
+
+  const user = await getUser();
+  if (!user) {
+    return {
+      ok: false,
+      error: "Please sign in to update tasks.",
+      needsAuth: true,
+    };
+  }
+
+  const task = await loadTaskForUser(parsed.data.id, user.id);
+  if (!task) return { ok: false, error: "Not authorized." };
+
+  const supabase = createServiceClient();
+  const tail = await supabase
+    .from("application_tasks")
+    .select("sort_order")
+    .eq("user_id", user.id)
+    .eq("status", parsed.data.status)
+    .order("sort_order", { ascending: false })
+    .limit(1);
+  const nextOrder =
+    tail.data && tail.data[0]
+      ? (tail.data[0] as { sort_order: number }).sort_order + 1
+      : 0;
+
+  const upd = await supabase
+    .from("application_tasks")
+    .update({ status: parsed.data.status, sort_order: nextOrder })
+    .eq("id", parsed.data.id);
+  if (upd.error) {
+    console.error("[moveTask] update failed", upd.error);
+    return { ok: false, error: "Couldn't move task." };
+  }
+  revalidatePath("/applications");
+  return { ok: true };
+}
+
+export async function deleteTask(rawInput: unknown): Promise<ActionResult> {
+  const parsed = DeleteTaskSchema.safeParse(rawInput);
+  if (!parsed.success) return { ok: false, error: "Invalid input." };
+
+  const user = await getUser();
+  if (!user) {
+    return {
+      ok: false,
+      error: "Please sign in to update tasks.",
+      needsAuth: true,
+    };
+  }
+
+  const task = await loadTaskForUser(parsed.data.id, user.id);
+  if (!task) return { ok: false, error: "Not authorized." };
+
+  const supabase = createServiceClient();
+  const del = await supabase
+    .from("application_tasks")
+    .delete()
+    .eq("id", parsed.data.id);
+  if (del.error) {
+    console.error("[deleteTask] delete failed", del.error);
+    return { ok: false, error: "Couldn't delete task." };
+  }
+  revalidatePath("/applications");
   return { ok: true };
 }
