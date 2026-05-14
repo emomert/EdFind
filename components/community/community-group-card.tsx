@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import {
   BadgeCheck,
+  Building2,
+  GraduationCap,
   Lock,
   MessagesSquare,
   Users,
@@ -41,14 +43,20 @@ export function CommunityGroupCard({
   group,
   responsibles,
   countryName,
+  parentUniversityName,
   onOpenChat,
 }: {
   group: CommunityGroup;
   responsibles: CommunityUser[];
   countryName: string;
+  parentUniversityName?: string;
   onOpenChat: (g: CommunityGroup) => void;
 }) {
   const { isSubscribed } = useSubscription();
+  const isProgram = group.type === "program";
+  const displayName = isProgram
+    ? group.name.split(" — ")[0] || group.name
+    : group.name;
 
   return (
     <motion.article
@@ -57,26 +65,56 @@ export function CommunityGroupCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.21, 0.6, 0.3, 1] }}
       whileHover={{ y: -3 }}
-      className="group flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-shadow hover:shadow-[0_12px_30px_-20px_rgba(13,148,136,0.35)] sm:p-5"
+      className={cn(
+        "group relative flex flex-col gap-3 rounded-2xl border bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-shadow hover:shadow-[0_12px_30px_-20px_rgba(13,148,136,0.35)] sm:p-5",
+        isProgram
+          ? "border-l-4 border-l-violet-300 border-y-slate-200 border-r-slate-200"
+          : "border-l-4 border-l-teal-400 border-y-slate-200 border-r-slate-200",
+      )}
     >
       <header className="flex items-start gap-3">
         <div
           className={cn(
             "flex size-11 shrink-0 items-center justify-center rounded-xl text-sm font-semibold shadow-sm",
-            group.type === "university"
-              ? "bg-gradient-to-br from-teal-500 to-emerald-500 text-white"
-              : "bg-gradient-to-br from-sky-100 to-violet-100 text-slate-800 ring-1 ring-slate-200",
+            isProgram
+              ? "bg-gradient-to-br from-violet-500 to-sky-500 text-white"
+              : "bg-gradient-to-br from-teal-500 to-emerald-500 text-white",
           )}
         >
           {logoText(group)}
         </div>
         <div className="min-w-0 flex-1">
+          <span
+            className={cn(
+              "mb-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-inset",
+              isProgram
+                ? "bg-violet-50 text-violet-700 ring-violet-200"
+                : "bg-teal-50 text-teal-800 ring-teal-200",
+            )}
+          >
+            {isProgram ? (
+              <GraduationCap className="size-2.5" />
+            ) : (
+              <Building2 className="size-2.5" />
+            )}
+            {isProgram ? "Program" : "University"}
+          </span>
           <h3 className="line-clamp-1 text-sm font-semibold text-slate-900">
-            {group.name}
+            {displayName}
           </h3>
-          <p className="text-[11px] uppercase tracking-wide text-slate-500">
-            {group.type === "university" ? "University Group" : "Program Group"} ·{" "}
-            {countryName}
+          <p className="mt-0.5 text-[11px] text-slate-500">
+            {isProgram && parentUniversityName ? (
+              <span className="inline-flex items-center gap-1">
+                <span className="text-slate-400">↳</span>
+                <span className="font-medium text-slate-600">
+                  {parentUniversityName}
+                </span>
+                <span>·</span>
+                <span>{countryName}</span>
+              </span>
+            ) : (
+              <span>{countryName}</span>
+            )}
           </p>
         </div>
         <span
@@ -168,13 +206,21 @@ export function CommunityGroupChip({
   countryName: string;
   onClick: () => void;
 }) {
+  const isProgram = group.type === "program";
   return (
     <button
       type="button"
       onClick={onClick}
       className="group flex w-full items-center gap-3 rounded-xl border border-transparent bg-white px-3 py-2.5 text-left transition hover:border-slate-200 hover:shadow-sm"
     >
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500/90 to-emerald-500/90 text-xs font-semibold text-white">
+      <div
+        className={cn(
+          "flex size-9 shrink-0 items-center justify-center rounded-lg text-xs font-semibold text-white",
+          isProgram
+            ? "bg-gradient-to-br from-violet-500/90 to-sky-500/90"
+            : "bg-gradient-to-br from-teal-500/90 to-emerald-500/90",
+        )}
+      >
         {logoText(group)}
       </div>
       <div className="min-w-0 flex-1">

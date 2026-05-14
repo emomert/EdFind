@@ -27,6 +27,7 @@ import { CommunityGroupCard } from "./community-group-card";
 import { CampusResponsibleCard } from "./campus-responsible-card";
 import { PopularQuestionsList } from "./popular-questions-card";
 import { GroupChatModal } from "./group-chat-modal";
+import { GroupTypeSelector } from "./group-type-selector";
 import {
   AskCommunityCard,
   CommunityStatsCard,
@@ -71,9 +72,12 @@ export function CommunityClient(props: CommunityClientProps) {
   });
 
   // ─── Filter passes ──────────────────────────────────────────────────
-  const filteredGroups = useMemo(() => {
+  // Stage 1: apply every filter EXCEPT groupType. We use this to compute
+  // counts for the segmented control so toggling type doesn't shift the
+  // visible counts under it.
+  const groupsBeforeTypeFilter = useMemo(() => {
     const q = filters.query.trim().toLowerCase();
-    let rows = props.groups.filter((g) => {
+    return props.groups.filter((g) => {
       if (filters.country && g.country !== filters.country) return false;
       if (filters.universitySlug && g.universitySlug !== filters.universitySlug)
         return false;
@@ -84,8 +88,6 @@ export function CommunityClient(props: CommunityClientProps) {
       ) {
         return false;
       }
-      if (filters.groupType !== "all" && g.type !== filters.groupType)
-        return false;
       if (
         q &&
         !(
@@ -97,10 +99,31 @@ export function CommunityClient(props: CommunityClientProps) {
       }
       return true;
     });
+  }, [props.groups, props.fieldByUniversitySlug, filters]);
+
+  const groupTypeCounts = useMemo(() => {
+    let uni = 0;
+    let prog = 0;
+    for (const g of groupsBeforeTypeFilter) {
+      if (g.type === "university") uni += 1;
+      else prog += 1;
+    }
+    return { all: uni + prog, university: uni, program: prog };
+  }, [groupsBeforeTypeFilter]);
+
+  // Stage 2: apply groupType + sort.
+  const filteredGroups = useMemo(() => {
+    let rows = groupsBeforeTypeFilter;
+    if (filters.groupType !== "all") {
+      rows = rows.filter((g) => g.type === filters.groupType);
+    }
+
+    const byMembers = (a: typeof rows[number], b: typeof rows[number]) =>
+      b.memberCount - a.memberCount;
 
     switch (filters.sort) {
       case "most_members":
-        rows = [...rows].sort((a, b) => b.memberCount - a.memberCount);
+        rows = [...rows].sort(byMembers);
         break;
       case "most_active":
         rows = [...rows].sort(
@@ -110,10 +133,20 @@ export function CommunityClient(props: CommunityClientProps) {
         );
         break;
       default:
-        rows = [...rows].sort((a, b) => b.memberCount - a.memberCount);
+        rows = [...rows].sort(byMembers);
     }
+
+    // When viewing "All", surface universities first so the type
+    // distinction is visually obvious in the grid.
+    if (filters.groupType === "all") {
+      rows = [...rows].sort((a, b) => {
+        if (a.type === b.type) return 0;
+        return a.type === "university" ? -1 : 1;
+      });
+    }
+
     return rows;
-  }, [props.groups, props.fieldByUniversitySlug, filters]);
+  }, [groupsBeforeTypeFilter, filters.groupType, filters.sort]);
 
   const filteredReviews = useMemo(() => {
     const q = filters.query.trim().toLowerCase();
@@ -259,6 +292,12 @@ export function CommunityClient(props: CommunityClientProps) {
                     groups={filteredGroups}
                     usersById={usersById}
                     countryNames={props.countryNames}
+                    universityNames={props.universityNames}
+                    typeFilter={filters.groupType}
+                    typeCounts={groupTypeCounts}
+                    onChangeType={(t) =>
+                      setFilters({ ...filters, groupType: t })
+                    }
                     onOpen={setOpenGroup}
                   />
                 )}
@@ -351,36 +390,68 @@ function GroupsTab({
   groups,
   usersById,
   countryNames,
+  universityNames,
+  typeFilter,
+  typeCounts,
+  onChangeType,
   onOpen,
 }: {
   groups: CommunityGroup[];
   usersById: Readonly<Record<string, CommunityUser>>;
   countryNames: Readonly<Record<string, string>>;
+  universityNames: Readonly<Record<string, string>>;
+  typeFilter: "all" | "university" | "program";
+  typeCounts: { all: number; university: number; program: number };
+  onChangeType: (t: "all" | "university" | "program") => void;
   onOpen: (g: CommunityGroup) => void;
 }) {
-  if (groups.length === 0)
-    return <EmptyState message="No groups match your filters yet." />;
-  // Limit initial render — there can be hundreds of groups.
   const initial = groups.slice(0, 24);
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2">
-        {initial.map((g) => (
-          <CommunityGroupCard
-            key={g.id}
-            group={g}
-            countryName={countryNames[g.country] || g.country}
-            responsibles={g.campusResponsibleIds
-              .map((id) => usersById[id])
-              .filter(Boolean)}
-            onOpenChat={onOpen}
-          />
-        ))}
-      </div>
-      {groups.length > 24 && (
-        <p className="text-center text-xs text-slate-500">
-          Showing {initial.length} of {groups.length} groups. Refine filters to narrow.
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <GroupTypeSelector
+          value={typeFilter}
+          onChange={onChangeType}
+          counts={typeCounts}
+        />
+        <p className="text-xs text-slate-500">
+          {typeFilter === "university"
+            ? "University-wide communities — meet the whole cohort."
+            : typeFilter === "program"
+            ? "Program-specific communities — laser-focused on one master's."
+            : "Universities and programs in one view."}
         </p>
+      </div>
+
+      {groups.length === 0 ? (
+        <EmptyState message="No groups match your filters yet." />
+      ) : (
+        <>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {initial.map((g) => (
+              <CommunityGroupCard
+                key={g.id}
+                group={g}
+                countryName={countryNames[g.country] || g.country}
+                parentUniversityName={
+                  g.type === "program"
+                    ? universityNames[g.universitySlug]
+                    : undefined
+                }
+                responsibles={g.campusResponsibleIds
+                  .map((id) => usersById[id])
+                  .filter(Boolean)}
+                onOpenChat={onOpen}
+              />
+            ))}
+          </div>
+          {groups.length > 24 && (
+            <p className="text-center text-xs text-slate-500">
+              Showing {initial.length} of {groups.length} groups. Refine filters
+              to narrow.
+            </p>
+          )}
+        </>
       )}
     </div>
   );
