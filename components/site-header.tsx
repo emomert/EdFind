@@ -3,7 +3,7 @@ import { LogOut } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
-import { APPLICATIONS_ENABLED } from "@/lib/feature-flags";
+import { APPLICATIONS_ENABLED, COMMUNITY_ENABLED } from "@/lib/feature-flags";
 import { getUser } from "@/lib/supabase/auth";
 
 const baseNavLinks = [
@@ -12,9 +12,13 @@ const baseNavLinks = [
   { href: "/shortlist", label: "Shortlist" },
 ];
 
-const navLinks = APPLICATIONS_ENABLED
-  ? [...baseNavLinks, { href: "/applications", label: "Applications" }]
-  : baseNavLinks;
+const navLinks = [
+  ...baseNavLinks,
+  ...(APPLICATIONS_ENABLED
+    ? [{ href: "/applications", label: "Applications" }]
+    : []),
+  ...(COMMUNITY_ENABLED ? [{ href: "/community", label: "Community" }] : []),
+];
 
 export async function SiteHeader() {
   const user = await getUser();

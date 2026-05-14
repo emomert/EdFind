@@ -22,3 +22,14 @@ const isOff = (v: string | undefined) => v === "false" || v === "0";
 export const APPLICATIONS_ENABLED = !isOff(
   process.env.NEXT_PUBLIC_ENABLE_APPLICATIONS,
 );
+
+/**
+ * Community / Verified Student Insights page. Controls whether /community
+ * is exposed and whether the header nav link is rendered. Pure mock data
+ * for now (see lib/community/fake-data.ts); subscription state is a cookie
+ * dev toggle until Stripe is wired. Default on; set
+ * NEXT_PUBLIC_ENABLE_COMMUNITY=false to hide.
+ */
+export const COMMUNITY_ENABLED = !isOff(
+  process.env.NEXT_PUBLIC_ENABLE_COMMUNITY,
+);
