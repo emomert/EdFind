@@ -14,6 +14,7 @@ import {
   MarkerSparkles,
   MarkerSquiggle,
 } from "@/components/decor/marker";
+import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
 import { Lift, Reveal, Stagger, StaggerItem } from "@/components/motion";
 
 export const metadata: Metadata = {
@@ -80,7 +81,8 @@ export default function StartPage() {
         <div className="absolute right-1/4 top-32 size-[320px] rounded-full bg-secondary/40 blur-3xl" />
       </div>
 
-      <section className="mx-auto max-w-5xl px-6 pb-12 pt-16 sm:pb-16 sm:pt-24">
+      <section className="relative overflow-hidden mx-auto max-w-5xl px-6 pb-12 pt-16 sm:pb-16 sm:pt-24">
+        <HeroBackgroundGraphics variant="programs" density="low" />
         <Reveal>
           <div className="text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-primary">

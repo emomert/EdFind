@@ -20,6 +20,7 @@ import {
   FIELD_LABELS,
 } from "@/components/applications/types";
 import { UniversityLogo } from "@/components/university/university-logo";
+import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
 
 export type CatalogUniversity = {
   slug: string;
@@ -191,8 +192,9 @@ export function CatalogClient({
       className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12"
     >
       {/* Hero */}
-      <header className="rounded-3xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-emerald-50 p-6 sm:p-10">
-        <div className="grid gap-6 lg:grid-cols-[1.5fr,auto] lg:items-end">
+      <header className="relative overflow-hidden rounded-3xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-emerald-50 p-6 sm:p-10">
+        <HeroBackgroundGraphics variant="programs" density="medium" />
+        <div className="relative z-10 grid gap-6 lg:grid-cols-[1.5fr,auto] lg:items-end">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-teal-700 shadow-sm ring-1 ring-inset ring-teal-200">
               <Sparkles className="size-3.5" />

@@ -20,6 +20,7 @@ import {
   MarkerSparkles,
   MarkerStar,
 } from "@/components/decor/marker";
+import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
 
 export type MatchCardProgram = {
   slug: string;
@@ -146,6 +147,7 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
         className="pointer-events-none absolute -bottom-24 -left-16 size-64 rounded-full bg-secondary/40 blur-3xl"
       />
 
+      <HeroBackgroundGraphics variant="programs" density="low" />
       <MarkerSparkles
         aria-hidden
         className="pointer-events-none absolute right-6 top-6 size-12 text-primary/30"
@@ -155,7 +157,7 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
         className="pointer-events-none absolute left-4 top-20 hidden size-6 text-primary/30 sm:block"
       />
 
-      <div className="relative">
+      <div className="relative z-10">
         <div className="flex items-center gap-2 text-sm font-medium text-primary">
           <Sparkles className="size-4" />
           Your top match

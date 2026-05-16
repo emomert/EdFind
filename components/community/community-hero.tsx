@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { BadgeCheck, Globe, MessagesSquare, Crown, GraduationCap } from "lucide-react";
 
+import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
+
 const TRUST_CHIPS = [
   { icon: BadgeCheck, label: "Verified only" },
   { icon: Globe, label: "European focus" },
@@ -21,8 +23,9 @@ export function CommunityHero() {
     >
       <div className="pointer-events-none absolute -right-16 -top-16 size-72 rounded-full bg-teal-300/30 blur-3xl" aria-hidden />
       <div className="pointer-events-none absolute -bottom-20 left-12 size-60 rounded-full bg-emerald-200/40 blur-3xl" aria-hidden />
+      <HeroBackgroundGraphics variant="community" density="low" />
 
-      <div className="relative grid gap-8 lg:grid-cols-[1.4fr,1fr] lg:items-center">
+      <div className="relative z-10 grid gap-8 lg:grid-cols-[1.4fr,1fr] lg:items-center">
         <div>
           <motion.span
             initial={{ opacity: 0, y: 6 }}
