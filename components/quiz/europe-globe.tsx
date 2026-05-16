@@ -40,6 +40,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { RotateCcw } from "lucide-react";
 
 import type { Destination } from "@/lib/quiz/schema";
+import { useSound } from "@/lib/sound/sound-context";
 
 // ISO 3166-1 numeric → EdFind destination code + display name.
 const SELECTABLE: Record<string, { code: Destination; name: string }> = {
@@ -69,10 +70,18 @@ const HOME_ROTATION: [number, number, number] = [-15, -53, 0];
 // the user doesn't accidentally select while panning the globe around.
 const CLICK_VS_DRAG_THRESHOLD_PX = 5;
 
-// How many degrees the globe rotates per pixel of drag. Tuned so a casual
-// swipe across the globe moves the visible centre noticeably but not
-// vertiginously.
-const DRAG_SENSITIVITY = 0.32;
+// How many degrees the globe rotates per pixel of drag. Tuned slow so the
+// globe feels weighty rather than twitchy — combined with inertia on
+// release this lands close to "real globe in a museum kiosk" feel.
+const DRAG_SENSITIVITY = 0.18;
+
+// Inertia after release: velocity decays exponentially each frame. 0.92 ≈
+// the spin coasts for about 1 s before settling. INERTIA_STOP_DEG_PER_FRAME
+// kills the loop once we're below visually-perceptible movement.
+const INERTIA_DECAY = 0.92;
+const INERTIA_STOP_DEG_PER_FRAME = 0.04;
+// Cap initial throw speed so a fast flick doesn't whip across the globe.
+const INERTIA_MAX_DEG_PER_FRAME = 6;
 
 // Smooth-return animation duration when the user clicks the reset button.
 const RESET_DURATION_MS = 700;
@@ -101,9 +110,19 @@ export function EuropeGlobe({
     startY: number;
     startRotation: [number, number, number];
     moved: boolean;
+    // Last two pointer samples so we can compute release velocity.
+    lastX: number;
+    lastY: number;
+    lastT: number;
+    prevX: number;
+    prevY: number;
+    prevT: number;
   } | null>(null);
   const suppressNextClickRef = useRef(false);
   const resetRafRef = useRef<number | null>(null);
+  const inertiaRafRef = useRef<number | null>(null);
+  const rotationRef = useRef<[number, number, number]>(HOME_ROTATION);
+  const sound = useSound();
 
   useEffect(() => {
     let cancelled = false;
@@ -166,6 +185,12 @@ export function EuropeGlobe({
     };
   }, [topo, rotation]);
 
+  // Keep rotationRef in lock-step with rotation state so inertia rAF can
+  // read the latest value without re-subscribing.
+  useEffect(() => {
+    rotationRef.current = rotation;
+  }, [rotation]);
+
   const cancelResetAnimation = useCallback(() => {
     if (resetRafRef.current !== null) {
       cancelAnimationFrame(resetRafRef.current);
@@ -173,22 +198,63 @@ export function EuropeGlobe({
     }
   }, []);
 
+  const cancelInertia = useCallback(() => {
+    if (inertiaRafRef.current !== null) {
+      cancelAnimationFrame(inertiaRafRef.current);
+      inertiaRafRef.current = null;
+    }
+  }, []);
+
+  const startInertia = useCallback(
+    (vx: number, vy: number) => {
+      cancelInertia();
+      let velX = clamp(vx, -INERTIA_MAX_DEG_PER_FRAME, INERTIA_MAX_DEG_PER_FRAME);
+      let velY = clamp(vy, -INERTIA_MAX_DEG_PER_FRAME, INERTIA_MAX_DEG_PER_FRAME);
+      const tick = () => {
+        const [lambda, phi, gamma] = rotationRef.current;
+        const nextLambda = lambda + velX;
+        const nextPhi = clamp(phi + velY, -89, 89);
+        setRotation([nextLambda, nextPhi, gamma]);
+        velX *= INERTIA_DECAY;
+        velY *= INERTIA_DECAY;
+        if (
+          Math.abs(velX) < INERTIA_STOP_DEG_PER_FRAME &&
+          Math.abs(velY) < INERTIA_STOP_DEG_PER_FRAME
+        ) {
+          inertiaRafRef.current = null;
+          return;
+        }
+        inertiaRafRef.current = requestAnimationFrame(tick);
+      };
+      inertiaRafRef.current = requestAnimationFrame(tick);
+    },
+    [cancelInertia],
+  );
+
   const handlePointerDown = useCallback(
     (e: ReactPointerEvent<SVGSVGElement>) => {
       // Ignore non-primary buttons; let middle/right-click pass through.
       if (e.button !== 0 && e.pointerType === "mouse") return;
       cancelResetAnimation();
+      cancelInertia();
       setHasInteracted(true);
+      const now = performance.now();
       dragRef.current = {
         pointerId: e.pointerId,
         startX: e.clientX,
         startY: e.clientY,
         startRotation: rotation,
         moved: false,
+        lastX: e.clientX,
+        lastY: e.clientY,
+        lastT: now,
+        prevX: e.clientX,
+        prevY: e.clientY,
+        prevT: now,
       };
       e.currentTarget.setPointerCapture(e.pointerId);
     },
-    [rotation, cancelResetAnimation],
+    [rotation, cancelResetAnimation, cancelInertia],
   );
 
   const handlePointerMove = useCallback(
@@ -202,8 +268,15 @@ export function EuropeGlobe({
         setIsDragging(true);
       }
       if (!drag.moved) return;
+      // Record sliding two-sample buffer for release-velocity estimation.
+      drag.prevX = drag.lastX;
+      drag.prevY = drag.lastY;
+      drag.prevT = drag.lastT;
+      drag.lastX = e.clientX;
+      drag.lastY = e.clientY;
+      drag.lastT = performance.now();
       // Lambda (yaw) rotates with horizontal drag; phi (pitch) with vertical.
-      // We clamp phi to ±89° so the user can't fully flip the globe.
+      // Phi clamps to ±89° so the user can't fully flip the globe.
       const nextLambda = drag.startRotation[0] + dx * DRAG_SENSITIVITY;
       const nextPhi = clamp(
         drag.startRotation[1] - dy * DRAG_SENSITIVITY,
@@ -223,6 +296,23 @@ export function EuropeGlobe({
         // The pointer-up here would otherwise fire a synthetic click on the
         // country path under the pointer. Eat the next click event.
         suppressNextClickRef.current = true;
+        // Compute release velocity from the most recent two samples.
+        const dt = drag.lastT - drag.prevT;
+        if (dt > 0 && dt < 120) {
+          // Pixels per millisecond → pixels per ~16.6 ms frame → degrees per
+          // frame via our drag sensitivity. Vertical sign is flipped to match
+          // the drag handler.
+          const pxPerFrameX = ((drag.lastX - drag.prevX) / dt) * 16.6;
+          const pxPerFrameY = ((drag.lastY - drag.prevY) / dt) * 16.6;
+          const velLambda = pxPerFrameX * DRAG_SENSITIVITY;
+          const velPhi = -pxPerFrameY * DRAG_SENSITIVITY;
+          if (
+            Math.abs(velLambda) > INERTIA_STOP_DEG_PER_FRAME ||
+            Math.abs(velPhi) > INERTIA_STOP_DEG_PER_FRAME
+          ) {
+            startInertia(velLambda, velPhi);
+          }
+        }
       }
       dragRef.current = null;
       setIsDragging(false);
@@ -232,11 +322,12 @@ export function EuropeGlobe({
         // setPointerCapture may have failed silently — releasing is best-effort.
       }
     },
-    [],
+    [startInertia],
   );
 
   const resetToHome = useCallback(() => {
     cancelResetAnimation();
+    cancelInertia();
     const start = rotation;
     const startTime = performance.now();
     const tick = (now: number) => {
@@ -255,9 +346,15 @@ export function EuropeGlobe({
       }
     };
     resetRafRef.current = requestAnimationFrame(tick);
-  }, [rotation, cancelResetAnimation]);
+  }, [rotation, cancelResetAnimation, cancelInertia]);
 
-  useEffect(() => () => cancelResetAnimation(), [cancelResetAnimation]);
+  useEffect(
+    () => () => {
+      cancelResetAnimation();
+      cancelInertia();
+    },
+    [cancelResetAnimation, cancelInertia],
+  );
 
   const isAtHome =
     Math.abs(rotation[0] - HOME_ROTATION[0]) < 0.5 &&
@@ -374,6 +471,7 @@ export function EuropeGlobe({
                     suppressNextClickRef.current = false;
                     return;
                   }
+                  sound.play(isSelected ? "deselect" : "select");
                   onToggle(meta.code);
                 }}
               />

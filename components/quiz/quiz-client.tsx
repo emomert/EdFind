@@ -23,6 +23,8 @@ import { QuizProgressBar } from "@/components/quiz/progress-bar";
 import { QuizMascot } from "@/components/quiz/mascot";
 import { QuestionScreen } from "@/components/quiz/question-screen";
 import { QuizLoadingScreen } from "@/components/quiz/loading-screen";
+import { SoundToggle } from "@/components/quiz/sound-toggle";
+import { SoundProvider, useSound } from "@/lib/sound/sound-context";
 
 type Phase = "questions" | "loading" | "error";
 
@@ -75,8 +77,17 @@ function selectedValuesFor(answers: Answers, field: keyof Answers): string[] {
 }
 
 export function QuizClient() {
+  return (
+    <SoundProvider>
+      <QuizClientInner />
+    </SoundProvider>
+  );
+}
+
+function QuizClientInner() {
   const router = useRouter();
   const reduce = useReducedMotion();
+  const { enabled: soundEnabled, toggle: toggleSound, play } = useSound();
   const [phase, setPhase] = useState<Phase>("questions");
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Answers>(EMPTY_ANSWERS);
@@ -147,6 +158,7 @@ export function QuizClient() {
 
   const handleSubmit = useCallback(async () => {
     setErrorMessage(null);
+    play("complete");
     setPhase("loading");
 
     // Build the sequence promise BEFORE mounting LoadingScreen so its
@@ -176,7 +188,7 @@ export function QuizClient() {
 
     setErrorMessage(result.error);
     setPhase("error");
-  }, [answers, router]);
+  }, [answers, router, play]);
 
   const handleNext = useCallback(() => {
     if (!canAdvance) return;
@@ -184,12 +196,14 @@ export function QuizClient() {
       void handleSubmit();
       return;
     }
+    play("advance");
     setStepIndex((i) => Math.min(i + 1, TOTAL_STEPS - 1));
-  }, [canAdvance, isLastStep, handleSubmit]);
+  }, [canAdvance, isLastStep, handleSubmit, play]);
 
   const handleBack = useCallback(() => {
+    play("back");
     setStepIndex((i) => Math.max(i - 1, 0));
-  }, []);
+  }, [play]);
 
   const handleSequenceComplete = useCallback(() => {
     sequenceResolveRef.current?.();
@@ -243,7 +257,15 @@ export function QuizClient() {
   return (
     <div className="mx-auto max-w-3xl px-6 pb-24">
       <div className="sticky top-16 z-10 -mx-6 border-b border-border bg-background/90 px-6 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-        <QuizProgressBar currentStep={stepIndex + 1} totalSteps={TOTAL_STEPS} />
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <QuizProgressBar
+              currentStep={stepIndex + 1}
+              totalSteps={TOTAL_STEPS}
+            />
+          </div>
+          <SoundToggle enabled={soundEnabled} onToggle={toggleSound} />
+        </div>
       </div>
 
       <div

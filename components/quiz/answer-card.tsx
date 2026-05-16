@@ -3,6 +3,8 @@
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 
+import { useSound } from "@/lib/sound/sound-context";
+
 type Props = {
   name: string;
   value: string;
@@ -24,6 +26,7 @@ export function AnswerCard({
 }: Props) {
   const inputType = selectMode === "single" ? "radio" : "checkbox";
   const inputId = `${name}-${value}`;
+  const { play } = useSound();
 
   return (
     <label
@@ -43,7 +46,10 @@ export function AnswerCard({
         name={name}
         value={value}
         checked={selected}
-        onChange={() => onSelect(value)}
+        onChange={() => {
+          play(selected ? "deselect" : "select");
+          onSelect(value);
+        }}
         className="peer sr-only"
       />
       <span
