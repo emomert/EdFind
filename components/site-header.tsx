@@ -8,8 +8,7 @@ import { getUser } from "@/lib/supabase/auth";
 import { HeaderSearch } from "@/components/header-search";
 
 const baseNavLinks = [
-  { href: "/quiz", label: "Quiz" },
-  { href: "/search", label: "AI Search" },
+  { href: "/start", label: "Find programs" },
   { href: "/catalog", label: "Catalog" },
   { href: "/shortlist", label: "Shortlist" },
 ];

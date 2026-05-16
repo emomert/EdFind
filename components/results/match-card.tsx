@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { SaveButton } from "@/components/shortlist/save-button";
 import { UniversityLogo } from "@/components/university/university-logo";
 import {
-  MarkerCircle,
   MarkerSparkles,
   MarkerStar,
 } from "@/components/decor/marker";
@@ -100,7 +99,7 @@ function scoreToNumber(score: number | string | null): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function ScoreBar({ score, withCircle = false }: { score: number; withCircle?: boolean }) {
+function ScoreBar({ score }: { score: number }) {
   const pct = Math.max(0, Math.min(100, score));
   return (
     <div className="w-full">
@@ -108,17 +107,9 @@ function ScoreBar({ score, withCircle = false }: { score: number; withCircle?: b
         <span className="font-medium uppercase tracking-wider text-muted-foreground">
           Match score
         </span>
-        <span className="relative font-mono text-base font-semibold text-foreground">
-          {withCircle ? (
-            <MarkerCircle
-              aria-hidden
-              className="pointer-events-none absolute -inset-x-3 -inset-y-2 text-primary/60"
-            />
-          ) : null}
-          <span className="relative">
-            {Math.round(pct)}
-            <span className="text-xs text-muted-foreground"> /100</span>
-          </span>
+        <span className="font-mono text-base font-semibold text-foreground">
+          {Math.round(pct)}
+          <span className="text-xs text-muted-foreground"> /100</span>
         </span>
       </div>
       <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
@@ -207,7 +198,7 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
 
         {score !== null ? (
           <div className="mt-6 max-w-md">
-            <ScoreBar score={score} withCircle />
+            <ScoreBar score={score} />
           </div>
         ) : null}
 
