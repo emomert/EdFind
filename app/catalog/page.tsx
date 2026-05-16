@@ -120,5 +120,15 @@ export default async function CatalogPage() {
       university_logo_url: p.university.logo_url,
     }));
 
-  return <CatalogClient universities={universities} programs={programs} />;
+  return (
+    <div className="relative">
+      {/* Page-level gradient wash so the hero blends into the page rather
+          than reading as a distinct bordered card. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] bg-gradient-to-b from-teal-50/55 via-cyan-50/30 to-transparent"
+      />
+      <CatalogClient universities={universities} programs={programs} />
+    </div>
+  );
 }

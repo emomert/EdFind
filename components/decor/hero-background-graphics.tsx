@@ -68,8 +68,6 @@ export function HeroBackgroundGraphics({
       ) : (
         <CommunityLayer density={density} />
       )}
-
-      <Skyline />
     </div>
   );
 }
@@ -79,62 +77,15 @@ export function HeroBackgroundGraphics({
 // ─────────────────────────────────────────────────────────────────────────────
 
 function SoftBlobs() {
+  // Big, very soft blobs anchored off-frame so they bleed past whatever
+  // container they're inside. This is what creates the "flowing" feel —
+  // gradients without sharp edges, never quite stopping anywhere.
   return (
     <>
-      <div className="absolute -top-24 -right-20 size-[420px] rounded-full bg-cyan-300/15 blur-3xl" />
-      <div className="absolute -bottom-32 -left-16 size-[360px] rounded-full bg-teal-200/20 blur-3xl" />
+      <div className="absolute -top-40 -right-32 size-[640px] rounded-full bg-cyan-300/18 blur-3xl" />
+      <div className="absolute -bottom-48 -left-32 size-[560px] rounded-full bg-teal-200/22 blur-3xl" />
+      <div className="absolute left-1/2 top-1/2 size-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-200/12 blur-3xl" />
     </>
-  );
-}
-
-function Skyline() {
-  // A flat SVG row of varying-height rectangles + a couple of dotted
-  // spires. Anchored to the bottom of the section, the eye reads it as
-  // a horizon line without it dominating.
-  return (
-    <svg
-      viewBox="0 0 1200 90"
-      preserveAspectRatio="none"
-      className="absolute inset-x-0 bottom-0 hidden h-16 w-full text-teal-600/10 sm:block"
-      aria-hidden="true"
-    >
-      <g fill="currentColor">
-        <rect x="20" y="50" width="36" height="40" />
-        <rect x="64" y="36" width="48" height="54" />
-        <rect x="120" y="48" width="28" height="42" />
-        <rect x="158" y="20" width="44" height="70" />
-        <rect x="212" y="44" width="32" height="46" />
-        <rect x="252" y="34" width="58" height="56" />
-        <rect x="318" y="50" width="24" height="40" />
-        <rect x="350" y="28" width="46" height="62" />
-        <rect x="404" y="46" width="36" height="44" />
-        <rect x="448" y="40" width="50" height="50" />
-        <rect x="506" y="22" width="38" height="68" />
-        <rect x="552" y="48" width="30" height="42" />
-        <rect x="590" y="38" width="54" height="52" />
-        <rect x="652" y="46" width="36" height="44" />
-        <rect x="696" y="30" width="48" height="60" />
-        <rect x="752" y="48" width="28" height="42" />
-        <rect x="788" y="24" width="44" height="66" />
-        <rect x="840" y="44" width="34" height="46" />
-        <rect x="882" y="36" width="52" height="54" />
-        <rect x="942" y="50" width="26" height="40" />
-        <rect x="976" y="32" width="44" height="58" />
-        <rect x="1028" y="46" width="38" height="44" />
-        <rect x="1074" y="40" width="48" height="50" />
-        <rect x="1130" y="50" width="32" height="40" />
-      </g>
-      {/* Two slender spires for visual variety */}
-      <g
-        stroke="currentColor"
-        strokeWidth={1.2}
-        strokeLinecap="round"
-        fill="none"
-      >
-        <line x1="180" y1="20" x2="180" y2="8" />
-        <line x1="528" y1="22" x2="528" y2="6" />
-      </g>
-    </svg>
   );
 }
 

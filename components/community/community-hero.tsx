@@ -19,7 +19,7 @@ export function CommunityHero() {
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.21, 0.6, 0.3, 1] }}
-      className="relative overflow-hidden rounded-3xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-emerald-50 p-6 sm:p-10"
+      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-50/50 via-transparent to-emerald-50/50 p-6 sm:p-10"
     >
       <div className="pointer-events-none absolute -right-16 -top-16 size-72 rounded-full bg-teal-300/30 blur-3xl" aria-hidden />
       <div className="pointer-events-none absolute -bottom-20 left-12 size-60 rounded-full bg-emerald-200/40 blur-3xl" aria-hidden />

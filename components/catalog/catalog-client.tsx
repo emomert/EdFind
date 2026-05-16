@@ -191,8 +191,10 @@ export function CatalogClient({
       transition={{ duration: 0.4 }}
       className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12"
     >
-      {/* Hero */}
-      <header className="relative overflow-hidden rounded-3xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-emerald-50 p-6 sm:p-10">
+      {/* Hero — borderless and very lightly tinted so the surrounding page
+          background flows through it. The HeroBackgroundGraphics blobs bleed
+          past the rounded edges and carry that gradient outward. */}
+      <header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-50/40 via-transparent to-emerald-50/40 p-6 sm:p-10">
         <HeroBackgroundGraphics variant="programs" density="medium" />
         <div className="relative z-10 grid gap-6 lg:grid-cols-[1.5fr,auto] lg:items-end">
           <div>

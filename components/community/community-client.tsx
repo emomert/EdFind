@@ -250,13 +250,19 @@ export function CommunityClient(props: CommunityClientProps) {
 
   return (
     <SubscriptionProvider isSubscribed={props.isSubscribed}>
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45 }}
-        className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12"
-      >
-        <CommunityHero />
+      <div className="relative">
+        {/* Page-level gradient wash so the hero blends into the page. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] bg-gradient-to-b from-teal-50/55 via-cyan-50/30 to-transparent"
+        />
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12"
+        >
+          <CommunityHero />
 
         <div className="mt-6 space-y-5">
           <CommunityFilters
@@ -343,7 +349,8 @@ export function CommunityClient(props: CommunityClientProps) {
           users={usersById}
           responsibles={openGroupResponsibles}
         />
-      </motion.div>
+        </motion.div>
+      </div>
     </SubscriptionProvider>
   );
 }
