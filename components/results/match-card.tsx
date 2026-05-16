@@ -15,6 +15,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { SaveButton } from "@/components/shortlist/save-button";
+import { UniversityLogo } from "@/components/university/university-logo";
 
 export type MatchCardProgram = {
   slug: string;
@@ -39,6 +40,7 @@ export type MatchCardProgram = {
     description: string | null;
     is_partner: boolean;
     qs_world_rank: number | null;
+    logo_url: string | null;
   };
 };
 
@@ -145,14 +147,22 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
           <Sparkles className="size-4" />
           Your top match
         </div>
-        <Link
-          href={`/programs/${u.slug}/${program.slug}`}
-          className="group mt-2 inline-block"
-        >
-          <h1 className="text-3xl font-semibold tracking-tight transition-colors group-hover:text-primary sm:text-4xl">
-            {program.name}
-          </h1>
-        </Link>
+        <div className="mt-3 flex items-center gap-3">
+          <UniversityLogo
+            name={u.name}
+            slug={u.slug}
+            logoUrl={u.logo_url}
+            size="md"
+          />
+          <Link
+            href={`/programs/${u.slug}/${program.slug}`}
+            className="group inline-block"
+          >
+            <h1 className="text-3xl font-semibold tracking-tight transition-colors group-hover:text-primary sm:text-4xl">
+              {program.name}
+            </h1>
+          </Link>
+        </div>
         <p className="mt-2 text-base text-muted-foreground">
           {program.degree} ·{" "}
           <Link
@@ -290,14 +300,27 @@ export function SiblingMatchCard({
         href={`/programs/${u.slug}/${program.slug}`}
         className="flex flex-1 flex-col"
       >
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          {u.city}, {u.country}
-        </p>
-        <h3 className="mt-1 text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
+        <div className="flex items-start gap-3">
+          <UniversityLogo
+            name={u.name}
+            slug={u.slug}
+            logoUrl={u.logo_url}
+            size="sm"
+          />
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {u.city}, {u.country}
+            </p>
+            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+              {u.name}
+            </p>
+          </div>
+        </div>
+        <h3 className="mt-3 text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
           {program.name}
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          {program.degree} · {u.name}
+          {program.degree}
           {u.qs_world_rank ? (
             <span className="ml-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
               QS #{u.qs_world_rank}

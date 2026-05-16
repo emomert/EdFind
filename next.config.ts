@@ -1,5 +1,15 @@
 import type { NextConfig } from "next";
 
+const supabaseHost = (() => {
+  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!raw) return null;
+  try {
+    return new URL(raw).host;
+  } catch {
+    return null;
+  }
+})();
+
 const nextConfig: NextConfig = {
   // Pin workspace root to this project so Turbopack ignores any lockfiles
   // higher up the directory tree (e.g. one in the user's home folder).
@@ -8,6 +18,27 @@ const nextConfig: NextConfig = {
   // causing Tailwind to look for node_modules in the parent folder.
   turbopack: {
     root: import.meta.dirname,
+  },
+  images: {
+    // University logos live in Supabase Storage. We also allow upload.wikimedia.org
+    // as a transitional source — the importer normalizes to Supabase Storage but
+    // a few records may temporarily point at Wikimedia during a migration.
+    remotePatterns: [
+      ...(supabaseHost
+        ? [
+            {
+              protocol: "https" as const,
+              hostname: supabaseHost,
+              pathname: "/storage/v1/object/public/**",
+            },
+          ]
+        : []),
+      {
+        protocol: "https" as const,
+        hostname: "upload.wikimedia.org",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

@@ -21,6 +21,7 @@ export type ApplicationItem = {
       country: string;
       city: string;
       website: string | null;
+      logo_url: string | null;
     };
   };
 };

@@ -22,6 +22,7 @@ import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
 import { APPLICATIONS_ENABLED } from "@/lib/feature-flags";
 import { TrackButton } from "@/components/applications/track-button";
+import { UniversityLogo } from "@/components/university/university-logo";
 
 type Params = { universitySlug: string; programSlug: string };
 
@@ -81,7 +82,7 @@ export default async function ProgramPage({
   const uniRes = await publicDb
     .from("universities")
     .select(
-      "id, slug, name, country, city, institution_type, website, description, qs_world_rank, is_partner",
+      "id, slug, name, country, city, institution_type, website, description, qs_world_rank, is_partner, logo_url",
     )
     .eq("slug", universitySlug)
     .maybeSingle();
@@ -161,7 +162,14 @@ export default async function ProgramPage({
         Back to {u.name}
       </Link>
 
-      <div className="mt-8">
+      <div className="mt-8 flex items-start gap-4">
+        <UniversityLogo
+          name={u.name}
+          slug={u.slug}
+          logoUrl={u.logo_url}
+          size="md"
+        />
+        <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1">
             <GraduationCap className="size-3.5" />
@@ -195,6 +203,7 @@ export default async function ProgramPage({
             </span>
           ) : null}
         </p>
+        </div>
       </div>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">

@@ -19,6 +19,7 @@ export type CatalogSearchUniversity = {
   city: string;
   qs_world_rank: number | null;
   is_partner: boolean;
+  logo_url: string | null;
 };
 
 export type CatalogSearchProgram = {
@@ -29,6 +30,7 @@ export type CatalogSearchProgram = {
   university_slug: string;
   university_name: string;
   university_country: string;
+  university_logo_url: string | null;
 };
 
 export type CatalogSearchResponse = {
@@ -41,13 +43,13 @@ export async function GET() {
   const [unisRes, progsRes] = await Promise.all([
     supabase
       .from("universities")
-      .select("slug, name, country, city, qs_world_rank, is_partner")
+      .select("slug, name, country, city, qs_world_rank, is_partner, logo_url")
       .order("name"),
     supabase
       .from("programs")
       .select(
         `slug, name, degree, language,
-         university:universities!inner(slug, name, country)`,
+         university:universities!inner(slug, name, country, logo_url)`,
       )
       .order("name"),
   ]);
@@ -58,7 +60,12 @@ export async function GET() {
     name: string;
     degree: string;
     language: string;
-    university: { slug: string; name: string; country: string };
+    university: {
+      slug: string;
+      name: string;
+      country: string;
+      logo_url: string | null;
+    };
   }>)
     .filter((p) => p.university != null)
     .map((p) => ({
@@ -69,6 +76,7 @@ export async function GET() {
       university_slug: p.university.slug,
       university_name: p.university.name,
       university_country: p.university.country,
+      university_logo_url: p.university.logo_url,
     }));
 
   const body: CatalogSearchResponse = { universities, programs };

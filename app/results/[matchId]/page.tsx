@@ -81,7 +81,7 @@ export default async function ResultsPage({
          tuition_per_year, currency, application_deadline, start_month,
          description, qs_subject_rank, qs_subject_area,
          university:universities(
-           slug, name, country, city, website, description, is_partner, qs_world_rank
+           slug, name, country, city, website, description, is_partner, qs_world_rank, logo_url
          )
        )`,
     )

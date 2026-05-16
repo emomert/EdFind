@@ -16,6 +16,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { SaveButton } from "@/components/shortlist/save-button";
+import { UniversityLogo } from "@/components/university/university-logo";
 import { cn } from "@/lib/utils";
 
 export type ShortlistItem = {
@@ -40,6 +41,7 @@ export type ShortlistItem = {
       city: string;
       qs_world_rank: number | null;
       is_partner: boolean;
+      logo_url: string | null;
     };
   };
 };
@@ -220,18 +222,31 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
                     href={`/programs/${u.slug}/${p.slug}`}
                     className="flex flex-1 flex-col"
                   >
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      <MapPin
-                        className="mr-1 inline size-3"
-                        aria-hidden="true"
+                    <div className="flex items-start gap-3">
+                      <UniversityLogo
+                        name={u.name}
+                        slug={u.slug}
+                        logoUrl={u.logo_url}
+                        size="sm"
                       />
-                      {u.city}, {u.country}
-                    </p>
-                    <h3 className="mt-2 pr-24 text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          <MapPin
+                            className="mr-1 inline size-3"
+                            aria-hidden="true"
+                          />
+                          {u.city}, {u.country}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {u.name}
+                        </p>
+                      </div>
+                    </div>
+                    <h3 className="mt-3 pr-24 text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
                       {p.name}
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {p.degree} · {u.name}
+                      {p.degree}
                       {u.qs_world_rank ? (
                         <span className="ml-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                           QS #{u.qs_world_rank}

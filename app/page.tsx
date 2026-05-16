@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/supabase/auth";
+import { UniversityLogo } from "@/components/university/university-logo";
 
 type FeaturedUniversity = {
   slug: string;
@@ -19,6 +20,7 @@ type FeaturedUniversity = {
   city: string;
   qs_world_rank: number | null;
   description: string | null;
+  logo_url: string | null;
   program_count: number;
 };
 
@@ -32,7 +34,7 @@ async function loadFeatured(): Promise<{
   const [uniRes, progRes, countriesRes] = await Promise.all([
     supabase
       .from("universities")
-      .select("slug, name, country, city, qs_world_rank, description")
+      .select("slug, name, country, city, qs_world_rank, description, logo_url")
       .order("qs_world_rank", { ascending: true, nullsFirst: false })
       .limit(6),
     supabase.from("programs").select("id", { count: "exact", head: true }),
@@ -61,6 +63,7 @@ async function loadFeatured(): Promise<{
     city: u.city,
     qs_world_rank: u.qs_world_rank,
     description: u.description,
+    logo_url: u.logo_url,
     program_count: counts[u.slug] ?? 0,
   }));
 
@@ -209,9 +212,12 @@ export default async function HomePage() {
               className="group flex flex-col rounded-2xl border border-border bg-card p-5 transition-all hover:border-primary/40 hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  {u.city}, {u.country}
-                </p>
+                <UniversityLogo
+                  name={u.name}
+                  slug={u.slug}
+                  logoUrl={u.logo_url}
+                  size="md"
+                />
                 {u.qs_world_rank ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                     <Award className="size-3" />
@@ -219,7 +225,10 @@ export default async function HomePage() {
                   </span>
                 ) : null}
               </div>
-              <h3 className="mt-3 text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
+              <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {u.city}, {u.country}
+              </p>
+              <h3 className="mt-1 text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
                 {u.name}
               </h3>
               {u.description ? (

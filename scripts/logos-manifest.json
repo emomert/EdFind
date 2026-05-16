@@ -1,0 +1,582 @@
+[
+  {
+    "slug": "aalto-university",
+    "name": "Aalto University",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Aalto_University_logo_tri-lingual_version.png",
+    "source_type": "wikimedia",
+    "image_format": "png",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Tri-lingual official logo; PNG (no SVG available on Commons)."
+  },
+  {
+    "slug": "copenhagen-business-school",
+    "name": "Copenhagen Business School",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/1/19/Logo_CopenhagenBusinessSchool.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official CBS logo, vector SVG."
+  },
+  {
+    "slug": "tu-eindhoven",
+    "name": "Eindhoven University of Technology",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/6/67/Eindhoven_University_of_Technology_logo_new.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Current TU/e logo, vector SVG."
+  },
+  {
+    "slug": "essec-business-school",
+    "name": "ESSEC Business School",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Logo_essec2.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official ESSEC logo, vector SVG."
+  },
+  {
+    "slug": "hec-paris",
+    "name": "HEC Paris",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/3/32/HEC_Paris.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official HEC Paris logo, vector SVG."
+  },
+  {
+    "slug": "imperial-college-london",
+    "name": "Imperial College London",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/0/06/Imperial_College_London_new_logo.png",
+    "source_type": "wikimedia",
+    "image_format": "png",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Current Imperial logo, PNG (Commons file)."
+  },
+  {
+    "slug": "kth-royal-institute-of-technology",
+    "name": "KTH Royal Institute of Technology",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/e/e0/KTH_Royal_Institute_of_Technology_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikipedia (fair use)",
+    "confidence": "high",
+    "notes": "Hosted on en.wikipedia (non-Commons fair use); vector SVG."
+  },
+  {
+    "slug": "ludwig-maximilian-university-of-munich",
+    "name": "Ludwig Maximilian University of Munich",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/0/06/LMU_Muenchen_Logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official LMU Munich logo, vector SVG."
+  },
+  {
+    "slug": "politecnico-di-milano",
+    "name": "Politecnico di Milano",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/c/c0/Polytechnic_University_of_Milan_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikipedia (fair use)",
+    "confidence": "high",
+    "notes": "Hosted on en.wikipedia (non-Commons fair use); vector SVG."
+  },
+  {
+    "slug": "sciences-po",
+    "name": "Sciences Po",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Logo_Sciences_Po.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official Sciences Po logo, vector SVG."
+  },
+  {
+    "slug": "trinity-college-dublin",
+    "name": "Trinity College Dublin",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/e/eb/Trinity_College_Dublin_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikipedia (fair use)",
+    "confidence": "high",
+    "notes": "Hosted on en.wikipedia (non-Commons fair use); vector SVG."
+  },
+  {
+    "slug": "university-college-london",
+    "name": "University College London",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/c/c2/UCL_Logo%2C_plain_background.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikipedia (fair use)",
+    "confidence": "high",
+    "notes": "Hosted on en.wikipedia (non-Commons fair use); vector SVG; URL contains encoded comma."
+  },
+  {
+    "slug": "university-of-edinburgh",
+    "name": "University of Edinburgh",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/3/3c/University_of_Edinburgh_Corporate_Logo_Colour.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikipedia (fair use)",
+    "confidence": "high",
+    "notes": "Corporate colour logo; non-Commons fair use; vector SVG."
+  },
+  {
+    "slug": "university-of-oxford",
+    "name": "University of Oxford",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/University_of_Oxford.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official Oxford coat-of-arms/wordmark, vector SVG."
+  },
+  {
+    "slug": "university-of-warwick",
+    "name": "University of Warwick",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/5/5b/University_of_Warwick_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikipedia (fair use)",
+    "confidence": "high",
+    "notes": "Hosted on en.wikipedia (non-Commons fair use); vector SVG."
+  },
+  {
+    "slug": "bi-norwegian-business-school",
+    "name": "BI Norwegian Business School",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/BI_Norwegian_Business_School_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Direct SVG from infobox; verified 200 OK."
+  },
+  {
+    "slug": "czech-technical-university",
+    "name": "Czech Technical University in Prague",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/a/a8/CVUT_znak.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons, CC BY-SA 3.0",
+    "confidence": "high",
+    "notes": "Initial hash from infobox guess was wrong; correct path resolved via File: page."
+  },
+  {
+    "slug": "erasmus-university-rotterdam",
+    "name": "Erasmus University Rotterdam",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Logo_Erasmus_Universiteit_Rotterdam.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Direct SVG from infobox; verified 200 OK."
+  },
+  {
+    "slug": "eth-zurich",
+    "name": "ETH Zurich",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/9/99/ETH_Z%C3%BCrich_Logo_black.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "URL contains percent-encoded umlaut; verified 200 OK."
+  },
+  {
+    "slug": "hertie-school",
+    "name": "Hertie School",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/2/23/Hertie_School_of_Governance_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "File name still references former 'of Governance' branding; this is the current logo on the Wikipedia infobox."
+  },
+  {
+    "slug": "institut-polytechnique-de-paris",
+    "name": "Institut Polytechnique de Paris",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Institut_polytechnique_de_Paris_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Direct SVG from infobox; verified 200 OK."
+  },
+  {
+    "slug": "ku-leuven",
+    "name": "KU Leuven",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/49/KU_Leuven_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Direct SVG from infobox; verified 200 OK."
+  },
+  {
+    "slug": "lund-university",
+    "name": "Lund University",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/3/3a/Lunds_universitet.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikipedia (non-free / fair use)",
+    "confidence": "high",
+    "notes": "Hosted on wikipedia/en (fair-use logo) rather than Commons; verified 200 OK."
+  },
+  {
+    "slug": "royal-college-of-art",
+    "name": "Royal College of Art",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/f/f9/Royal_College_of_Art_logo.png",
+    "source_type": "wikimedia",
+    "image_format": "png",
+    "license_note": "Wikipedia (non-free / fair use)",
+    "confidence": "high",
+    "notes": "Only PNG available on Wikipedia (en, fair-use); no SVG found in infobox."
+  },
+  {
+    "slug": "stockholm-school-of-economics",
+    "name": "Stockholm School of Economics",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/d/d0/Stockholm_School_Of_Economics_Logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikipedia (non-free / fair use)",
+    "confidence": "high",
+    "notes": "Hosted on wikipedia/en (fair-use logo) rather than Commons; verified 200 OK."
+  },
+  {
+    "slug": "tu-wien",
+    "name": "TU Wien",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/e5/TU_Signet_CMYK.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official TU Wien signet (CMYK variant); verified 200 OK."
+  },
+  {
+    "slug": "university-of-amsterdam",
+    "name": "University of Amsterdam",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Amsterdamuniversitylogo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Direct SVG from infobox; verified 200 OK."
+  },
+  {
+    "slug": "university-of-manchester",
+    "name": "University of Manchester",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/7/72/UniOfManchesterLogo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikipedia (non-free / fair use)",
+    "confidence": "high",
+    "notes": "Hosted on wikipedia/en (fair-use logo) rather than Commons; verified 200 OK."
+  },
+  {
+    "slug": "university-of-st-gallen",
+    "name": "University of St. Gallen",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/8/84/HSG_Logo_EN_RGB.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official HSG English-language RGB logo; verified 200 OK."
+  },
+  {
+    "slug": "wu-vienna",
+    "name": "WU Vienna University of Economics and Business",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/9/97/Logo_Wirtschaftsuniversit%C3%A4t_Wien.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "URL contains percent-encoded umlaut; verified 200 OK."
+  },
+  {
+    "slug": "bocconi-university",
+    "name": "Bocconi University",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Bocconi_University_Logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official Bocconi wordmark SVG from Wikimedia Commons (Pentagram 2002 identity)."
+  },
+  {
+    "slug": "tu-delft",
+    "name": "Delft University of Technology",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/9/98/Delft_University_of_Technology_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikipedia (en, fair use)",
+    "confidence": "high",
+    "notes": "Hosted on en.wikipedia (not commons) under fair-use; verified SVG."
+  },
+  {
+    "slug": "esade-business-school",
+    "name": "Esade",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/ESADE_Logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "ESADE wordmark SVG from Wikimedia Commons."
+  },
+  {
+    "slug": "geneva-graduate-institute",
+    "name": "Geneva Graduate Institute",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/43/Geneva_Graduate_Institute_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Current Geneva Graduate Institute logo SVG."
+  },
+  {
+    "slug": "ie-university",
+    "name": "IE University",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/IE_University_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official IE University crest SVG from Wikimedia Commons."
+  },
+  {
+    "slug": "karlsruhe-institute-of-technology",
+    "name": "Karlsruhe Institute of Technology",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Logo_KIT.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official KIT logo SVG (1000x500)."
+  },
+  {
+    "slug": "london-business-school",
+    "name": "London Business School",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/London_Business_School_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official LBS logo SVG from Wikimedia Commons."
+  },
+  {
+    "slug": "ntnu",
+    "name": "Norwegian University of Science and Technology",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/7/75/NTNU-logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Bruno Oldani NTNU mark, in use since 1995."
+  },
+  {
+    "slug": "rwth-aachen-university",
+    "name": "RWTH Aachen University",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/3/39/RWTH_Aachen-Logo_3.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "RWTH Aachen logo SVG from Wikimedia Commons."
+  },
+  {
+    "slug": "technical-university-of-denmark",
+    "name": "Technical University of Denmark",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/4/4e/Technical_University_of_Denmark_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikipedia (en, fair use)",
+    "confidence": "high",
+    "notes": "DTU red-diamond logo SVG hosted on en.wikipedia (fair use); verified."
+  },
+  {
+    "slug": "universidad-carlos-iii-de-madrid",
+    "name": "Universidad Carlos III de Madrid",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Logo_UC3M.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "UC3M emblem SVG from Wikimedia Commons."
+  },
+  {
+    "slug": "university-of-bologna",
+    "name": "University of Bologna",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/University_of_bologna_wordmark_svg.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons",
+    "confidence": "high",
+    "notes": "Official UniBo wordmark SVG (preferred over historic seal)."
+  },
+  {
+    "slug": "university-of-mannheim",
+    "name": "University of Mannheim",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/0/04/University_of_Mannheim.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons, public domain (DE)",
+    "confidence": "high",
+    "notes": "2017 University of Mannheim logo SVG."
+  },
+  {
+    "slug": "university-of-tartu",
+    "name": "University of Tartu",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/University_of_Tartu_circular_logo_in_EST_and_ENG.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "Bilingual EST/ENG circular logo SVG (uploaded 2025)."
+  },
+  {
+    "slug": "charles-university",
+    "name": "Charles University",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Charles-University-symbol-4.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "Official symbol from infobox of Charles University Wikipedia article."
+  },
+  {
+    "slug": "epfl-lausanne",
+    "name": "École Polytechnique Fédérale de Lausanne",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/9/95/Logo_EPFL_2019.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "Current EPFL 2019 logo from infobox."
+  },
+  {
+    "slug": "escp-business-school",
+    "name": "ESCP Business School",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/42/ESCP_LOGO_CMJN.png",
+    "source_type": "wikimedia",
+    "image_format": "png",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "PNG logo from infobox; SVG not available."
+  },
+  {
+    "slug": "goldsmiths-university-of-london",
+    "name": "Goldsmiths, University of London",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Goldsmith_University-logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "Official logo from infobox."
+  },
+  {
+    "slug": "iese-business-school",
+    "name": "IESE Business School",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/1/11/IESE_LOGO_UPDATED_2023.png",
+    "source_type": "wikimedia",
+    "image_format": "png",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "Updated 2023 IESE logo from infobox."
+  },
+  {
+    "slug": "kings-college-london",
+    "name": "King's College London",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/1/14/King%27s_College_London_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "Official KCL logo from infobox."
+  },
+  {
+    "slug": "london-school-of-economics",
+    "name": "London School of Economics and Political Science",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/London_school_of_economics_logo_with_name.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "LSE logo with name from infobox."
+  },
+  {
+    "slug": "nova-school-of-business-and-economics",
+    "name": "NOVA School of Business and Economics",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Nova_logo.png",
+    "source_type": "wikimedia",
+    "image_format": "png",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "PNG logo from infobox; SVG not available."
+  },
+  {
+    "slug": "sapienza-universita-di-roma",
+    "name": "Sapienza Università di Roma",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Uniroma1.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "Official Sapienza logo (Uniroma1) from infobox."
+  },
+  {
+    "slug": "technical-university-of-munich",
+    "name": "Technical University of Munich",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Logo_of_the_Technical_University_of_Munich.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "high",
+    "notes": "Official TUM logo in TUM blue from infobox."
+  },
+  {
+    "slug": "universitat-pompeu-fabra",
+    "name": "Universitat Pompeu Fabra",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Logo_UPF.jpg",
+    "source_type": "wikimedia",
+    "image_format": "jpg",
+    "license_note": "Wikimedia Commons, CC BY-SA 4.0",
+    "confidence": "medium",
+    "notes": "JPG logo from infobox; only format available on Wikimedia."
+  },
+  {
+    "slug": "university-of-cambridge",
+    "name": "University of Cambridge",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/2/2b/University_of_Cambridge_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia (en, fair use)",
+    "confidence": "high",
+    "notes": "Hosted on wikipedia/en (likely non-free trademark); official current logo."
+  },
+  {
+    "slug": "university-of-oslo",
+    "name": "University of Oslo",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/2/20/University_of_Oslo_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia (en, fair use)",
+    "confidence": "high",
+    "notes": "Hosted on wikipedia/en (likely non-free trademark); official current logo."
+  },
+  {
+    "slug": "university-of-warsaw",
+    "name": "University of Warsaw",
+    "source_url": "https://upload.wikimedia.org/wikipedia/en/3/31/POL_University_of_Warsaw_logo.svg",
+    "source_type": "wikimedia",
+    "image_format": "svg",
+    "license_note": "Wikimedia (en, fair use)",
+    "confidence": "high",
+    "notes": "Hosted on wikipedia/en (likely non-free trademark); official current logo."
+  }
+]

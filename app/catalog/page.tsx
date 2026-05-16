@@ -25,6 +25,7 @@ type UniRow = {
   is_partner: boolean;
   website: string | null;
   description: string | null;
+  logo_url: string | null;
 };
 
 type ProgRow = {
@@ -43,6 +44,7 @@ type ProgRow = {
     name: string;
     country: string;
     city: string;
+    logo_url: string | null;
   };
 };
 
@@ -53,7 +55,7 @@ export default async function CatalogPage() {
     supabase
       .from("universities")
       .select(
-        "slug, name, country, city, institution_type, established_year, student_count, qs_world_rank, is_partner, website, description",
+        "slug, name, country, city, institution_type, established_year, student_count, qs_world_rank, is_partner, website, description, logo_url",
       )
       .order("name"),
     supabase
@@ -62,7 +64,7 @@ export default async function CatalogPage() {
         `slug, name, degree, field_of_study, language,
          duration_months, tuition_per_year, currency,
          application_deadline, start_month,
-         university:universities!inner(slug, name, country, city)`,
+         university:universities!inner(slug, name, country, city, logo_url)`,
       )
       .order("name"),
   ]);
@@ -89,6 +91,7 @@ export default async function CatalogPage() {
     is_partner: u.is_partner,
     website: u.website,
     description: u.description,
+    logo_url: u.logo_url,
     program_count: programCounts[u.slug] || 0,
   }));
 
@@ -114,6 +117,7 @@ export default async function CatalogPage() {
       university_name: p.university.name,
       university_country: p.university.country,
       university_city: p.university.city,
+      university_logo_url: p.university.logo_url,
     }));
 
   return <CatalogClient universities={universities} programs={programs} />;

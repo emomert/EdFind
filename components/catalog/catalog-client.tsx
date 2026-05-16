@@ -19,6 +19,7 @@ import {
   COUNTRY_NAMES,
   FIELD_LABELS,
 } from "@/components/applications/types";
+import { UniversityLogo } from "@/components/university/university-logo";
 
 export type CatalogUniversity = {
   slug: string;
@@ -32,6 +33,7 @@ export type CatalogUniversity = {
   is_partner: boolean;
   website: string | null;
   description: string | null;
+  logo_url: string | null;
   program_count: number;
 };
 
@@ -50,6 +52,7 @@ export type CatalogProgram = {
   university_name: string;
   university_country: string;
   university_city: string;
+  university_logo_url: string | null;
 };
 
 const LANG_NAMES: Record<string, string> = {
@@ -439,17 +442,6 @@ function EmptyState({ message }: { message: string }) {
   );
 }
 
-function logoInitials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter((w) => /^[A-Za-z]/.test(w))
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
 function UniversityCard({ uni }: { uni: CatalogUniversity }) {
   return (
     <motion.div
@@ -464,9 +456,12 @@ function UniversityCard({ uni }: { uni: CatalogUniversity }) {
         className="group flex h-full flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-shadow hover:border-teal-200 hover:shadow-[0_12px_30px_-20px_rgba(13,148,136,0.35)] sm:p-5"
       >
         <div className="flex items-start gap-3">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 text-sm font-semibold text-white shadow-sm">
-            {logoInitials(uni.name)}
-          </div>
+          <UniversityLogo
+            name={uni.name}
+            slug={uni.slug}
+            logoUrl={uni.logo_url}
+            size="md"
+          />
           <div className="min-w-0 flex-1">
             <h3 className="line-clamp-2 text-sm font-semibold tracking-tight text-slate-900 group-hover:text-teal-700">
               {uni.name}
@@ -537,9 +532,12 @@ function ProgramCard({ prog }: { prog: CatalogProgram }) {
         className="group flex h-full flex-col gap-2.5 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-shadow hover:border-teal-200 hover:shadow-[0_10px_28px_-18px_rgba(13,148,136,0.3)] sm:p-5"
       >
         <div className="flex items-start gap-3">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-sky-500 text-xs font-semibold text-white shadow-sm">
-            {logoInitials(prog.university_name)}
-          </div>
+          <UniversityLogo
+            name={prog.university_name}
+            slug={prog.university_slug}
+            logoUrl={prog.university_logo_url}
+            size="md"
+          />
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-violet-700">
               <span className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-0.5 ring-1 ring-inset ring-violet-200">

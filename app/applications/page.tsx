@@ -34,7 +34,7 @@ export default async function ApplicationsPage() {
         `id, status, notes, deadline_at, program_id,
          program:programs!inner(
            slug, name, degree, application_deadline,
-           university:universities!inner(slug, name, country, city, website)
+           university:universities!inner(slug, name, country, city, website, logo_url)
          )`,
       )
       .eq("user_id", user.id)

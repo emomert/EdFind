@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/auth";
+import { UniversityLogo } from "@/components/university/university-logo";
 
 export const metadata: Metadata = {
   title: "Compare programs",
@@ -44,6 +45,7 @@ type CompareProgram = {
     qs_world_rank: number | null;
     is_partner: boolean;
     website: string | null;
+    logo_url: string | null;
   };
 };
 
@@ -129,7 +131,7 @@ export default async function ComparePage({
        tuition_per_year, currency, application_deadline, start_month,
        description, requirements, qs_subject_rank, qs_subject_area,
        university:universities!inner(
-         slug, name, country, city, qs_world_rank, is_partner, website
+         slug, name, country, city, qs_world_rank, is_partner, website, logo_url
        )`,
     )
     .in("id", uniqueIds);
@@ -279,17 +281,27 @@ function ProgramHeader({ program }: { program: CompareProgram }) {
   const u = program.university;
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        <MapPin className="mr-1 inline size-3" aria-hidden="true" />
-        {u.city}, {u.country}
-      </p>
+      <div className="flex items-start gap-3">
+        <UniversityLogo
+          name={u.name}
+          slug={u.slug}
+          logoUrl={u.logo_url}
+          size="sm"
+        />
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <MapPin className="mr-1 inline size-3" aria-hidden="true" />
+            {u.city}, {u.country}
+          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{u.name}</p>
+        </div>
+      </div>
       <Link
         href={`/programs/${u.slug}/${program.slug}`}
-        className="mt-2 block text-base font-semibold leading-snug tracking-tight transition-colors hover:text-primary"
+        className="mt-3 block text-base font-semibold leading-snug tracking-tight transition-colors hover:text-primary"
       >
         {program.name}
       </Link>
-      <p className="mt-1 text-xs text-muted-foreground">{u.name}</p>
     </div>
   );
 }

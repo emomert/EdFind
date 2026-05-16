@@ -25,7 +25,7 @@ export default async function ShortlistPage() {
          tuition_per_year, currency, application_deadline,
          qs_subject_rank, qs_subject_area,
          university:universities!inner(
-           slug, name, country, city, qs_world_rank, is_partner
+           slug, name, country, city, qs_world_rank, is_partner, logo_url
          )
        )`,
     )

@@ -15,6 +15,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { UniversityLogo } from "@/components/university/university-logo";
 import {
   removeApplication,
   setApplicationDeadline,
@@ -29,17 +30,6 @@ import {
   COUNTRY_NAMES,
   type ApplicationItem,
 } from "./types";
-
-function logoInitials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter((w) => /^[A-Za-z]/.test(w))
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 function nextStepFor(status: ApplicationStatus, hasNotes: boolean): string {
   switch (status) {
@@ -157,12 +147,12 @@ export function ApplicationCard({
       )}
     >
       <div className="flex items-start gap-3 sm:gap-4">
-        <div
-          className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal-100 to-teal-50 text-sm font-semibold text-teal-700 ring-1 ring-teal-100"
-          aria-hidden
-        >
-          {logoInitials(u.name)}
-        </div>
+        <UniversityLogo
+          name={u.name}
+          slug={u.slug}
+          logoUrl={u.logo_url}
+          size="md"
+        />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <Link

@@ -16,6 +16,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
+import { UniversityLogo } from "@/components/university/university-logo";
 
 type Params = { slug: string };
 
@@ -68,7 +69,7 @@ export default async function UniversityPage({
   const uniRes = await publicDb
     .from("universities")
     .select(
-      "id, slug, name, country, city, institution_type, website, description, established_year, student_count, qs_world_rank, is_partner",
+      "id, slug, name, country, city, institution_type, website, description, established_year, student_count, qs_world_rank, is_partner, logo_url",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -116,6 +117,14 @@ export default async function UniversityPage({
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
         <div>
+          <div className="mb-4 flex items-center gap-4">
+            <UniversityLogo
+              name={u.name}
+              slug={u.slug}
+              logoUrl={u.logo_url}
+              size="lg"
+            />
+          </div>
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1">
               <MapPin className="size-3.5" />

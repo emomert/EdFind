@@ -16,6 +16,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { COUNTRY_NAMES } from "@/components/applications/types";
+import { UniversityLogo } from "@/components/university/university-logo";
 import type {
   CatalogSearchProgram,
   CatalogSearchResponse,
@@ -434,9 +435,12 @@ function UniversityRow({
         active ? "bg-teal-50" : "hover:bg-slate-50",
       )}
     >
-      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 text-[11px] font-semibold text-white">
-        {logoInitials(u.name)}
-      </div>
+      <UniversityLogo
+        name={u.name}
+        slug={u.slug}
+        logoUrl={u.logo_url}
+        size="sm"
+      />
       <div className="min-w-0 flex-1">
         <p className={cn("truncate text-sm font-medium", active ? "text-teal-800" : "text-slate-800")}>
           {u.name}
@@ -474,9 +478,12 @@ function ProgramRow({
         active ? "bg-teal-50" : "hover:bg-slate-50",
       )}
     >
-      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-sky-500 text-[11px] font-semibold text-white">
-        {logoInitials(p.university_name)}
-      </div>
+      <UniversityLogo
+        name={p.university_name}
+        slug={p.university_slug}
+        logoUrl={p.university_logo_url}
+        size="sm"
+      />
       <div className="min-w-0 flex-1">
         <p className={cn("truncate text-sm font-medium", active ? "text-teal-800" : "text-slate-800")}>
           {p.name}
@@ -491,13 +498,3 @@ function ProgramRow({
   );
 }
 
-function logoInitials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter((w) => /^[A-Za-z]/.test(w))
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
