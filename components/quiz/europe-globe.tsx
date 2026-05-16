@@ -1,11 +1,18 @@
 "use client";
 
 /**
- * EuropeGlobe — interactive country picker for the quiz's `destinations`
- * question. Renders Europe (+ Turkey for orientation, since the audience is
- * Turkish) onto an azimuthal-equal-area projection clipped to a circle so
- * the map curves like a globe. The 10 EdFind-supported countries are
- * clickable; the rest of Europe sits as muted context.
+ * EuropeGlobe — interactive globe for the quiz's destinations question.
+ *
+ * Renders the world (Europe + Turkey + a wide context band of neighbouring
+ * regions) onto an azimuthal-equal-area projection clipped to a circle so
+ * the map curves like a real globe. The user can drag to rotate it; a
+ * reset button snaps the view back to Europe.
+ *
+ * Visual treatment is "stylised satellite": deep-blue ocean radial
+ * gradient, olive land, a soft cyan atmospheric glow on the rim, and a
+ * faint specular highlight that sells the spherical illusion. The ten
+ * EdFind-supported countries override the land colour with teal so they
+ * read as "pick me" without needing an extra label.
  *
  * Data: /maps/europe.topo.json (world-atlas 110m, filtered down at build
  * time by scripts/download-europe-map.mjs). Fetched at runtime so the
@@ -13,17 +20,24 @@
  *
  * Accessibility: each selectable country is a `<path>` with role="button",
  * aria-pressed, and keyboard support (Enter/Space toggle). A native SVG
- * `<title>` provides the hover tooltip and screen-reader name. The
- * consumer should also render the parallel chip list below so users who
- * can't see the map can still confirm their selection.
+ * `<title>` provides the hover tooltip and screen-reader name. Drag is
+ * pointer-only — keyboard users can still tab/select normally.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { geoAzimuthalEqualArea, geoGraticule10, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Topology } from "topojson-specification";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import { motion, useReducedMotion } from "framer-motion";
+import { RotateCcw } from "lucide-react";
 
 import type { Destination } from "@/lib/quiz/schema";
 
@@ -41,15 +55,27 @@ const SELECTABLE: Record<string, { code: Destination; name: string }> = {
   "826": { code: "GB", name: "United Kingdom" },
 };
 
-// Geographic centre + scale chosen to fit Europe + Turkey within the clip
-// circle at this canvas size. Tweak `SCALE` if you change `WIDTH`.
+// Canvas geometry.
 const WIDTH = 480;
 const HEIGHT = 480;
 const CENTER_X = WIDTH / 2;
 const CENTER_Y = HEIGHT / 2;
 const RADIUS = (WIDTH - 36) / 2;
 const SCALE = 620;
-const ROTATE: [number, number, number] = [-15, -53, 0];
+const HOME_ROTATION: [number, number, number] = [-15, -53, 0];
+
+// Pixel distance below which a pointer interaction is treated as a click
+// rather than a drag. Anything above this suppresses the country toggle so
+// the user doesn't accidentally select while panning the globe around.
+const CLICK_VS_DRAG_THRESHOLD_PX = 5;
+
+// How many degrees the globe rotates per pixel of drag. Tuned so a casual
+// swipe across the globe moves the visible centre noticeably but not
+// vertiginously.
+const DRAG_SENSITIVITY = 0.32;
+
+// Smooth-return animation duration when the user clicks the reset button.
+const RESET_DURATION_MS = 700;
 
 type GeoFeature = Feature<Geometry, { name?: string }> & {
   id?: string | number;
@@ -63,7 +89,21 @@ export function EuropeGlobe({
   onToggle: (code: Destination) => void;
 }) {
   const [topo, setTopo] = useState<Topology | null>(null);
+  const [rotation, setRotation] =
+    useState<[number, number, number]>(HOME_ROTATION);
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const reduce = useReducedMotion();
+
+  const dragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    startRotation: [number, number, number];
+    moved: boolean;
+  } | null>(null);
+  const suppressNextClickRef = useRef(false);
+  const resetRafRef = useRef<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -83,40 +123,145 @@ export function EuropeGlobe({
     };
   }, []);
 
-  const { contextFeatures, selectableFeatures, graticulePath, projectionPath } =
-    useMemo(() => {
-      if (!topo) {
-        return {
-          contextFeatures: [] as GeoFeature[],
-          selectableFeatures: [] as GeoFeature[],
-          graticulePath: "",
-          projectionPath: null as ReturnType<typeof geoPath> | null,
-        };
-      }
-      const projection = geoAzimuthalEqualArea()
-        .rotate(ROTATE)
-        .scale(SCALE)
-        .translate([CENTER_X, CENTER_Y])
-        .clipAngle(40);
-      const path = geoPath(projection);
-      const fc = feature(
-        topo,
-        topo.objects.countries as never,
-      ) as unknown as FeatureCollection<Geometry, { name?: string }>;
-      const all = fc.features as GeoFeature[];
-      const selectable = all.filter((f) =>
-        f.id !== undefined ? SELECTABLE[String(f.id)] !== undefined : false,
-      );
-      const context = all.filter((f) =>
-        f.id !== undefined ? SELECTABLE[String(f.id)] === undefined : true,
-      );
+  // Pre-parse the geometry once. The projection/path pipeline below depends
+  // only on `rotation`, so we recompute paths but never re-decode TopoJSON.
+  const features = useMemo(() => {
+    if (!topo) {
       return {
-        contextFeatures: context,
-        selectableFeatures: selectable,
-        graticulePath: path(geoGraticule10()) ?? "",
-        projectionPath: path,
+        all: [] as GeoFeature[],
+        selectable: [] as GeoFeature[],
+        context: [] as GeoFeature[],
       };
-    }, [topo]);
+    }
+    const fc = feature(
+      topo,
+      topo.objects.countries as never,
+    ) as unknown as FeatureCollection<Geometry, { name?: string }>;
+    const all = fc.features as GeoFeature[];
+    const selectable = all.filter((f) =>
+      f.id !== undefined ? SELECTABLE[String(f.id)] !== undefined : false,
+    );
+    const context = all.filter((f) =>
+      f.id !== undefined ? SELECTABLE[String(f.id)] === undefined : true,
+    );
+    return { all, selectable, context };
+  }, [topo]);
+
+  const { projectionPath, graticulePath } = useMemo(() => {
+    if (!topo) {
+      return {
+        projectionPath: null as ReturnType<typeof geoPath> | null,
+        graticulePath: "",
+      };
+    }
+    const projection = geoAzimuthalEqualArea()
+      .rotate(rotation)
+      .scale(SCALE)
+      .translate([CENTER_X, CENTER_Y])
+      .clipAngle(75);
+    const path = geoPath(projection);
+    return {
+      projectionPath: path,
+      graticulePath: path(geoGraticule10()) ?? "",
+    };
+  }, [topo, rotation]);
+
+  const cancelResetAnimation = useCallback(() => {
+    if (resetRafRef.current !== null) {
+      cancelAnimationFrame(resetRafRef.current);
+      resetRafRef.current = null;
+    }
+  }, []);
+
+  const handlePointerDown = useCallback(
+    (e: ReactPointerEvent<SVGSVGElement>) => {
+      // Ignore non-primary buttons; let middle/right-click pass through.
+      if (e.button !== 0 && e.pointerType === "mouse") return;
+      cancelResetAnimation();
+      setHasInteracted(true);
+      dragRef.current = {
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        startRotation: rotation,
+        moved: false,
+      };
+      e.currentTarget.setPointerCapture(e.pointerId);
+    },
+    [rotation, cancelResetAnimation],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: ReactPointerEvent<SVGSVGElement>) => {
+      const drag = dragRef.current;
+      if (!drag || drag.pointerId !== e.pointerId) return;
+      const dx = e.clientX - drag.startX;
+      const dy = e.clientY - drag.startY;
+      if (!drag.moved && Math.hypot(dx, dy) > CLICK_VS_DRAG_THRESHOLD_PX) {
+        drag.moved = true;
+        setIsDragging(true);
+      }
+      if (!drag.moved) return;
+      // Lambda (yaw) rotates with horizontal drag; phi (pitch) with vertical.
+      // We clamp phi to ±89° so the user can't fully flip the globe.
+      const nextLambda = drag.startRotation[0] + dx * DRAG_SENSITIVITY;
+      const nextPhi = clamp(
+        drag.startRotation[1] - dy * DRAG_SENSITIVITY,
+        -89,
+        89,
+      );
+      setRotation([nextLambda, nextPhi, drag.startRotation[2]]);
+    },
+    [],
+  );
+
+  const finishDrag = useCallback(
+    (e: ReactPointerEvent<SVGSVGElement>) => {
+      const drag = dragRef.current;
+      if (!drag || drag.pointerId !== e.pointerId) return;
+      if (drag.moved) {
+        // The pointer-up here would otherwise fire a synthetic click on the
+        // country path under the pointer. Eat the next click event.
+        suppressNextClickRef.current = true;
+      }
+      dragRef.current = null;
+      setIsDragging(false);
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        // setPointerCapture may have failed silently — releasing is best-effort.
+      }
+    },
+    [],
+  );
+
+  const resetToHome = useCallback(() => {
+    cancelResetAnimation();
+    const start = rotation;
+    const startTime = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - startTime) / RESET_DURATION_MS);
+      // ease-out-cubic
+      const eased = 1 - Math.pow(1 - t, 3);
+      setRotation([
+        lerp(start[0], HOME_ROTATION[0], eased),
+        lerp(start[1], HOME_ROTATION[1], eased),
+        lerp(start[2], HOME_ROTATION[2], eased),
+      ]);
+      if (t < 1) {
+        resetRafRef.current = requestAnimationFrame(tick);
+      } else {
+        resetRafRef.current = null;
+      }
+    };
+    resetRafRef.current = requestAnimationFrame(tick);
+  }, [rotation, cancelResetAnimation]);
+
+  useEffect(() => () => cancelResetAnimation(), [cancelResetAnimation]);
+
+  const isAtHome =
+    Math.abs(rotation[0] - HOME_ROTATION[0]) < 0.5 &&
+    Math.abs(rotation[1] - HOME_ROTATION[1]) < 0.5;
 
   if (!topo || !projectionPath) {
     return <GlobeSkeleton />;
@@ -126,46 +271,57 @@ export function EuropeGlobe({
     <div className="relative mx-auto w-full max-w-[480px]">
       <motion.svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        className="h-auto w-full select-none"
+        className="h-auto w-full touch-none select-none [filter:drop-shadow(0_18px_40px_rgba(15,23,42,0.18))]"
         role="group"
-        aria-label="Europe map — pick which countries you'd like to study in"
+        aria-label="Globe — drag to rotate, click a highlighted country to select"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={finishDrag}
+        onPointerCancel={finishDrag}
+        style={{
+          cursor: isDragging ? "grabbing" : "grab",
+          transformOrigin: `${CENTER_X}px ${CENTER_Y}px`,
+        }}
         animate={
-          reduce ? undefined : { rotate: [-1.4, 1.4, -1.4] }
+          reduce || hasInteracted ? undefined : { rotate: [-1.4, 1.4, -1.4] }
         }
         transition={
-          reduce
+          reduce || hasInteracted
             ? undefined
-            : {
-                duration: 9,
-                ease: "easeInOut",
-                repeat: Infinity,
-              }
+            : { duration: 9, ease: "easeInOut", repeat: Infinity }
         }
-        style={{ transformOrigin: `${CENTER_X}px ${CENTER_Y}px` }}
-        whileHover={{ rotate: 0 }}
       >
         <defs>
           <clipPath id="globe-clip">
             <circle cx={CENTER_X} cy={CENTER_Y} r={RADIUS} />
           </clipPath>
-          <radialGradient id="globe-ocean" cx="35%" cy="32%" r="80%">
-            <stop offset="0%" stopColor="#e0f5f3" />
-            <stop offset="100%" stopColor="#bfe6e0" />
+          <radialGradient id="globe-ocean" cx="32%" cy="28%" r="85%">
+            <stop offset="0%" stopColor="#3b6f9c" />
+            <stop offset="55%" stopColor="#1d3a5f" />
+            <stop offset="100%" stopColor="#0c1f33" />
           </radialGradient>
-          <radialGradient id="globe-shine" cx="30%" cy="28%" r="55%">
-            <stop offset="0%" stopColor="rgba(255,255,255,0.55)" />
-            <stop offset="60%" stopColor="rgba(255,255,255,0)" />
+          <radialGradient id="globe-atmosphere" cx="50%" cy="50%" r="55%">
+            <stop offset="78%" stopColor="rgba(125,211,252,0)" />
+            <stop offset="92%" stopColor="rgba(125,211,252,0.55)" />
+            <stop offset="100%" stopColor="rgba(56,189,248,0)" />
+          </radialGradient>
+          <radialGradient id="globe-shine" cx="28%" cy="22%" r="60%">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.40)" />
+            <stop offset="55%" stopColor="rgba(255,255,255,0)" />
+          </radialGradient>
+          <radialGradient id="globe-shadow" cx="68%" cy="74%" r="65%">
+            <stop offset="60%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.35)" />
           </radialGradient>
         </defs>
 
-        {/* Outer halo ring for depth. */}
+        {/* Atmospheric glow rim — slightly larger than the globe. */}
         <circle
           cx={CENTER_X}
           cy={CENTER_Y}
-          r={RADIUS + 4}
-          fill="none"
-          stroke="rgb(13 148 136 / 0.18)"
-          strokeWidth={3}
+          r={RADIUS + 10}
+          fill="url(#globe-atmosphere)"
+          pointerEvents="none"
         />
 
         {/* Ocean. */}
@@ -176,32 +332,32 @@ export function EuropeGlobe({
           fill="url(#globe-ocean)"
         />
 
-        {/* Map content, clipped to the ocean circle. */}
+        {/* Map content. */}
         <g clipPath="url(#globe-clip)">
           {graticulePath ? (
             <path
               d={graticulePath}
               fill="none"
-              stroke="rgb(15 118 110 / 0.15)"
+              stroke="rgba(186,230,253,0.18)"
               strokeWidth={0.4}
             />
           ) : null}
 
-          {contextFeatures.map((f) => {
+          {features.context.map((f) => {
             const d = projectionPath(f);
             if (!d) return null;
             return (
               <path
                 key={`ctx-${f.id}`}
                 d={d}
-                fill="rgb(203 213 225 / 0.6)"
-                stroke="rgb(148 163 184 / 0.6)"
-                strokeWidth={0.3}
+                fill="#6f7f4d"
+                stroke="rgba(20,30,15,0.4)"
+                strokeWidth={0.35}
               />
             );
           })}
 
-          {selectableFeatures.map((f) => {
+          {features.selectable.map((f) => {
             const meta = SELECTABLE[String(f.id)];
             const isSelected = selected.includes(meta.code);
             const d = projectionPath(f);
@@ -213,13 +369,19 @@ export function EuropeGlobe({
                 name={meta.name}
                 code={meta.code}
                 isSelected={isSelected}
-                onToggle={() => onToggle(meta.code)}
+                onToggle={() => {
+                  if (suppressNextClickRef.current) {
+                    suppressNextClickRef.current = false;
+                    return;
+                  }
+                  onToggle(meta.code);
+                }}
               />
             );
           })}
         </g>
 
-        {/* Glossy highlight + outer rim. */}
+        {/* Specular highlight + soft interior shadow that sell the curvature. */}
         <circle
           cx={CENTER_X}
           cy={CENTER_Y}
@@ -231,14 +393,33 @@ export function EuropeGlobe({
           cx={CENTER_X}
           cy={CENTER_Y}
           r={RADIUS}
+          fill="url(#globe-shadow)"
+          pointerEvents="none"
+        />
+
+        {/* Outer rim. */}
+        <circle
+          cx={CENTER_X}
+          cy={CENTER_Y}
+          r={RADIUS}
           fill="none"
-          stroke="rgb(15 118 110 / 0.35)"
-          strokeWidth={1.5}
+          stroke="rgba(8,47,73,0.65)"
+          strokeWidth={1.25}
         />
       </motion.svg>
 
-      {/* Live region for screen readers — narrates picks without forcing
-          them to interpret the map. */}
+      {!isAtHome ? (
+        <button
+          type="button"
+          onClick={resetToHome}
+          className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur transition-colors hover:bg-accent"
+          aria-label="Center the globe on Europe"
+        >
+          <RotateCcw className="size-3.5" />
+          Center on Europe
+        </button>
+      ) : null}
+
       <p className="sr-only" aria-live="polite">
         {selected.length === 0
           ? "No countries selected."
@@ -276,21 +457,16 @@ function SelectablePath({
           onToggle();
         }
       }}
-      className={[
-        "cursor-pointer outline-none transition-colors",
-        "focus-visible:[filter:drop-shadow(0_0_0_2px_rgb(13_148_136))]",
-      ].join(" ")}
+      className="cursor-pointer outline-none transition-colors"
       animate={{
-        fill: isSelected ? "rgb(13 148 136)" : "rgb(204 251 241)",
-        scale: isSelected ? 1.015 : 1,
+        fill: isSelected ? "#14b8a6" : "#a7d49c",
       }}
       whileHover={{
-        fill: isSelected ? "rgb(15 118 110)" : "rgb(153 246 228)",
+        fill: isSelected ? "#0d9488" : "#7fc66f",
       }}
-      transition={{ type: "spring", stiffness: 260, damping: 22 }}
-      stroke={isSelected ? "rgb(15 118 110)" : "rgb(13 148 136)"}
-      strokeWidth={isSelected ? 1 : 0.6}
-      style={{ transformBox: "fill-box", transformOrigin: "center" }}
+      transition={{ duration: 0.18 }}
+      stroke={isSelected ? "#0f766e" : "#3a5a2c"}
+      strokeWidth={isSelected ? 1 : 0.5}
     >
       <title>{name}</title>
     </motion.path>
@@ -300,8 +476,16 @@ function SelectablePath({
 function GlobeSkeleton() {
   return (
     <div className="relative mx-auto flex aspect-square w-full max-w-[480px] items-center justify-center">
-      <div className="size-[88%] animate-pulse rounded-full bg-gradient-to-br from-teal-50 to-emerald-100" />
-      <span className="sr-only">Loading map…</span>
+      <div className="size-[88%] animate-pulse rounded-full bg-gradient-to-br from-slate-200 to-slate-300" />
+      <span className="sr-only">Loading globe…</span>
     </div>
   );
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
 }
