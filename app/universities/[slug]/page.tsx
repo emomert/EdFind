@@ -12,7 +12,7 @@ import {
   Users,
 } from "lucide-react";
 
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
@@ -39,7 +39,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = createServiceClient();
+  const supabase = await createClient();
   const { data } = await supabase
     .from("universities")
     .select("name, country, city, description")
@@ -63,9 +63,9 @@ export default async function UniversityPage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const supabase = createServiceClient();
+  const publicDb = await createClient();
 
-  const uniRes = await supabase
+  const uniRes = await publicDb
     .from("universities")
     .select(
       "id, slug, name, country, city, institution_type, website, description, established_year, student_count, qs_world_rank, is_partner",
@@ -77,7 +77,7 @@ export default async function UniversityPage({
 
   const u = uniRes.data;
 
-  const programsRes = await supabase
+  const programsRes = await publicDb
     .from("programs")
     .select(
       "id, slug, name, degree, field_of_study, language, duration_months, tuition_per_year, currency, qs_subject_rank, qs_subject_area",
@@ -90,7 +90,8 @@ export default async function UniversityPage({
   const user = await getUser();
   let savedSet = new Set<string>();
   if (user && programs.length > 0) {
-    const savedRes = await supabase
+    const userDb = createServiceClient();
+    const savedRes = await userDb
       .from("saved_programs")
       .select("program_id")
       .eq("user_id", user.id)

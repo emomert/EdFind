@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getUser } from "@/lib/supabase/auth";
 import { LoginClient } from "@/components/auth/login-client";
+import { sanitizeNextPath } from "@/lib/auth/safe-redirect";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -15,10 +16,11 @@ export default async function LoginPage({
   searchParams: Promise<{ next?: string; error?: string }>;
 }) {
   const { next, error } = await searchParams;
+  const safeNext = sanitizeNextPath(next);
   const user = await getUser();
   if (user) {
-    redirect(next && next.startsWith("/") ? next : "/");
+    redirect(safeNext);
   }
 
-  return <LoginClient next={next ?? "/"} error={error ?? null} />;
+  return <LoginClient next={safeNext} error={error ?? null} />;
 }

@@ -124,6 +124,14 @@ async function loadApplicationForUser(
   return row;
 }
 
+async function assertOptionalApplicationOwnership(
+  applicationId: string | null | undefined,
+  userId: string,
+): Promise<boolean> {
+  if (applicationId === null || applicationId === undefined) return true;
+  return (await loadApplicationForUser(applicationId, userId)) !== null;
+}
+
 /**
  * Toggle a program in/out of the tracker. First click adds with default
  * 'interested' status; second click removes the row entirely. Used by the
@@ -205,7 +213,8 @@ export async function setApplicationStatus(
   const upd = await supabase
     .from("applications")
     .update({ status: parsed.data.status })
-    .eq("id", parsed.data.applicationId);
+    .eq("id", parsed.data.applicationId)
+    .eq("user_id", user.id);
   if (upd.error) {
     console.error("[setApplicationStatus] update failed", upd.error);
     return { ok: false, error: "Couldn't update status." };
@@ -238,7 +247,8 @@ export async function setApplicationNotes(
   const upd = await supabase
     .from("applications")
     .update({ notes: parsed.data.notes })
-    .eq("id", parsed.data.applicationId);
+    .eq("id", parsed.data.applicationId)
+    .eq("user_id", user.id);
   if (upd.error) {
     console.error("[setApplicationNotes] update failed", upd.error);
     return { ok: false, error: "Couldn't update notes." };
@@ -270,7 +280,8 @@ export async function setApplicationDeadline(
   const upd = await supabase
     .from("applications")
     .update({ deadline_at: parsed.data.deadline })
-    .eq("id", parsed.data.applicationId);
+    .eq("id", parsed.data.applicationId)
+    .eq("user_id", user.id);
   if (upd.error) {
     console.error("[setApplicationDeadline] update failed", upd.error);
     return { ok: false, error: "Couldn't update deadline." };
@@ -302,7 +313,8 @@ export async function removeApplication(
   const del = await supabase
     .from("applications")
     .delete()
-    .eq("id", parsed.data.applicationId);
+    .eq("id", parsed.data.applicationId)
+    .eq("user_id", user.id);
   if (del.error) {
     console.error("[removeApplication] delete failed", del.error);
     return { ok: false, error: "Couldn't remove application." };
@@ -336,73 +348,29 @@ export async function resetAllProgress(
     };
   }
 
-  // We also wipe any pre-auth rows still tied to the same client_id (e.g. test
-  // data created before sign-in that never got migrated). Either filter is
-  // safe — they only touch the caller's own rows.
+  // Collect all client_ids we should sweep for orphaned anon rows (test data
+  // created before sign-in that never got migrated).
   const cookieStore = await cookies();
   const cookieClientId = cookieStore.get(CLIENT_ID_COOKIE)?.value;
-  const clientIds = [parsed.data.clientId, cookieClientId].filter(
-    (v): v is string => Boolean(v),
+  const clientIds = Array.from(
+    new Set(
+      [parsed.data.clientId, cookieClientId].filter(
+        (v): v is string => Boolean(v),
+      ),
+    ),
   );
 
+  // Single transactional RPC — see supabase/migrations/20260516120000_*.
+  // matches.profile_id has ON DELETE CASCADE so the profiles delete
+  // implicitly clears matches.
   const supabase = createServiceClient();
-
-  // matches.profile_id → profiles.id has ON DELETE CASCADE, so deleting the
-  // profiles row also clears matches. We touch each other table explicitly
-  // so a failure surfaces a clear error.
-  const tasksByUser = await supabase
-    .from("application_tasks")
-    .delete()
-    .eq("user_id", user.id);
-  if (tasksByUser.error) {
-    console.error("[resetAllProgress] application_tasks failed", tasksByUser.error);
+  const { error } = await supabase.rpc("reset_user_progress", {
+    p_user_id: user.id,
+    p_client_ids: clientIds,
+  });
+  if (error) {
+    console.error("[resetAllProgress] rpc failed", error);
     return { ok: false, error: "Couldn't reset progress. Try again." };
-  }
-
-  const appsByUser = await supabase
-    .from("applications")
-    .delete()
-    .eq("user_id", user.id);
-  if (appsByUser.error) {
-    console.error("[resetAllProgress] applications failed", appsByUser.error);
-    return { ok: false, error: "Couldn't reset progress. Try again." };
-  }
-
-  const savesByUser = await supabase
-    .from("saved_programs")
-    .delete()
-    .eq("user_id", user.id);
-  if (savesByUser.error) {
-    console.error("[resetAllProgress] saved_programs failed", savesByUser.error);
-    return { ok: false, error: "Couldn't reset progress. Try again." };
-  }
-
-  const profilesByUser = await supabase
-    .from("profiles")
-    .delete()
-    .eq("user_id", user.id);
-  if (profilesByUser.error) {
-    console.error("[resetAllProgress] profiles failed", profilesByUser.error);
-    return { ok: false, error: "Couldn't reset progress. Try again." };
-  }
-
-  // Sweep any orphaned anon rows for this client_id too (defensive).
-  if (clientIds.length > 0) {
-    await supabase
-      .from("applications")
-      .delete()
-      .in("client_id", clientIds)
-      .is("user_id", null);
-    await supabase
-      .from("saved_programs")
-      .delete()
-      .in("client_id", clientIds)
-      .is("user_id", null);
-    await supabase
-      .from("profiles")
-      .delete()
-      .in("client_id", clientIds)
-      .is("user_id", null);
   }
 
   revalidatePath("/applications");
@@ -444,6 +412,15 @@ export async function createTask(
       error: "Please sign in to add tasks.",
       needsAuth: true,
     };
+  }
+
+  if (
+    !(await assertOptionalApplicationOwnership(
+      parsed.data.applicationId ?? null,
+      user.id,
+    ))
+  ) {
+    return { ok: false, error: "Not authorized." };
   }
 
   const supabase = createServiceClient();
@@ -497,6 +474,16 @@ export async function updateTask(rawInput: unknown): Promise<ActionResult> {
   const task = await loadTaskForUser(parsed.data.id, user.id);
   if (!task) return { ok: false, error: "Not authorized." };
 
+  if (
+    parsed.data.applicationId !== undefined &&
+    !(await assertOptionalApplicationOwnership(
+      parsed.data.applicationId,
+      user.id,
+    ))
+  ) {
+    return { ok: false, error: "Not authorized." };
+  }
+
   const patch: Record<string, unknown> = {};
   if (parsed.data.title !== undefined) patch.title = parsed.data.title;
   if (parsed.data.category !== undefined) patch.category = parsed.data.category;
@@ -511,7 +498,8 @@ export async function updateTask(rawInput: unknown): Promise<ActionResult> {
   const upd = await supabase
     .from("application_tasks")
     .update(patch)
-    .eq("id", parsed.data.id);
+    .eq("id", parsed.data.id)
+    .eq("user_id", user.id);
   if (upd.error) {
     console.error("[updateTask] update failed", upd.error);
     return { ok: false, error: "Couldn't update task." };
@@ -552,7 +540,8 @@ export async function moveTask(rawInput: unknown): Promise<ActionResult> {
   const upd = await supabase
     .from("application_tasks")
     .update({ status: parsed.data.status, sort_order: nextOrder })
-    .eq("id", parsed.data.id);
+    .eq("id", parsed.data.id)
+    .eq("user_id", user.id);
   if (upd.error) {
     console.error("[moveTask] update failed", upd.error);
     return { ok: false, error: "Couldn't move task." };
@@ -581,7 +570,8 @@ export async function deleteTask(rawInput: unknown): Promise<ActionResult> {
   const del = await supabase
     .from("application_tasks")
     .delete()
-    .eq("id", parsed.data.id);
+    .eq("id", parsed.data.id)
+    .eq("user_id", user.id);
   if (del.error) {
     console.error("[deleteTask] delete failed", del.error);
     return { ok: false, error: "Couldn't delete task." };

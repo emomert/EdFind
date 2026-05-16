@@ -3,8 +3,8 @@ import "server-only";
 import { z } from "zod";
 
 import type { ValidatedAnswers } from "@/lib/quiz/schema";
+import { callDeepSeek } from "@/lib/ai/client";
 
-const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
 const DEEPSEEK_MODEL = "deepseek-v4-flash";
 
 export type ProgramForMatching = {
@@ -134,15 +134,11 @@ export async function matchProgramsToProfile(
   answers: ValidatedAnswers,
   programs: ProgramForMatching[],
 ): Promise<MatchSuggestion[]> {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) {
-    throw new Error("DEEPSEEK_API_KEY is not set");
-  }
   if (programs.length === 0) {
     throw new Error("No programs in catalog to match against");
   }
 
-  const body = {
+  const json = (await callDeepSeek({
     model: DEEPSEEK_MODEL,
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
@@ -156,25 +152,7 @@ export async function matchProgramsToProfile(
     // "length" before any JSON is emitted. Matching is straightforward enough
     // that direct mode is sufficient and the round-trip is faster + cheaper.
     thinking: { type: "disabled" },
-  };
-
-  const res = await fetch(DEEPSEEK_API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(`DeepSeek API ${res.status}: ${errText.slice(0, 300)}`);
-  }
-
-  const json = (await res.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
-  };
+  })) as { choices?: Array<{ message?: { content?: string } }> };
   const content = json.choices?.[0]?.message?.content;
   if (!content) {
     throw new Error("DeepSeek returned no content");

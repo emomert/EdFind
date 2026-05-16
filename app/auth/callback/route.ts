@@ -4,8 +4,7 @@ import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { CLIENT_ID_COOKIE } from "@/lib/quiz/client-id";
 import { attachAnonymousRowsToUser } from "@/app/auth/migrate";
-
-const SAFE_REDIRECT = /^\/(?!\/)/;
+import { sanitizeNextPath } from "@/lib/auth/safe-redirect";
 
 /**
  * Supabase Auth OAuth callback. Exchanges the auth code in the URL for a
@@ -16,8 +15,7 @@ const SAFE_REDIRECT = /^\/(?!\/)/;
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
-  const nextRaw = url.searchParams.get("next") ?? "/";
-  const next = SAFE_REDIRECT.test(nextRaw) ? nextRaw : "/";
+  const next = sanitizeNextPath(url.searchParams.get("next"));
 
   if (!code) {
     return NextResponse.redirect(new URL("/login?error=missing_code", url));

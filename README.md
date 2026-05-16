@@ -6,7 +6,9 @@ EdFind is a SaaS web app that helps graduating students in Turkey discover and a
 
 ## Status
 
-**MVP shipped.** Live at **https://ed-find.vercel.app/**, hosted on Vercel, backed by Supabase (eu-west). The full end-to-end works in production: profile quiz → Server Action → Supabase profile + match → personalized results page. Real submissions verified on launch day (2026-05-08). What's next: more universities in the catalog, real AI matching, then auth and tier billing.
+**MVP shipped.** Live at **https://ed-find.vercel.app/**, hosted on Vercel, backed by Supabase (eu-west). The full end-to-end works in production: 9-question profile quiz (or AI free-text search) → Server Action → Supabase profile + match → personalized results page. Real submissions verified on launch day (2026-05-08).
+
+Live features beyond the original MVP: Google sign-in (required for `/quiz`, `/search`, `/results*`, `/shortlist`, `/applications`, `/compare`), shortlist + side-by-side compare, application tracker with task kanban, community pages, public `/catalog` browse, and a header command-palette search. Catalog covers **58 universities / 197 programs across 15 European countries**. Matching runs on **DeepSeek V4 Flash** (`deepseek-v4-flash`). What's next: Stripe / tier billing, Turkish localization.
 
 See [`docs/architecture.md`](docs/architecture.md) for the phased roadmap.
 

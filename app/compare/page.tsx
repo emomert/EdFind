@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/auth";
 
 export const metadata: Metadata = {
@@ -121,7 +121,7 @@ export default async function ComparePage({
     redirect("/shortlist");
   }
 
-  const supabase = createServiceClient();
+  const supabase = await createClient();
   const res = await supabase
     .from("programs")
     .select(

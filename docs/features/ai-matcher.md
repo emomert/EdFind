@@ -4,14 +4,16 @@ Replaces the Phase-4 placeholder ("Polimi MSc Management Engineering for everyon
 
 ## What it does
 
-When a student submits the profile quiz:
+When a student submits the profile quiz (or a free-text query via `/search`):
 
-1. The `submitProfile` Server Action persists the profile.
-2. It loads the entire program catalog (currently 54 programs across 38 universities) joined to university metadata.
+1. `lib/server/persist-and-match.ts` persists the profile against the authenticated `user_id`.
+2. It loads the entire program catalog (currently **197 programs across 58 universities** in 15 European countries) joined to university metadata.
 3. It calls `matchProgramsToProfile` in `lib/ai/index.ts`, which sends the profile + compressed catalog to **DeepSeek V4 Flash** (`deepseek-v4-flash`) with `response_format: { type: "json_object" }`.
-4. The model returns a ranked top-3 with `program_id`, `score` (0–100), and a one-sentence `rationale`.
+4. The model returns a ranked top-3 with `program_id`, `score` (0–100), and a 70–130-word `rationale` per match.
 5. All three matches are inserted into `matches` with their scores and rationales.
 6. The action redirects the client to `/results/[matchId]` for the **highest-scoring** match.
+
+Both the matcher and the free-text query parser go through `lib/ai/client.ts`, which adds a 25s timeout (configurable via `AI_TIMEOUT_MS`), one retry on 5xx/timeout, and an `AI_DISABLED=true` env kill switch.
 
 ## Where the code lives
 
@@ -52,7 +54,7 @@ At today's catalog size (99 programs) the request is roughly **16k input tokens 
 `MatcherOutputSchema` (Zod) requires:
 
 - `matches`: array of 1–5 entries
-- Each entry: `program_id` (non-empty string), `score` (0–100 number), `rationale` (1–400 char string)
+- Each entry: `program_id` (non-empty string), `score` (0–100 number), `rationale` (1–900 char string)
 
 After parsing, we filter to `program_id`s that actually exist in the catalog (defensive against hallucinations), sort by score desc, and take the top 3.
 
@@ -60,13 +62,15 @@ After parsing, we filter to `program_id`s that actually exist in the catalog (de
 
 | Cause | Behavior |
 |---|---|
+| `AI_DISABLED=true` | `callDeepSeek` throws `AiDisabledError` immediately. Action returns the standard error envelope. |
 | `DEEPSEEK_API_KEY` missing | Action returns `{ ok: false, error: "Couldn't run the matcher..." }` |
-| API non-200 | Same. Error logged to server console. |
-| Model returns malformed/invalid JSON | Same. |
+| API non-200 (5xx) | One retry with linear backoff; failure on second attempt surfaces an error. |
+| Timeout (default 25s) | One retry; surfaces `AiTimeoutError` on second timeout. |
+| Model returns malformed/invalid JSON | Action returns error envelope. |
 | Model returns 0 valid program ids | Same. |
 | All matches insert successfully but none have scores | Falls back to insertion order; first-inserted is treated as top match. |
 
-There is intentionally **no fallback to the placeholder match** — a degraded silent fallback would mask real outages. If the matcher is down, the user sees an error and can retry.
+There is intentionally **no fallback to the placeholder match** — a degraded silent fallback would mask real outages. If the matcher is down, the user sees an error and can retry. There is also no OpenAI fallback in code today; the README/`docs/decisions/0003-*` references to OpenAI as "backup" describe the abstraction (we route everything through `lib/ai/client.ts`), not a wired-up failover.
 
 ## Production env
 
@@ -82,5 +86,5 @@ After updating either, re-run `scripts/smoke-deepseek.mjs` locally to verify.
 - No streaming — Flash is fast enough at this catalog size that the full-response wait is fine.
 - No caching — each profile is unique and submissions are infrequent. Consider when traffic grows.
 - No A/B between Flash and Pro — Flash is sufficient now. Reassess if the matcher feels weak in user testing.
-- No retry on API failure — we just bubble the error up. The Server Action already has a clean error UX.
-- No explicit cost cap — at $0.002/submission, 100 submissions/day = $0.20/day. Revisit if traffic grows ~100x.
+- No per-user rate limit — current traffic doesn't warrant it. Add Upstash / KV-backed quota before opening up free access more broadly.
+- No explicit cost cap — at $0.003/submission, 100 submissions/day = $0.30/day. Revisit if traffic grows ~100x.

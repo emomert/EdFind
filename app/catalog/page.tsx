@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import {
   CatalogClient,
   type CatalogProgram,
@@ -47,7 +47,7 @@ type ProgRow = {
 };
 
 export default async function CatalogPage() {
-  const supabase = createServiceClient();
+  const supabase = await createClient();
 
   const [unisRes, progsRes] = await Promise.all([
     supabase

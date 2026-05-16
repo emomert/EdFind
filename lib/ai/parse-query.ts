@@ -15,8 +15,8 @@ import {
   WORK_EXPERIENCES,
   type ValidatedAnswers,
 } from "@/lib/quiz/schema";
+import { callDeepSeek } from "@/lib/ai/client";
 
-const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
 const DEEPSEEK_MODEL = "deepseek-v4-flash";
 
 // Same shape as AnswersSchema but with all fields nullable so we can detect
@@ -93,17 +93,12 @@ export type ParseQueryResult = {
 export async function parseFreeTextToProfile(
   query: string,
 ): Promise<ParseQueryResult> {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) {
-    throw new Error("DEEPSEEK_API_KEY is not set");
-  }
-
   const trimmed = query.trim();
   if (trimmed.length === 0) {
     throw new Error("Query is empty");
   }
 
-  const body = {
+  const json = (await callDeepSeek({
     model: DEEPSEEK_MODEL,
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
@@ -115,25 +110,7 @@ export async function parseFreeTextToProfile(
     // V4 Flash burns its budget on reasoning_content when thinking is on; we
     // need direct JSON. Same gotcha as the matcher in lib/ai/index.ts.
     thinking: { type: "disabled" },
-  };
-
-  const res = await fetch(DEEPSEEK_API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(`DeepSeek API ${res.status}: ${errText.slice(0, 300)}`);
-  }
-
-  const json = (await res.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
-  };
+  })) as { choices?: Array<{ message?: { content?: string } }> };
   const content = json.choices?.[0]?.message?.content;
   if (!content) {
     throw new Error("DeepSeek returned no content");

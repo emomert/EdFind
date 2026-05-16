@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/supabase/auth";
 
 type FeaturedUniversity = {
@@ -26,7 +26,8 @@ async function loadFeatured(): Promise<{
   universities: FeaturedUniversity[];
   totals: { universities: number; programs: number; countries: number };
 }> {
-  const supabase = createServiceClient();
+  // Anon client: universities + programs have public_read RLS policies.
+  const supabase = await createClient();
 
   const [uniRes, progRes, countriesRes] = await Promise.all([
     supabase

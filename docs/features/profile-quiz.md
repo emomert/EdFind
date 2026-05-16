@@ -48,13 +48,16 @@ The schema is **versioned** (`answers_version`). When we add or change a questio
 
 ## Server flow on submit
 
-1. Validate answers against the v1 Zod schema. Reject if any required key is missing or unknown.
-2. Generate a `client_id` if the browser doesn't already have one (UUIDv4, persisted to localStorage and a signed cookie).
-3. Insert into `profiles` with `tier='free'`, `answers_version=1`, the validated `answers` blob, and the `client_id`.
-4. Run the matcher (see `docs/features/matching.md` once written; in MVP, return the seeded program).
-5. Insert one row into `matches`.
-6. Return `{ matchId }` to the client.
-7. Client navigates to `/results/:matchId`.
+1. Sign-in is required (`/quiz` is auth-gated since Phase 9.4) — unauthenticated visitors are redirected to `/login?next=/quiz`.
+2. Validate answers against the v2 `AnswersSchema` (Zod). Reject if any required key is missing or unknown.
+3. Generate a `client_id` if the browser doesn't already have one (UUIDv4, persisted to localStorage and a signed cookie). The same `client_id` survives sign-in via the auth callback's `attach_anon_rows_to_user` RPC.
+4. Insert into `profiles` with `tier='free'`, `answers_version=2`, the validated `answers` blob, the `client_id`, and the authenticated `user_id`.
+5. Run the real DeepSeek V4 Flash matcher (see `docs/features/ai-matcher.md`) over the full catalog and return the top 3.
+6. Insert one row per match into `matches`, each with its score and rationale.
+7. Return `{ matchId }` for the highest-scoring match.
+8. Client navigates to `/results/:matchId`.
+
+The shared backend for `/quiz` and `/search` lives in `lib/server/persist-and-match.ts` — both entry paths converge there once they have a `ValidatedAnswers` object.
 
 ## Loading / results transition
 

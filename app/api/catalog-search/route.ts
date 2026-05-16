@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Lightweight catalog index for the header search modal. Returned shape is
@@ -37,7 +37,7 @@ export type CatalogSearchResponse = {
 };
 
 export async function GET() {
-  const supabase = createServiceClient();
+  const supabase = await createClient();
   const [unisRes, progsRes] = await Promise.all([
     supabase
       .from("universities")

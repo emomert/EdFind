@@ -16,7 +16,7 @@ import {
   Wallet,
 } from "lucide-react";
 
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
@@ -45,7 +45,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { universitySlug, programSlug } = await params;
-  const supabase = createServiceClient();
+  const supabase = await createClient();
   const uniRes = await supabase
     .from("universities")
     .select("id, name")
@@ -76,9 +76,9 @@ export default async function ProgramPage({
   params: Promise<Params>;
 }) {
   const { universitySlug, programSlug } = await params;
-  const supabase = createServiceClient();
+  const publicDb = await createClient();
 
-  const uniRes = await supabase
+  const uniRes = await publicDb
     .from("universities")
     .select(
       "id, slug, name, country, city, institution_type, website, description, qs_world_rank, is_partner",
@@ -89,7 +89,7 @@ export default async function ProgramPage({
 
   const u = uniRes.data;
 
-  const progRes = await supabase
+  const progRes = await publicDb
     .from("programs")
     .select(
       "id, slug, name, degree, field_of_study, language, duration_months, tuition_per_year, currency, application_deadline, start_month, description, requirements, qs_subject_rank, qs_subject_area",
@@ -106,7 +106,8 @@ export default async function ProgramPage({
   let isSaved = false;
   let isTracked = false;
   if (user) {
-    const savedRes = await supabase
+    const userDb = createServiceClient();
+    const savedRes = await userDb
       .from("saved_programs")
       .select("id")
       .eq("user_id", user.id)
@@ -115,7 +116,7 @@ export default async function ProgramPage({
     isSaved = Boolean(savedRes.data);
 
     if (APPLICATIONS_ENABLED) {
-      const trackedRes = await supabase
+      const trackedRes = await userDb
         .from("applications")
         .select("id")
         .eq("user_id", user.id)
@@ -125,7 +126,7 @@ export default async function ProgramPage({
     }
   }
 
-  const peersRes = await supabase
+  const peersRes = await publicDb
     .from("programs")
     .select("slug, name, degree, field_of_study, duration_months")
     .eq("university_id", u.id)
