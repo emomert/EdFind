@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, RotateCw } from "lucide-react";
 
 import {
@@ -75,6 +76,7 @@ function selectedValuesFor(answers: Answers, field: keyof Answers): string[] {
 
 export function QuizClient() {
   const router = useRouter();
+  const reduce = useReducedMotion();
   const [phase, setPhase] = useState<Phase>("questions");
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Answers>(EMPTY_ANSWERS);
@@ -250,15 +252,25 @@ export function QuizClient() {
         className="mt-10 outline-none"
         aria-live="polite"
       >
-        <QuestionScreen
-          question={question}
-          selected={selectedValues}
-          onSelect={handleSelect}
-          onBack={stepIndex === 0 ? null : handleBack}
-          onNext={handleNext}
-          canAdvance={canAdvance}
-          isLastStep={isLastStep}
-        />
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={stepIndex}
+            initial={reduce ? false : { opacity: 0, y: 12 }}
+            animate={reduce ? undefined : { opacity: 1, y: 0 }}
+            exit={reduce ? undefined : { opacity: 0, y: -8 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <QuestionScreen
+              question={question}
+              selected={selectedValues}
+              onSelect={handleSelect}
+              onBack={stepIndex === 0 ? null : handleBack}
+              onNext={handleNext}
+              canAdvance={canAdvance}
+              isLastStep={isLastStep}
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       <QuizMascot className="mt-12" />

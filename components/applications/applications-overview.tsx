@@ -7,6 +7,11 @@ import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import {
+  MarkerArrow,
+  MarkerFolder,
+  MarkerSparkles,
+} from "@/components/decor/marker";
 import type { ApplicationStatus } from "@/app/applications/actions";
 import { ApplicationCard } from "./application-card";
 import {
@@ -172,11 +177,32 @@ function EmptyApplicationsState({ hasAnyApps }: { hasAnyApps: boolean }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
-      className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center"
+      className="relative overflow-hidden rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center"
     >
-      <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-100 to-teal-50 text-teal-700">
-        <Search className="size-5" />
-      </div>
+      <MarkerSparkles
+        aria-hidden
+        className="absolute left-8 top-6 size-9 text-teal-300"
+      />
+      <MarkerSparkles
+        aria-hidden
+        className="absolute right-10 top-8 size-7 -scale-x-100 text-teal-200"
+      />
+      {hasAnyApps ? (
+        <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-100 to-teal-50 text-teal-700">
+          <Search className="size-5" />
+        </div>
+      ) : (
+        <div className="relative mx-auto inline-block">
+          <MarkerFolder
+            aria-hidden
+            className="mx-auto h-16 w-20 text-teal-600/80"
+          />
+          <MarkerArrow
+            aria-hidden
+            className="absolute -right-14 -top-2 hidden h-14 w-16 rotate-[18deg] text-teal-500/60 sm:block"
+          />
+        </div>
+      )}
       <h3 className="mt-4 text-base font-semibold tracking-tight">
         {hasAnyApps ? "Nothing matches that filter." : "No applications yet."}
       </h3>

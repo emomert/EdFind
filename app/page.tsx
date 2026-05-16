@@ -12,6 +12,14 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/supabase/auth";
 import { UniversityLogo } from "@/components/university/university-logo";
+import {
+  MarkerArrow,
+  MarkerRoute,
+  MarkerSparkles,
+  MarkerSquiggle,
+  MarkerStar,
+} from "@/components/decor/marker";
+import { Drift, Lift, Reveal, Stagger, StaggerItem } from "@/components/motion";
 
 type FeaturedUniversity = {
   slug: string;
@@ -101,8 +109,13 @@ export default async function HomePage() {
             </span>
             <h1 className="mt-5 text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Find the right{" "}
-              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                master&apos;s in Europe
+              <span className="relative inline-block">
+                <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                  master&apos;s in Europe
+                </span>
+                <MarkerSquiggle
+                  className="absolute -bottom-2 left-0 h-2.5 w-full text-primary/70 sm:-bottom-3 sm:h-3"
+                />
               </span>{" "}
               for you.
             </h1>
@@ -151,6 +164,10 @@ export default async function HomePage() {
           </div>
 
           <aside className="relative">
+            <MarkerSparkles
+              aria-hidden
+              className="absolute -right-3 -top-6 size-10 text-primary/40 sm:-right-6 sm:-top-8 sm:size-12"
+            />
             <div className="grid grid-cols-3 gap-3">
               <Stat
                 icon={<GraduationCap className="size-4" />}
@@ -169,7 +186,11 @@ export default async function HomePage() {
               />
             </div>
 
-            <div className="mt-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="relative mt-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <MarkerArrow
+                aria-hidden
+                className="absolute -left-10 top-2 hidden h-12 w-14 -rotate-12 text-primary/30 sm:block"
+              />
               <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Compass className="size-4 text-primary" />
                 How it works
@@ -195,54 +216,63 @@ export default async function HomePage() {
         id="featured"
         className="relative mx-auto max-w-6xl px-6 py-12 sm:py-16"
       >
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Featured universities
-          </h2>
-          <p className="hidden text-sm text-muted-foreground sm:block">
-            Top-ranked institutions in our catalog
-          </p>
-        </div>
+        <Reveal>
+          <div className="flex items-baseline justify-between">
+            <h2 className="relative text-2xl font-semibold tracking-tight sm:text-3xl">
+              Featured universities
+              <MarkerStar
+                aria-hidden
+                className="absolute -right-7 -top-3 size-5 text-primary/40 sm:-right-9 sm:-top-4 sm:size-6"
+              />
+            </h2>
+            <p className="hidden text-sm text-muted-foreground sm:block">
+              Top-ranked institutions in our catalog
+            </p>
+          </div>
+        </Reveal>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Stagger className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {universities.map((u) => (
-            <Link
-              key={u.slug}
-              href={`/universities/${u.slug}`}
-              className="group flex flex-col rounded-2xl border border-border bg-card p-5 transition-all hover:border-primary/40 hover:shadow-md"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <UniversityLogo
-                  name={u.name}
-                  slug={u.slug}
-                  logoUrl={u.logo_url}
-                  size="md"
-                />
-                {u.qs_world_rank ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                    <Award className="size-3" />
-                    QS #{u.qs_world_rank}
-                  </span>
-                ) : null}
-              </div>
-              <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {u.city}, {u.country}
-              </p>
-              <h3 className="mt-1 text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
-                {u.name}
-              </h3>
-              {u.description ? (
-                <p className="mt-2 line-clamp-3 flex-1 text-sm text-muted-foreground">
-                  {u.description}
-                </p>
-              ) : null}
-              <p className="mt-4 text-xs text-muted-foreground">
-                {u.program_count} program{u.program_count === 1 ? "" : "s"} in
-                catalog
-              </p>
-            </Link>
+            <StaggerItem key={u.slug}>
+              <Lift>
+                <Link
+                  href={`/universities/${u.slug}`}
+                  className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition-all hover:border-primary/40 hover:shadow-md"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <UniversityLogo
+                      name={u.name}
+                      slug={u.slug}
+                      logoUrl={u.logo_url}
+                      size="md"
+                    />
+                    {u.qs_world_rank ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        <Award className="size-3" />
+                        QS #{u.qs_world_rank}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    {u.city}, {u.country}
+                  </p>
+                  <h3 className="mt-1 text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
+                    {u.name}
+                  </h3>
+                  {u.description ? (
+                    <p className="mt-2 line-clamp-3 flex-1 text-sm text-muted-foreground">
+                      {u.description}
+                    </p>
+                  ) : null}
+                  <p className="mt-4 text-xs text-muted-foreground">
+                    {u.program_count} program{u.program_count === 1 ? "" : "s"} in
+                    catalog
+                  </p>
+                </Link>
+              </Lift>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
 
         <div className="mt-8 text-center">
           <Button asChild variant="outline">
@@ -296,8 +326,17 @@ function DecorativeBackdrop() {
       aria-hidden="true"
       className="pointer-events-none absolute inset-x-0 top-0 -z-10 overflow-hidden"
     >
-      <div className="absolute -top-20 left-1/4 size-[500px] rounded-full bg-primary/10 opacity-60 blur-3xl" />
-      <div className="absolute right-1/4 top-40 size-[400px] rounded-full bg-secondary/40 blur-3xl" />
+      <Drift className="absolute -top-20 left-1/4 size-[500px]" amplitude={18} duration={16}>
+        <div className="size-full rounded-full bg-primary/10 opacity-60 blur-3xl" />
+      </Drift>
+      <Drift
+        className="absolute right-1/4 top-40 size-[400px]"
+        amplitude={14}
+        duration={20}
+        delay={1.5}
+      >
+        <div className="size-full rounded-full bg-secondary/40 blur-3xl" />
+      </Drift>
       <svg
         className="absolute inset-x-0 top-0 -z-10 h-64 w-full text-border/40 [mask-image:linear-gradient(to_bottom,white,transparent)]"
         xmlns="http://www.w3.org/2000/svg"
@@ -316,6 +355,10 @@ function DecorativeBackdrop() {
         </defs>
         <rect width="100%" height="100%" fill="url(#hero-grid)" />
       </svg>
+      <MarkerRoute
+        className="absolute right-6 top-72 hidden h-24 w-72 text-primary/25 lg:block"
+        aria-hidden
+      />
     </div>
   );
 }

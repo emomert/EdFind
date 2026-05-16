@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Award,
-  Bookmark,
   CalendarDays,
   GraduationCap,
   Languages,
@@ -17,6 +16,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { SaveButton } from "@/components/shortlist/save-button";
 import { UniversityLogo } from "@/components/university/university-logo";
+import {
+  MarkerArrow,
+  MarkerBookmark,
+  MarkerSparkles,
+} from "@/components/decor/marker";
+import { Stagger, StaggerItem } from "@/components/motion";
 import { cn } from "@/lib/utils";
 
 export type ShortlistItem = {
@@ -161,17 +166,31 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
       ) : null}
 
       {emptyState ? (
-        <div className="mt-12 rounded-3xl border border-dashed border-border bg-card p-10 text-center">
-          <Bookmark
-            className="mx-auto size-10 text-muted-foreground"
-            aria-hidden="true"
+        <div className="relative mt-12 overflow-hidden rounded-3xl border border-dashed border-border bg-card p-10 text-center">
+          <MarkerSparkles
+            aria-hidden
+            className="absolute left-8 top-6 size-10 text-primary/25"
           />
+          <MarkerSparkles
+            aria-hidden
+            className="absolute right-10 top-12 size-8 -scale-x-100 text-primary/20"
+          />
+          <div className="relative mx-auto inline-block">
+            <MarkerBookmark
+              aria-hidden
+              className="mx-auto h-20 w-16 text-primary/70"
+            />
+            <MarkerArrow
+              aria-hidden
+              className="absolute -right-16 top-2 hidden h-16 w-20 rotate-12 text-primary/50 sm:block"
+            />
+          </div>
           <h2 className="mt-4 text-lg font-semibold tracking-tight">
             Nothing saved yet
           </h2>
           <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
             Hit the save button on any program card or detail page and it&apos;ll
-            show up here.
+            land here — ready to compare side-by-side.
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Button asChild>
@@ -183,14 +202,14 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
           </div>
         </div>
       ) : (
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+        <Stagger className="mt-8 grid gap-4 sm:grid-cols-2">
           {items.map((item) => {
             const isSelected = selected.has(item.program_id);
             const { program: p } = item;
             const u = p.university;
             const checkDisabled = !isSelected && reachedMax;
             return (
-              <li key={item.id}>
+              <StaggerItem key={item.id}>
                 <article
                   className={cn(
                     "group relative flex h-full flex-col rounded-2xl border bg-card p-5 transition-colors",
@@ -300,10 +319,10 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
                     />
                   </div>
                 </article>
-              </li>
+              </StaggerItem>
             );
           })}
-        </ul>
+        </Stagger>
       )}
     </div>
   );

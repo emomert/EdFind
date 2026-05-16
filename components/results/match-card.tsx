@@ -16,6 +16,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { SaveButton } from "@/components/shortlist/save-button";
 import { UniversityLogo } from "@/components/university/university-logo";
+import {
+  MarkerCircle,
+  MarkerSparkles,
+  MarkerStar,
+} from "@/components/decor/marker";
 
 export type MatchCardProgram = {
   slug: string;
@@ -95,7 +100,7 @@ function scoreToNumber(score: number | string | null): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function ScoreBar({ score }: { score: number }) {
+function ScoreBar({ score, withCircle = false }: { score: number; withCircle?: boolean }) {
   const pct = Math.max(0, Math.min(100, score));
   return (
     <div className="w-full">
@@ -103,9 +108,17 @@ function ScoreBar({ score }: { score: number }) {
         <span className="font-medium uppercase tracking-wider text-muted-foreground">
           Match score
         </span>
-        <span className="font-mono text-base font-semibold text-foreground">
-          {Math.round(pct)}
-          <span className="text-xs text-muted-foreground"> /100</span>
+        <span className="relative font-mono text-base font-semibold text-foreground">
+          {withCircle ? (
+            <MarkerCircle
+              aria-hidden
+              className="pointer-events-none absolute -inset-x-3 -inset-y-2 text-primary/60"
+            />
+          ) : null}
+          <span className="relative">
+            {Math.round(pct)}
+            <span className="text-xs text-muted-foreground"> /100</span>
+          </span>
         </span>
       </div>
       <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
@@ -140,6 +153,15 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-24 -left-16 size-64 rounded-full bg-secondary/40 blur-3xl"
+      />
+
+      <MarkerSparkles
+        aria-hidden
+        className="pointer-events-none absolute right-6 top-6 size-12 text-primary/30"
+      />
+      <MarkerStar
+        aria-hidden
+        className="pointer-events-none absolute left-4 top-20 hidden size-6 text-primary/30 sm:block"
       />
 
       <div className="relative">
@@ -185,7 +207,7 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
 
         {score !== null ? (
           <div className="mt-6 max-w-md">
-            <ScoreBar score={score} />
+            <ScoreBar score={score} withCircle />
           </div>
         ) : null}
 

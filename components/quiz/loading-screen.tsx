@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Loader2 } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MarkerCheck, MarkerSparkles } from "@/components/decor/marker";
 
 type Stage = {
   label: string;
@@ -21,6 +23,7 @@ type Props = {
 
 export function QuizLoadingScreen({ onComplete }: Props) {
   const [stageIndex, setStageIndex] = useState(0);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     let cancelled = false;
@@ -46,10 +49,18 @@ export function QuizLoadingScreen({ onComplete }: Props) {
 
   return (
     <div
-      className="mx-auto flex max-w-md flex-col items-center text-center"
+      className="relative mx-auto flex max-w-md flex-col items-center text-center"
       role="status"
       aria-live="polite"
     >
+      <MarkerSparkles
+        aria-hidden
+        className="absolute -left-6 -top-6 size-10 text-primary/30"
+      />
+      <MarkerSparkles
+        aria-hidden
+        className="absolute -right-4 top-2 size-8 -scale-x-100 text-primary/25"
+      />
       <Loader2 className="size-12 animate-spin text-primary" aria-hidden="true" />
       <h2 className="mt-6 text-2xl font-semibold tracking-tight">
         Matching you to programs…
@@ -76,14 +87,26 @@ export function QuizLoadingScreen({ onComplete }: Props) {
               <span
                 aria-hidden="true"
                 className={cn(
-                  "flex size-6 items-center justify-center rounded-full",
-                  status === "done" && "bg-primary text-primary-foreground",
-                  status === "active" && "bg-primary/20 text-primary",
+                  "flex size-7 shrink-0 items-center justify-center rounded-full",
+                  status === "done" && "bg-primary/15 text-primary",
+                  status === "active" && "bg-primary/15 text-primary",
                   status === "pending" && "bg-muted text-muted-foreground",
                 )}
               >
                 {status === "done" ? (
-                  <Check className="size-4" />
+                  reduce ? (
+                    <MarkerCheck className="size-4" />
+                  ) : (
+                    <motion.span
+                      key={`done-${index}`}
+                      initial={{ pathLength: 0, opacity: 0.4 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                      className="block size-4"
+                    >
+                      <MarkerCheck className="size-4" />
+                    </motion.span>
+                  )
                 ) : status === "active" ? (
                   <Loader2 className="size-4 animate-spin" />
                 ) : (
