@@ -252,7 +252,10 @@ export function EuropeGlobe({
         prevY: e.clientY,
         prevT: now,
       };
-      e.currentTarget.setPointerCapture(e.pointerId);
+      // NOTE: don't call setPointerCapture here. Capturing on the SVG would
+      // retarget the synthesized `click` event to the SVG, so taps on inner
+      // country <path>s would never fire their onClick. Capture is deferred
+      // to handlePointerMove once we know it's a drag, not a tap.
     },
     [rotation, cancelResetAnimation, cancelInertia],
   );
@@ -266,6 +269,13 @@ export function EuropeGlobe({
       if (!drag.moved && Math.hypot(dx, dy) > CLICK_VS_DRAG_THRESHOLD_PX) {
         drag.moved = true;
         setIsDragging(true);
+        // Now we know this is a drag, not a tap — capture the pointer so
+        // motion outside the SVG bounds keeps rotating the globe.
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          // Capture can fail (e.g., pointer no longer active); harmless.
+        }
       }
       if (!drag.moved) return;
       // Record sliding two-sample buffer for release-velocity estimation.

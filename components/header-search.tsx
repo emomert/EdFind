@@ -197,9 +197,6 @@ export function HeaderSearch() {
       >
         <Search className="size-3.5" />
         <span className="hidden sm:inline">Search</span>
-        <span className="hidden rounded border border-slate-200 bg-slate-50 px-1 py-px text-[10px] font-mono text-slate-400 md:inline">
-          ⌘K
-        </span>
       </button>
 
       <AnimatePresence>
