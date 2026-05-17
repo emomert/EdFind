@@ -71,10 +71,19 @@ export function StudentProgressCard({
   profile: ProfileSummary;
 }) {
   const initials = initialsOf(email);
+  // Title-case the first token only. We avoid /\b\w/ here: in JS regex (no /u
+  // flag with \w), `\w` is [A-Za-z0-9_], so Turkish letters like ğ/ş/ç/ı/ü/ö
+  // are not word chars — that creates a fake word boundary inside names like
+  // "Erdoğan" and uppercases the letter after ğ (→ "ErdoğAn"). Locale-aware
+  // uppercase on the leading character handles Turkish casing correctly
+  // (notably i → İ).
   const firstName = (displayName || (email ?? "").split("@")[0] || "there")
     .split(/\s+/)[0]
     .replace(/[._-]/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toLocaleUpperCase("tr-TR") + w.slice(1))
+    .join(" ");
 
   const targetCountries = useMemo(
     () => deriveTargetCountries(applications, profile),
