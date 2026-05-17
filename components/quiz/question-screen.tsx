@@ -44,6 +44,14 @@ const DESTINATION_NAMES: Record<Destination, string> = {
   SE: "Sweden",
   DK: "Denmark",
   IE: "Ireland",
+  AT: "Austria",
+  BE: "Belgium",
+  CZ: "Czechia",
+  EE: "Estonia",
+  FI: "Finland",
+  NO: "Norway",
+  PL: "Poland",
+  PT: "Portugal",
   ANY: "Anywhere in Europe",
 };
 
@@ -176,7 +184,7 @@ function DestinationGlobe({
 
       <p className="mt-4 text-center text-xs text-muted-foreground">
         {anyPicked
-          ? "Matching across all 15 countries in our catalog."
+          ? "Matching across all 18 countries in our catalog."
           : picked.length === 0
           ? "Click any highlighted country to add it. Click a chip to remove."
           : `${picked.length} selected — click again to remove, or pick more.`}

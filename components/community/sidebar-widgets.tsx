@@ -114,10 +114,12 @@ export function CommunityStatsCard({
 export function TopUniversitiesWidget({
   groups,
   countryNames,
+  universityLogos,
   onSelect,
 }: {
   groups: CommunityGroup[];
   countryNames: Readonly<Record<string, string>>;
+  universityLogos: Readonly<Record<string, string | null>>;
   onSelect: (g: CommunityGroup) => void;
 }) {
   return (
@@ -140,6 +142,7 @@ export function TopUniversitiesWidget({
             <CommunityGroupChip
               group={g}
               countryName={countryNames[g.country] || g.country}
+              universityLogoUrl={universityLogos[g.universitySlug] ?? null}
               onClick={() => onSelect(g)}
             />
           </li>

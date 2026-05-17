@@ -12,6 +12,9 @@ import { z } from "zod";
 
 export const ANSWERS_VERSION = 2;
 
+// Mirrors the set of countries that actually appear in `universities.country`
+// (currently 18). Adding values here is forward-compatible — old answers that
+// reference a subset stay valid, so no ANSWERS_VERSION bump is required.
 export const DESTINATIONS = [
   "IT",
   "NL",
@@ -23,6 +26,14 @@ export const DESTINATIONS = [
   "SE",
   "DK",
   "IE",
+  "AT",
+  "BE",
+  "CZ",
+  "EE",
+  "FI",
+  "NO",
+  "PL",
+  "PT",
   "ANY",
 ] as const;
 export type Destination = (typeof DESTINATIONS)[number];
@@ -161,6 +172,14 @@ export const QUESTIONS: readonly Question[] = [
       { value: "SE", label: "Sweden" },
       { value: "DK", label: "Denmark" },
       { value: "IE", label: "Ireland" },
+      { value: "AT", label: "Austria" },
+      { value: "BE", label: "Belgium" },
+      { value: "CZ", label: "Czechia" },
+      { value: "EE", label: "Estonia" },
+      { value: "FI", label: "Finland" },
+      { value: "NO", label: "Norway" },
+      { value: "PL", label: "Poland" },
+      { value: "PT", label: "Portugal" },
       { value: "ANY", label: "No preference" },
     ],
   },

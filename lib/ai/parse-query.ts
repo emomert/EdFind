@@ -51,7 +51,7 @@ Output strict JSON in this exact shape, with no markdown, no commentary, no extr
 }
 
 Allowed values:
-- destinations: IT (Italy), NL (Netherlands), DE (Germany), GB (UK / Britain / England), ES (Spain), FR (France), CH (Switzerland), SE (Sweden), DK (Denmark), IE (Ireland), or ANY for "anywhere / no preference". For multiple countries, return all of them.
+- destinations: IT (Italy), NL (Netherlands), DE (Germany), GB (UK / Britain / England), ES (Spain), FR (France), CH (Switzerland), SE (Sweden), DK (Denmark), IE (Ireland), AT (Austria), BE (Belgium), CZ (Czechia / Czech Republic), EE (Estonia), FI (Finland), NO (Norway), PL (Poland), PT (Portugal), or ANY for "anywhere / no preference". For multiple countries, return all of them.
 - field_of_study: business_management, engineering, computer_science_ai, design, architecture_built_environment, economics_finance, data_science, social_sciences. Map "management" → business_management, "MBA" → business_management, "CS"/"AI"/"machine learning" → computer_science_ai, "fintech" → economics_finance, "DS" → data_science, "humanities" → social_sciences, "architecture" → architecture_built_environment, etc.
 - budget_per_year: <10k, 10-15k, 15-20k, 20-25k, 25k+, flexible. Map any concrete number to the nearest bracket — e.g. "under 5k" → <10k, "around 12k" → 10-15k, "no budget limit" → flexible.
 - duration_preference: 12mo, 18mo, 24mo, flexible. "1 year" → 12mo, "2 years" → 24mo, "any" → flexible.

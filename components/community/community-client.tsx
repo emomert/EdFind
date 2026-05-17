@@ -44,6 +44,7 @@ export type CommunityClientProps = {
   questions: CommunityQuestion[];
   messagesByGroup: Record<string, CommunityMessage[]>;
   universityNames: Record<string, string>;
+  universityLogos: Record<string, string | null>;
   programNames: Record<string, string>;
   countryNames: Record<string, string>;
   fieldByUniversitySlug: Record<string, string | null>;
@@ -299,6 +300,7 @@ export function CommunityClient(props: CommunityClientProps) {
                     usersById={usersById}
                     countryNames={props.countryNames}
                     universityNames={props.universityNames}
+                    universityLogos={props.universityLogos}
                     typeFilter={filters.groupType}
                     typeCounts={groupTypeCounts}
                     onChangeType={(t) =>
@@ -330,6 +332,7 @@ export function CommunityClient(props: CommunityClientProps) {
                   .filter((g) => g.type === "university")
                   .sort((a, b) => b.memberCount - a.memberCount)}
                 countryNames={props.countryNames}
+                universityLogos={props.universityLogos}
                 onSelect={setOpenGroup}
               />
               {!props.isSubscribed && <UpgradeCommunityAccessCard />}
@@ -348,6 +351,12 @@ export function CommunityClient(props: CommunityClientProps) {
           messages={messagesForOpen}
           users={usersById}
           responsibles={openGroupResponsibles}
+          universityName={
+            openGroup ? props.universityNames[openGroup.universitySlug] : undefined
+          }
+          universityLogoUrl={
+            openGroup ? props.universityLogos[openGroup.universitySlug] : undefined
+          }
         />
         </motion.div>
       </div>
@@ -398,6 +407,7 @@ function GroupsTab({
   usersById,
   countryNames,
   universityNames,
+  universityLogos,
   typeFilter,
   typeCounts,
   onChangeType,
@@ -407,6 +417,7 @@ function GroupsTab({
   usersById: Readonly<Record<string, CommunityUser>>;
   countryNames: Readonly<Record<string, string>>;
   universityNames: Readonly<Record<string, string>>;
+  universityLogos: Readonly<Record<string, string | null>>;
   typeFilter: "all" | "university" | "program";
   typeCounts: { all: number; university: number; program: number };
   onChangeType: (t: "all" | "university" | "program") => void;
@@ -445,6 +456,7 @@ function GroupsTab({
                     ? universityNames[g.universitySlug]
                     : undefined
                 }
+                universityLogoUrl={universityLogos[g.universitySlug] ?? null}
                 responsibles={g.campusResponsibleIds
                   .map((id) => usersById[id])
                   .filter(Boolean)}

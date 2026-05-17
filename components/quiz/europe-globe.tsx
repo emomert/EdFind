@@ -43,13 +43,24 @@ import type { Destination } from "@/lib/quiz/schema";
 import { useSound } from "@/lib/sound/sound-context";
 
 // ISO 3166-1 numeric → EdFind destination code + display name.
+// Must mirror `DESTINATIONS` in lib/quiz/schema.ts (minus the synthetic "ANY"
+// option, which is a chip below the globe). Today: 18 countries — matches
+// the set of distinct `universities.country` values in the catalog.
 const SELECTABLE: Record<string, { code: Destination; name: string }> = {
+  "040": { code: "AT", name: "Austria" },
+  "056": { code: "BE", name: "Belgium" },
+  "203": { code: "CZ", name: "Czechia" },
   "208": { code: "DK", name: "Denmark" },
+  "233": { code: "EE", name: "Estonia" },
+  "246": { code: "FI", name: "Finland" },
   "250": { code: "FR", name: "France" },
   "276": { code: "DE", name: "Germany" },
   "372": { code: "IE", name: "Ireland" },
   "380": { code: "IT", name: "Italy" },
   "528": { code: "NL", name: "Netherlands" },
+  "578": { code: "NO", name: "Norway" },
+  "616": { code: "PL", name: "Poland" },
+  "620": { code: "PT", name: "Portugal" },
   "724": { code: "ES", name: "Spain" },
   "752": { code: "SE", name: "Sweden" },
   "756": { code: "CH", name: "Switzerland" },

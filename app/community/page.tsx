@@ -25,6 +25,7 @@ type UniRow = {
   slug: string;
   name: string;
   country: string;
+  logo_url: string | null;
 };
 
 type ProgRow = {
@@ -42,12 +43,15 @@ export default async function CommunityPage() {
 
   const supabase = createServiceClient();
   const [unisRes, progsRes, subscription] = await Promise.all([
-    supabase.from("universities").select("slug, name, country").order("name"),
+    supabase
+      .from("universities")
+      .select("slug, name, country, logo_url")
+      .order("name"),
     supabase
       .from("programs")
       .select(
         `slug, name, field_of_study,
-         university:universities!inner(slug, name, country)`,
+         university:universities!inner(slug, name, country, logo_url)`,
       )
       .order("name"),
     getSubscriptionState(),
@@ -57,9 +61,11 @@ export default async function CommunityPage() {
   const programs = ((progsRes.data ?? []) as unknown) as ProgRow[];
 
   const universityNames: Record<string, string> = {};
+  const universityLogos: Record<string, string | null> = {};
   const fieldByUniversitySlug: Record<string, string | null> = {};
   for (const u of universities) {
     universityNames[u.slug] = u.name;
+    universityLogos[u.slug] = u.logo_url;
     fieldByUniversitySlug[u.slug] = null;
   }
 
@@ -131,6 +137,7 @@ export default async function CommunityPage() {
       questions={FAKE_QUESTIONS}
       messagesByGroup={FAKE_MESSAGES_BY_GROUP}
       universityNames={universityNames}
+      universityLogos={universityLogos}
       programNames={programNames}
       countryNames={COUNTRY_NAMES}
       fieldByUniversitySlug={fieldByUniversitySlug}

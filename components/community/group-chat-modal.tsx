@@ -2,14 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowRight,
-  Crown,
-  Lock,
-  MessagesSquare,
-  Send,
-  X,
-} from "lucide-react";
+import { ArrowRight, Crown, Lock, Send, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type {
@@ -17,6 +10,7 @@ import type {
   CommunityMessage,
   CommunityUser,
 } from "@/lib/community/types";
+import { UniversityLogo } from "@/components/university/university-logo";
 import { VerifiedBadge } from "./verified-badge";
 import { UserAvatar } from "./user-avatar";
 import { RoleBadge } from "./role-badge";
@@ -35,6 +29,8 @@ export function GroupChatModal({
   messages,
   users,
   responsibles,
+  universityName,
+  universityLogoUrl,
 }: {
   open: boolean;
   onClose: () => void;
@@ -42,6 +38,8 @@ export function GroupChatModal({
   messages: CommunityMessage[];
   users: Readonly<Record<string, CommunityUser>>;
   responsibles: CommunityUser[];
+  universityName?: string;
+  universityLogoUrl?: string | null;
 }) {
   return (
     <AnimatePresence>
@@ -66,9 +64,12 @@ export function GroupChatModal({
             aria-labelledby="group-chat-title"
           >
             <header className="flex items-start gap-3 border-b border-slate-200 bg-gradient-to-br from-teal-50/80 via-white to-emerald-50/60 px-5 py-4">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 text-white shadow-sm">
-                <MessagesSquare className="size-5" />
-              </div>
+              <UniversityLogo
+                name={universityName || group.name}
+                slug={group.universitySlug}
+                logoUrl={universityLogoUrl}
+                size="md"
+              />
               <div className="min-w-0 flex-1">
                 <h2
                   id="group-chat-title"

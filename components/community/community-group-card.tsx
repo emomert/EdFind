@@ -13,6 +13,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import type { CommunityGroup, CommunityUser } from "@/lib/community/types";
+import { UniversityLogo } from "@/components/university/university-logo";
 import { useSubscription } from "./subscription-context";
 import { UserAvatar } from "./user-avatar";
 
@@ -28,15 +29,14 @@ const ACTIVITY_LABEL: Record<CommunityGroup["activityLevel"], string> = {
   high: "Buzzing",
 };
 
-function logoText(group: CommunityGroup): string {
-  const source = group.type === "university" ? group.name : group.name.split(" — ")[0];
-  return source
-    .split(/\s+/)
-    .filter((w) => /^[A-Za-z]/.test(w))
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
+// The display name for a group: program groups encode their parent uni in
+// the suffix (`Some Program — Some University`), strip it for the logo lookup
+// and the card title.
+function groupDisplayName(group: CommunityGroup): string {
+  if (group.type === "program") {
+    return group.name.split(" — ")[0] || group.name;
+  }
+  return group.name;
 }
 
 export function CommunityGroupCard({
@@ -44,19 +44,22 @@ export function CommunityGroupCard({
   responsibles,
   countryName,
   parentUniversityName,
+  universityLogoUrl,
   onOpenChat,
 }: {
   group: CommunityGroup;
   responsibles: CommunityUser[];
   countryName: string;
   parentUniversityName?: string;
+  universityLogoUrl?: string | null;
   onOpenChat: (g: CommunityGroup) => void;
 }) {
   const { isSubscribed } = useSubscription();
   const isProgram = group.type === "program";
-  const displayName = isProgram
-    ? group.name.split(" — ")[0] || group.name
-    : group.name;
+  const displayName = groupDisplayName(group);
+  // Programs don't have their own logo — they show the parent university's.
+  // For uni groups, the lookup yields the uni's logo by definition.
+  const logoName = isProgram ? parentUniversityName || displayName : group.name;
 
   return (
     <motion.article
@@ -73,16 +76,12 @@ export function CommunityGroupCard({
       )}
     >
       <header className="flex items-start gap-3">
-        <div
-          className={cn(
-            "flex size-11 shrink-0 items-center justify-center rounded-xl text-sm font-semibold shadow-sm",
-            isProgram
-              ? "bg-gradient-to-br from-violet-500 to-sky-500 text-white"
-              : "bg-gradient-to-br from-teal-500 to-emerald-500 text-white",
-          )}
-        >
-          {logoText(group)}
-        </div>
+        <UniversityLogo
+          name={logoName}
+          slug={group.universitySlug}
+          logoUrl={universityLogoUrl}
+          size="sm"
+        />
         <div className="min-w-0 flex-1">
           <span
             className={cn(
@@ -200,29 +199,26 @@ export function CommunityGroupCard({
 export function CommunityGroupChip({
   group,
   countryName,
+  universityLogoUrl,
   onClick,
 }: {
   group: CommunityGroup;
   countryName: string;
+  universityLogoUrl?: string | null;
   onClick: () => void;
 }) {
-  const isProgram = group.type === "program";
   return (
     <button
       type="button"
       onClick={onClick}
       className="group flex w-full items-center gap-3 rounded-xl border border-transparent bg-white px-3 py-2.5 text-left transition hover:border-slate-200 hover:shadow-sm"
     >
-      <div
-        className={cn(
-          "flex size-9 shrink-0 items-center justify-center rounded-lg text-xs font-semibold text-white",
-          isProgram
-            ? "bg-gradient-to-br from-violet-500/90 to-sky-500/90"
-            : "bg-gradient-to-br from-teal-500/90 to-emerald-500/90",
-        )}
-      >
-        {logoText(group)}
-      </div>
+      <UniversityLogo
+        name={groupDisplayName(group)}
+        slug={group.universitySlug}
+        logoUrl={universityLogoUrl}
+        size="sm"
+      />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-slate-800 group-hover:text-teal-700">
           {group.name.replace(" Community", "")}
