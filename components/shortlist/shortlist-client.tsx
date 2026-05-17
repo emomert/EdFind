@@ -23,6 +23,7 @@ import {
 } from "@/components/decor/marker";
 import { Stagger, StaggerItem } from "@/components/motion";
 import { cn } from "@/lib/utils";
+import { formatTuition } from "@/lib/format/currency";
 
 export type ShortlistItem = {
   id: string;
@@ -78,15 +79,6 @@ function formatField(field: string): string {
 
 function formatLanguage(code: string): string {
   return LANGUAGE_LABELS[code] ?? code.toUpperCase();
-}
-
-function formatTuition(
-  amount: string | number | null,
-  currency: string,
-): string {
-  if (amount == null) return "Tuition not listed";
-  const num = typeof amount === "string" ? Number(amount) : amount;
-  return `${currency} ${num.toLocaleString("en-GB")} / year`;
 }
 
 export function ShortlistClient({ items }: { items: ShortlistItem[] }) {

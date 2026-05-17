@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
 import { UniversityLogo } from "@/components/university/university-logo";
+import { formatTuition } from "@/lib/format/currency";
 
 type Params = { slug: string };
 
@@ -237,7 +238,7 @@ export default async function UniversityPage({
                   </p>
                   <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
                     <span className="rounded-full bg-muted px-2 py-1">
-                      {formatTuition(p.tuition_per_year, p.currency)}
+                      {formatTuition(p.tuition_per_year, p.currency, "short")}
                     </span>
                     {p.qs_subject_rank ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 font-medium text-primary">
@@ -310,11 +311,3 @@ function formatLanguage(code: string): string {
   return LANGUAGE_LABELS[code] ?? code.toUpperCase();
 }
 
-function formatTuition(
-  amount: string | number | null,
-  currency: string,
-): string {
-  if (amount == null) return "Tuition not listed";
-  const num = typeof amount === "string" ? Number(amount) : amount;
-  return `${currency} ${num.toLocaleString("en-GB")}/yr`;
-}

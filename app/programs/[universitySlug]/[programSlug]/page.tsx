@@ -23,6 +23,7 @@ import { SaveButton } from "@/components/shortlist/save-button";
 import { APPLICATIONS_ENABLED } from "@/lib/feature-flags";
 import { TrackButton } from "@/components/applications/track-button";
 import { UniversityLogo } from "@/components/university/university-logo";
+import { formatTuition } from "@/lib/format/currency";
 
 type Params = { universitySlug: string; programSlug: string };
 
@@ -147,10 +148,7 @@ export default async function ProgramPage({
       })
     : "Rolling / not posted";
 
-  const tuitionLabel =
-    p.tuition_per_year != null
-      ? `${p.currency} ${Number(p.tuition_per_year).toLocaleString("en-GB")} / year`
-      : "Tuition not listed";
+  const tuitionLabel = formatTuition(p.tuition_per_year, p.currency);
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 sm:py-16">

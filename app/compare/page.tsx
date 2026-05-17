@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/auth";
 import { UniversityLogo } from "@/components/university/university-logo";
+import { formatTuition as formatTuitionWithEur } from "@/lib/format/currency";
 
 export const metadata: Metadata = {
   title: "Compare programs",
@@ -86,13 +87,14 @@ function formatLanguage(code: string): string {
   return LANGUAGE_LABELS[code] ?? code.toUpperCase();
 }
 
+// Compare table cells are already labelled "Tuition" by the row header, so
+// the empty label "Not listed" is preferred over the longer default.
 function formatTuition(
   amount: string | number | null,
   currency: string,
 ): string {
   if (amount == null) return "Not listed";
-  const num = typeof amount === "string" ? Number(amount) : amount;
-  return `${currency} ${num.toLocaleString("en-GB")} / year`;
+  return formatTuitionWithEur(amount, currency);
 }
 
 function formatDeadline(date: string | null): string {

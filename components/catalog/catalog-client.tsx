@@ -21,6 +21,7 @@ import {
 } from "@/components/applications/types";
 import { UniversityLogo } from "@/components/university/university-logo";
 import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
+import { formatTuition } from "@/lib/format/currency";
 
 export type CatalogUniversity = {
   slug: string;
@@ -571,7 +572,7 @@ function ProgramCard({ prog }: { prog: CatalogProgram }) {
           </span>
           {prog.tuition_per_year != null && (
             <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200">
-              {Math.round(prog.tuition_per_year).toLocaleString()} {prog.currency}/yr
+              {formatTuition(prog.tuition_per_year, prog.currency, "chip")}
             </span>
           )}
         </div>

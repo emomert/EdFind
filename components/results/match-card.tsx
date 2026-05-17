@@ -21,6 +21,7 @@ import {
   MarkerStar,
 } from "@/components/decor/marker";
 import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
+import { formatTuition } from "@/lib/format/currency";
 
 export type MatchCardProgram = {
   slug: string;
@@ -83,15 +84,6 @@ function formatField(field: string): string {
 
 function formatLanguage(code: string): string {
   return LANGUAGE_LABELS[code] ?? code.toUpperCase();
-}
-
-function formatTuition(
-  amount: string | number | null,
-  currency: string,
-): string {
-  if (amount == null) return "Tuition not listed";
-  const num = typeof amount === "string" ? Number(amount) : amount;
-  return `${currency} ${num.toLocaleString("en-GB")} / year`;
 }
 
 function scoreToNumber(score: number | string | null): number | null {
