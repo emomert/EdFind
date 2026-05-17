@@ -64,6 +64,7 @@ If you find yourself reaching for an alternative (Firebase, Express backend, MUI
 | Why we picked X                                     | `docs/decisions/`                                               |
 | Brand colors, typography, voice                     | `docs/design/brand.md`                                          |
 | Per-feature specs                                   | `docs/features/`                                                |
+| How to add new universities / programs              | `docs/runbooks/add-programs.md` (read before any catalog drop)  |
 | v1 visual reference                                 | `Website UI Design Ver_1.pdf` (repo root)                       |
 | Long-term memory across sessions (Claude Code)      | `~/.claude/projects/.../memory/`                                |
 
