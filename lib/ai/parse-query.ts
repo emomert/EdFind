@@ -67,6 +67,9 @@ Rules:
 - Never invent a value not in the allowed lists.
 - Output JSON only.`;
 
+// Note: additional_context is intentionally NOT in FALLBACKS — it isn't
+// extracted by the parser, it's set further down to the student's original
+// free-text query (which IS additional context, by definition).
 const FALLBACKS = {
   destinations: ["ANY"] as const,
   field_of_study: "business_management",
@@ -77,6 +80,7 @@ const FALLBACKS = {
   career_goal: "unsure",
   academic_focus: "balanced",
   work_experience: "none",
+  additional_context: null,
 } as const satisfies ValidatedAnswers;
 
 export type ParseQueryResult = {
@@ -133,7 +137,22 @@ export async function parseFreeTextToProfile(
   const inferredFields: Array<keyof ValidatedAnswers> = [];
   const filled = { ...FALLBACKS } as Record<keyof ValidatedAnswers, unknown>;
 
-  for (const key of Object.keys(FALLBACKS) as Array<keyof ValidatedAnswers>) {
+  // The parser only extracts the 9 structured fields. additional_context is
+  // handled separately below — we set it to the student's verbatim query so
+  // the matcher gets the full free-text as a soft signal.
+  const PARSED_FIELDS = [
+    "destinations",
+    "field_of_study",
+    "budget_per_year",
+    "duration_preference",
+    "english_level",
+    "scholarship_need",
+    "career_goal",
+    "academic_focus",
+    "work_experience",
+  ] as const;
+
+  for (const key of PARSED_FIELDS) {
     const value = parserOutput.data[key];
     if (value === null || (Array.isArray(value) && value.length === 0)) {
       inferredFields.push(key);
@@ -141,6 +160,11 @@ export async function parseFreeTextToProfile(
     }
     filled[key] = value;
   }
+
+  // Pass the original query through as additional_context (bounded to match
+  // the quiz's 500-char limit). This is what makes /search results feel
+  // personal — the matcher can quote the student's actual phrasing back.
+  filled.additional_context = trimmed.slice(0, 500);
 
   // Final pass through the strict AnswersSchema — paranoid, but cheap, and
   // protects the matcher from ever seeing a malformed profile.

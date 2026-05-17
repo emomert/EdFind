@@ -79,6 +79,13 @@ export function QuestionScreen({
 
       {isDestinations ? (
         <DestinationGlobe selected={selected} onSelect={onSelect} />
+      ) : question.select === "text" ? (
+        <FreeTextInput
+          value={selected[0] ?? ""}
+          placeholder={question.placeholder}
+          maxLength={question.maxLength}
+          onChange={onSelect}
+        />
       ) : (
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
           {question.options.map((option) => (
@@ -111,6 +118,44 @@ export function QuestionScreen({
         </Button>
       </div>
     </fieldset>
+  );
+}
+
+function FreeTextInput({
+  value,
+  placeholder,
+  maxLength,
+  onChange,
+}: {
+  value: string;
+  placeholder: string;
+  maxLength: number;
+  onChange: (next: string) => void;
+}) {
+  const remaining = maxLength - value.length;
+  return (
+    <div className="mt-8">
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value.slice(0, maxLength))}
+        placeholder={placeholder}
+        rows={5}
+        maxLength={maxLength}
+        className="w-full resize-y rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+        aria-label="Anything else we should know"
+      />
+      <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+        <span>
+          You can skip this — the AI will still match using your other answers.
+        </span>
+        <span
+          aria-live="polite"
+          className={remaining < 50 ? "text-amber-700" : ""}
+        >
+          {remaining} characters left
+        </span>
+      </div>
+    </div>
   );
 }
 

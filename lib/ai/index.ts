@@ -60,6 +60,7 @@ Output strict JSON in this exact shape, with no markdown, no commentary, no extr
 Rationale style — REQUIRED:
 - Length: 70-130 words PER rationale (so the JSON output for 3 matches is ~250-400 words total). Do NOT compress. A one-sentence rationale is a failure of the format.
 - Address the student directly in second person ("You picked..." / "Your budget..." / "Since you have 1-2 years of experience..."). Quote at least two of their actual quiz answers.
+- If the student provided "additional_context" (free-text), QUOTE or paraphrase at least one specific detail from it in the rationale of the matches it actually informs. This is what makes the recommendation feel personal rather than generic.
 - Cite at least TWO concrete numbers from the program: tuition (with currency), duration, ranking, application deadline date, or English-test minimum.
 - Mention at least one meaningful caveat or trade-off (rate qualification, deadline timing, research vs. industry track, prestige vs. cost).
 - No marketing fluff. No exclamations. No emojis. No vague words like "great fit" — be specific.
@@ -81,6 +82,7 @@ Matching rules:
   · career_goal alignment with programme character (e.g. phd_research → research-oriented programmes; entrepreneurship → programmes with venture / innovation tracks; return_to_turkey → ranking & brand recognition matters more than EU placement networks)
   · ranking prestige (lower QS rank number = better)
   · scholarship_need vs tuition affordability
+  · additional_context: if the student volunteered free-text (e.g. "I want to work with Prof. X's lab", "my partner is moving to Berlin", "switching from civil engineering"), use that as a strong soft signal. A geographic constraint there can override a generic destination preference. A specific lab, professor, or sub-field mentioned should bias ranking toward programmes that plausibly host it. Family / partner location should weight that city heavily. NEVER fabricate facts about the programme to fit the context — if the catalog doesn't confirm it, just acknowledge the alignment without inventing details.
 - Diversity: if multiple strong candidates exist, prefer 3 substantively different options (different cities or different sub-fields) over 3 near-clones.
 
 Be decisive. Always return exactly 3 matches when the catalog allows it.`;
@@ -99,6 +101,9 @@ function buildUserMessage(
     career_goal: answers.career_goal,
     academic_focus: answers.academic_focus,
     work_experience: answers.work_experience,
+    // Verbatim student-typed free text — bounded at 500 chars upstream.
+    // null when the student skipped it.
+    additional_context: answers.additional_context,
   };
 
   const compactPrograms = programs.map((p) => ({

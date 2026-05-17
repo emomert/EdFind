@@ -39,12 +39,12 @@ const PATHS: Path[] = [
   {
     href: "/quiz",
     eyebrow: "Structured",
-    title: "Take the 9-question quiz",
+    title: "Take the 10-question quiz",
     description:
-      "Walk through nine quick questions about destination, budget, field of study, and goals. Best if you're still figuring out what you want.",
+      "Walk through nine quick questions about destination, budget, field of study, and goals, then add anything else we'd miss in a free-text box. Best if you're still figuring out what you want.",
     icon: <ListChecks className="size-5" />,
     bullets: [
-      "9 multiple-choice questions",
+      "9 multiple-choice + 1 optional free-text",
       "Drafts saved automatically",
       "Same AI matcher under the hood",
     ],

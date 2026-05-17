@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How EdFind's AI matching actually works</title>
+<style>
+  :root {
+    --bg: #f7f9fb;
+    --surface: #ffffff;
+    --ink: #0f172a;
+    --muted: #475569;
+    --line: #e2e8f0;
+    --teal: #0d9488;
+    --teal-bg: #ccfbf1;
+    --code-bg: #0f172a;
+    --code-ink: #e2e8f0;
+    --code-comment: #64748b;
+    --code-key: #5eead4;
+    --code-str: #fcd34d;
+    --code-num: #fda4af;
+    --code-fn: #93c5fd;
+    --amber: #b45309;
+    --amber-bg: #fef3c7;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+  header.hero {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 36px;
+    margin-bottom: 48px;
+  }
+  .eyebrow {
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  h1 {
+    font-size: 40px;
+    line-height: 1.1;
+    margin: 8px 0 16px;
+    letter-spacing: -0.015em;
+  }
+  h2 {
+    font-size: 24px;
+    margin: 56px 0 12px;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+  h2 .step {
+    display: inline-block;
+    background: var(--teal-bg);
+    color: var(--teal);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    vertical-align: middle;
+    margin-right: 10px;
+    line-height: 1.5;
+  }
+  h3 {
+    font-size: 18px;
+    margin: 32px 0 8px;
+  }
+  p { margin: 12px 0; color: #1f2937; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 6px 0; color: #1f2937; }
+  a { color: var(--teal); text-decoration: underline; text-decoration-thickness: 1.5px; }
+  .lead { font-size: 18px; color: var(--muted); }
+  .pill {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #075985;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .pill.warn {
+    background: var(--amber-bg);
+    color: var(--amber);
+  }
+  pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", monospace; }
+  code.inline {
+    background: #eef2f7;
+    color: #0f172a;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 90%;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 18px 20px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin: 16px 0 24px;
+  }
+  pre .c { color: var(--code-comment); font-style: italic; }
+  pre .k { color: #c4b5fd; }
+  pre .s { color: var(--code-str); }
+  pre .n { color: var(--code-num); }
+  pre .f { color: var(--code-fn); }
+  pre .t { color: var(--code-key); }
+  pre .filename {
+    display: block;
+    color: #94a3b8;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1e293b;
+  }
+  .pipeline {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 20px 0;
+  }
+  .pipeline ol {
+    margin: 0;
+    padding-left: 22px;
+    counter-reset: step;
+  }
+  .pipeline ol li {
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--line);
+    color: #1f2937;
+  }
+  .pipeline ol li:last-child { border-bottom: 0; }
+  .pipeline ol li b { color: var(--teal); font-weight: 600; }
+  .callout {
+    border-left: 3px solid var(--teal);
+    background: #f0fdfa;
+    padding: 12px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 20px 0;
+  }
+  .callout.warn {
+    border-left-color: #b45309;
+    background: #fef9e7;
+  }
+  .callout p:first-child { margin-top: 0; }
+  .callout p:last-child { margin-bottom: 0; }
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .grid2 .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .grid2 .card h4 {
+    margin: 0 0 6px;
+    font-size: 14px;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .grid2 .card p { margin: 0; font-size: 14px; color: #1f2937; }
+  footer {
+    margin-top: 80px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 13px;
+  }
+  @media (max-width: 640px) {
+    .wrap { padding: 32px 18px 64px; }
+    h1 { font-size: 30px; }
+    h2 { font-size: 21px; }
+    .grid2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">EdFind engineering · AI matching deep-dive</div>
+  <h1>How EdFind's AI matching actually works</h1>
+  <p class="lead">
+    A walk through the live code path that takes ten quiz answers, runs them
+    against 196 European master's programs, and returns three ranked matches
+    with a personalised rationale — synchronous, validated end-to-end, and
+    cheap enough to run inside a single Vercel function call.
+  </p>
+</header>
+
+<h2>What this document is</h2>
+<p>
+  This is a code-level explanation of EdFind's matching pipeline, not a
+  marketing overview. Every code block below is a real excerpt from the
+  current <code class="inline">main</code> branch. File paths are shown on
+  each snippet so you can jump to the source.
+</p>
+
+<div class="pipeline">
+  <strong>The full pipeline at a glance:</strong>
+  <ol>
+    <li><b>Quiz client</b> collects 9 typed answers + 1 free-text into a draft kept in <code class="inline">localStorage</code>.</li>
+    <li><b>Server Action</b> validates the payload with a Zod schema (<code class="inline">AnswersSchema</code>).</li>
+    <li><b>Persist + match</b> server function inserts the profile, loads the catalog, calls DeepSeek, persists the matches.</li>
+    <li><b>DeepSeek V4 Flash</b> receives a system prompt + the profile + the catalog as JSON, returns 3 ranked matches.</li>
+    <li><b>Output validator</b> re-parses the JSON, checks the Zod schema, drops any program_id not in the catalog.</li>
+    <li><b>Redirect</b> to <code class="inline">/results/[matchId]</code>, which reads the rationale straight from <code class="inline">matches.rationale</code>.</li>
+  </ol>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2><span class="step">1</span> The answer shape</h2>
+<p>
+  Every column the matcher sees comes from
+  <code class="inline">lib/quiz/schema.ts</code>. The
+  <code class="inline">Answers</code> type is the single source of truth — TypeScript propagates it to the UI, the
+  Server Action, the AI prompt builder, and the database column. A change
+  here ripples everywhere at compile time.
+</p>
+
+<pre><span class="filename">lib/quiz/schema.ts</span>
+<span class="k">export type</span> <span class="t">Answers</span> = {
+  destinations: Destination[];
+  field_of_study: FieldOfStudy | <span class="k">null</span>;
+  budget_per_year: BudgetBracket | <span class="k">null</span>;
+  duration_preference: Duration | <span class="k">null</span>;
+  english_level: EnglishLevel | <span class="k">null</span>;
+  scholarship_need: ScholarshipNeed | <span class="k">null</span>;
+  career_goal: CareerGoal | <span class="k">null</span>;
+  academic_focus: AcademicFocus | <span class="k">null</span>;
+  work_experience: WorkExperience | <span class="k">null</span>;
+  <span class="c">// Optional free-text. Lets the student volunteer anything that</span>
+  <span class="c">// doesn't fit a multiple-choice box (specific labs, family in a</span>
+  <span class="c">// city, motivation). Fed to the matcher verbatim and quoted back</span>
+  <span class="c">// in the rationale.</span>
+  additional_context: <span class="t">string</span> | <span class="k">null</span>;
+};</pre>
+
+<p>
+  The 9 structured fields are typed unions whose members are the exact
+  strings the quiz UI emits. They're also what the matcher sees in the
+  prompt — there's no translation layer between "user picked option X" and
+  "the AI received option X".
+</p>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2><span class="step">2</span> Server-side validation <span class="pill">Zod</span></h2>
+<p>
+  The quiz client never trusts itself. When the user hits "See my matches"
+  the answers go through
+  <code class="inline">AnswersSchema.safeParse(...)</code> on the server
+  before anything else happens. A malformed payload (extra key, invalid
+  enum value, empty <code class="inline">destinations</code>) is rejected
+  with a typed error.
+</p>
+
+<pre><span class="filename">lib/quiz/schema.ts</span>
+<span class="k">export const</span> <span class="f">AnswersSchema</span> = z.<span class="f">object</span>({
+  destinations: z.<span class="f">array</span>(z.<span class="f">enum</span>(DESTINATIONS)).<span class="f">min</span>(<span class="n">1</span>),
+  field_of_study: z.<span class="f">enum</span>(FIELDS_OF_STUDY),
+  budget_per_year: z.<span class="f">enum</span>(BUDGET_BRACKETS),
+  duration_preference: z.<span class="f">enum</span>(DURATIONS),
+  english_level: z.<span class="f">enum</span>(ENGLISH_LEVELS),
+  scholarship_need: z.<span class="f">enum</span>(SCHOLARSHIP_NEEDS),
+  career_goal: z.<span class="f">enum</span>(CAREER_GOALS),
+  academic_focus: z.<span class="f">enum</span>(ACADEMIC_FOCUS),
+  work_experience: z.<span class="f">enum</span>(WORK_EXPERIENCES),
+  <span class="c">// Optional and bounded — null or empty string when the student</span>
+  <span class="c">// skipped it. Defaulted on the server when older clients submit</span>
+  <span class="c">// a v2 payload.</span>
+  additional_context: z
+    .<span class="f">string</span>()
+    .<span class="f">max</span>(ADDITIONAL_CONTEXT_MAX_LENGTH)
+    .<span class="f">nullable</span>()
+    .<span class="f">optional</span>()
+    .<span class="f">default</span>(<span class="k">null</span>),
+});</pre>
+
+<div class="callout">
+  <p>
+    <strong>Why this matters:</strong> the matcher prompt is constructed
+    from the parsed output, not the raw input. If validation passes we
+    know every field is in its allowed enum or null — the AI can never
+    receive (and therefore can never hallucinate around) a junk value.
+  </p>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2><span class="step">3</span> Loading the catalog</h2>
+<p>
+  Once the profile is persisted we load all the programs the matcher should
+  consider. The query is intentionally wide — the catalog is small enough
+  (~200 rows) that loading everything is faster than running another LLM
+  call to pre-filter.
+</p>
+
+<pre><span class="filename">lib/server/persist-and-match.ts</span>
+<span class="k">const</span> programsRes = <span class="k">await</span> supabase
+  .<span class="f">from</span>(<span class="s">"programs"</span>)
+  .<span class="f">select</span>(
+    <span class="s">`id, slug, name, degree, field_of_study, language, duration_months,</span>
+<span class="s">     tuition_per_year, currency, description,</span>
+<span class="s">     qs_subject_rank, qs_subject_area,</span>
+<span class="s">     university:universities!inner(name, country, city, qs_world_rank, is_partner)`</span>,
+  );</pre>
+
+<p>
+  Each row is mapped into the flat
+  <code class="inline">ProgramForMatching</code> shape the prompt builder
+  expects. The university join is denormalised here so the AI sees a single
+  flat object per program rather than nested data.
+</p>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2><span class="step">4</span> Building the prompt</h2>
+<p>
+  The system prompt is a single long string in
+  <code class="inline">lib/ai/index.ts</code>. It does four things, in
+  order: declares the JSON output shape, enforces a rationale style,
+  defines hard filters, and defines soft fits.
+</p>
+
+<pre><span class="filename">lib/ai/index.ts <span style="color:#64748b">(excerpt — the contract)</span></span>
+<span class="k">const</span> SYSTEM_PROMPT = <span class="s">`You are EdFind's matching engine. EdFind helps</span>
+<span class="s">Turkish students find master's programs in Europe. Given a student's</span>
+<span class="s">profile and the full catalog of available programs, return the 3</span>
+<span class="s">best-fit programs ranked by overall match.</span>
+
+<span class="s">Output strict JSON in this exact shape, with no markdown, no</span>
+<span class="s">commentary, no extra keys:</span>
+
+<span class="s">{</span>
+<span class="s">  "matches": [</span>
+<span class="s">    { "program_id": "&lt;exact UUID from catalog&gt;",</span>
+<span class="s">      "score": 0-100,</span>
+<span class="s">      "rationale": "&lt;2-3 sentence personalised paragraph&gt;" },</span>
+<span class="s">    ... (3 entries total, ordered highest score first)</span>
+<span class="s">  ]</span>
+<span class="s">}`</span>;</pre>
+
+<p>
+  Hard filters tell the model what it must <em>never</em> include in the
+  top 3. Soft fits tell it what to weigh. The free-text
+  <code class="inline">additional_context</code> field is treated as a
+  strong soft signal — strong enough to override a generic destination
+  preference if the student mentioned a specific city.
+</p>
+
+<pre><span class="filename">lib/ai/index.ts <span style="color:#64748b">(excerpt — hard filters)</span></span>
+<span class="c">- Hard filters (a program failing any of these should never be in the</span>
+<span class="c">  top 3 unless nothing else qualifies):</span>
+<span class="c">  · Destination: if the student's destinations does NOT include "ANY",</span>
+<span class="c">    restrict to programs whose country is in the destinations list.</span>
+<span class="c">  · Language: if english_level is "intermediate", prefer programs whose</span>
+<span class="c">    language is "en" with milder requirements; never recommend a</span>
+<span class="c">    non-English program if the student's English is weak.</span>
+<span class="c">  · Budget: "&lt;10k" rules out anything above ~10,000 EUR/year (convert</span>
+<span class="c">    non-EUR roughly: 1 GBP ≈ 1.18 EUR, 1 CHF ≈ 1.05 EUR, ...).</span>
+<span class="c">  · Duration: respect duration_preference unless "flexible".</span></pre>
+
+<p>
+  The user message is a JSON-serialised dump of the profile plus a compact
+  view of the catalog. Each program's description is truncated to 240
+  chars to keep total token count tight.
+</p>
+
+<pre><span class="filename">lib/ai/index.ts <span style="color:#64748b">(excerpt — user message)</span></span>
+<span class="k">const</span> profile = {
+  destinations: answers.destinations,
+  field_of_study: answers.field_of_study,
+  budget_per_year_bracket: answers.budget_per_year,
+  duration_preference: answers.duration_preference,
+  english_level: answers.english_level,
+  scholarship_need: answers.scholarship_need,
+  career_goal: answers.career_goal,
+  academic_focus: answers.academic_focus,
+  work_experience: answers.work_experience,
+  <span class="c">// Verbatim student-typed free text — bounded at 500 chars upstream.</span>
+  additional_context: answers.additional_context,
+};
+
+<span class="k">const</span> compactPrograms = programs.<span class="f">map</span>((p) => ({
+  id: p.id,
+  name: p.name,
+  university: p.university_name,
+  country: p.university_country,
+  field: p.field_of_study,
+  language: p.language,
+  duration_months: p.duration_months,
+  tuition_per_year: p.tuition_per_year,
+  currency: p.currency,
+  qs_world_rank: p.university_qs_world_rank,
+  qs_subject_rank: p.qs_subject_rank,
+  description: (p.description ?? <span class="s">""</span>).<span class="f">slice</span>(<span class="n">0</span>, <span class="n">240</span>),
+}));</pre>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2><span class="step">5</span> Calling DeepSeek <span class="pill">V4 Flash</span></h2>
+<p>
+  Every model call goes through a single wrapper in
+  <code class="inline">lib/ai/client.ts</code>. It enforces a 25-second
+  timeout, retries once on 5xx or network failure, and short-circuits via
+  the <code class="inline">AI_DISABLED</code> env if we need to kill the
+  feature without redeploying.
+</p>
+
+<pre><span class="filename">lib/ai/client.ts <span style="color:#64748b">(excerpt — retry loop)</span></span>
+<span class="k">for</span> (<span class="k">let</span> attempt = <span class="n">1</span>; attempt &lt;= maxAttempts; attempt++) {
+  <span class="k">const</span> controller = <span class="k">new</span> <span class="f">AbortController</span>();
+  <span class="k">const</span> timeout = <span class="f">setTimeout</span>(() => controller.<span class="f">abort</span>(), DEFAULT_TIMEOUT_MS);
+
+  <span class="k">try</span> {
+    <span class="k">const</span> res = <span class="k">await</span> <span class="f">fetch</span>(DEEPSEEK_API_URL, {
+      method: <span class="s">"POST"</span>,
+      headers: {
+        Authorization: <span class="s">`Bearer ${apiKey}`</span>,
+        <span class="s">"Content-Type"</span>: <span class="s">"application/json"</span>,
+      },
+      body: <span class="f">JSON.stringify</span>(body),
+      signal: controller.signal,
+    });
+
+    <span class="k">if</span> (!res.ok) {
+      <span class="k">const</span> isRetryable = res.status &gt;= <span class="n">500</span> &amp;&amp; res.status &lt; <span class="n">600</span>;
+      <span class="k">if</span> (isRetryable &amp;&amp; attempt &lt; maxAttempts) {
+        <span class="k">await</span> <span class="f">sleep</span>(<span class="n">400</span> * attempt);
+        <span class="k">continue</span>;
+      }
+      <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">`DeepSeek API ${res.status}`</span>);
+    }
+    <span class="k">return await</span> res.<span class="f">json</span>();
+  } <span class="k">catch</span> (err) {
+    <span class="k">const</span> isAbort = err <span class="k">instanceof</span> DOMException &amp;&amp; err.name === <span class="s">"AbortError"</span>;
+    <span class="k">if</span> (isAbort &amp;&amp; attempt &lt; maxAttempts) <span class="k">continue</span>;
+    <span class="k">if</span> (isAbort) <span class="k">throw new</span> <span class="f">AiTimeoutError</span>();
+    <span class="k">throw</span> err;
+  } <span class="k">finally</span> {
+    <span class="f">clearTimeout</span>(timeout);
+  }
+}</pre>
+
+<p>
+  The matcher itself sends the request with one important and
+  non-obvious flag: <code class="inline">thinking: { type: "disabled" }</code>.
+</p>
+
+<pre><span class="filename">lib/ai/index.ts <span style="color:#64748b">(excerpt — the call)</span></span>
+<span class="k">const</span> json = <span class="k">await</span> <span class="f">callDeepSeek</span>({
+  model: DEEPSEEK_MODEL, <span class="c">// "deepseek-v4-flash"</span>
+  messages: [
+    { role: <span class="s">"system"</span>, content: SYSTEM_PROMPT },
+    { role: <span class="s">"user"</span>, content: <span class="f">buildUserMessage</span>(answers, programs) },
+  ],
+  response_format: { type: <span class="s">"json_object"</span> },
+  temperature: <span class="n">0.55</span>,
+  max_tokens: <span class="n">3000</span>,
+  <span class="c">// Disable V4's reasoning step. With thinking enabled the model</span>
+  <span class="c">// burns the entire max_tokens budget on reasoning_content and</span>
+  <span class="c">// finish_reason becomes "length" before any JSON is emitted.</span>
+  <span class="c">// Matching is straightforward enough that direct mode is</span>
+  <span class="c">// sufficient and the round-trip is faster + cheaper.</span>
+  thinking: { type: <span class="s">"disabled"</span> },
+});</pre>
+
+<div class="callout warn">
+  <p>
+    <strong>Gotcha worth a callout:</strong> V4 Flash defaults to its
+    reasoning step. With reasoning on, the model fills
+    <code class="inline">reasoning_content</code> until it hits
+    <code class="inline">max_tokens</code> and then truncates the visible
+    response — usually before any JSON is emitted. We hit this twice in
+    development before pinning <code class="inline">thinking.type</code>
+    to <code class="inline">"disabled"</code> on every call.
+  </p>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2><span class="step">6</span> Validating the output</h2>
+<p>
+  The model's response is treated as untrusted input. We parse it as JSON,
+  run it through a Zod schema, drop any
+  <code class="inline">program_id</code> that isn't in the catalog we just
+  sent, and sort by score.
+</p>
+
+<pre><span class="filename">lib/ai/index.ts <span style="color:#64748b">(excerpt — output schema)</span></span>
+<span class="k">const</span> MatcherOutputSchema = z.<span class="f">object</span>({
+  matches: z
+    .<span class="f">array</span>(
+      z.<span class="f">object</span>({
+        program_id: z.<span class="f">string</span>().<span class="f">min</span>(<span class="n">1</span>),
+        score: z.<span class="f">number</span>().<span class="f">min</span>(<span class="n">0</span>).<span class="f">max</span>(<span class="n">100</span>),
+        rationale: z.<span class="f">string</span>().<span class="f">min</span>(<span class="n">1</span>).<span class="f">max</span>(<span class="n">900</span>),
+      }),
+    )
+    .<span class="f">min</span>(<span class="n">1</span>)
+    .<span class="f">max</span>(<span class="n">5</span>),
+});</pre>
+
+<pre><span class="filename">lib/ai/index.ts <span style="color:#64748b">(excerpt — defensive parsing)</span></span>
+<span class="k">let</span> parsed: unknown;
+<span class="k">try</span> {
+  parsed = <span class="f">JSON.parse</span>(content);
+} <span class="k">catch</span> {
+  <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">`DeepSeek returned non-JSON: ${content.slice(0, 200)}`</span>);
+}
+
+<span class="k">const</span> validated = MatcherOutputSchema.<span class="f">safeParse</span>(parsed);
+<span class="k">if</span> (!validated.success) {
+  <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">`DeepSeek output failed validation`</span>);
+}
+
+<span class="c">// Drop hallucinated IDs the model invented.</span>
+<span class="k">const</span> validIds = <span class="k">new</span> <span class="f">Set</span>(programs.<span class="f">map</span>((p) => p.id));
+<span class="k">const</span> filtered = validated.data.matches.<span class="f">filter</span>((m) =>
+  validIds.<span class="f">has</span>(m.program_id),
+);
+
+filtered.<span class="f">sort</span>((a, b) => b.score - a.score);
+<span class="k">return</span> filtered.<span class="f">slice</span>(<span class="n">0</span>, <span class="n">3</span>);</pre>
+
+<div class="callout">
+  <p>
+    Three layers of defence: JSON-parse, schema-validate, ID-filter. If
+    the model ever returns a UUID that isn't in the catalog (it has, on
+    rare occasions, fabricated plausible-looking IDs), we silently drop
+    that suggestion rather than write a dangling foreign key.
+  </p>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2><span class="step">7</span> Persisting + redirecting</h2>
+<p>
+  The validated suggestions become rows in the
+  <code class="inline">matches</code> table. We sort by score, take the
+  highest, and redirect the user to
+  <code class="inline">/results/[matchId]</code>. The results page then
+  reads <code class="inline">matches.rationale</code> directly — the AI
+  call is one-shot per submission, never re-run on refresh.
+</p>
+
+<pre><span class="filename">lib/server/persist-and-match.ts</span>
+<span class="k">const</span> matchesToInsert = suggestions.<span class="f">map</span>((s) => ({
+  profile_id: profileId,
+  program_id: s.program_id,
+  score: s.score,
+  rationale: s.rationale,
+  user_id: user.id,
+}));
+
+<span class="k">const</span> matchesInsertRes = <span class="k">await</span> supabase
+  .<span class="f">from</span>(<span class="s">"matches"</span>)
+  .<span class="f">insert</span>(matchesToInsert)
+  .<span class="f">select</span>(<span class="s">"id, score"</span>);
+
+<span class="k">const</span> sortedMatches = [...matchesInsertRes.data].<span class="f">sort</span>(
+  (a, b) => <span class="f">Number</span>(b.score) - <span class="f">Number</span>(a.score),
+);
+<span class="k">const</span> topMatchId = sortedMatches[<span class="n">0</span>].id;
+<span class="k">return</span> { ok: <span class="k">true</span>, matchId: topMatchId };</pre>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2><span class="step">8</span> The personalisation layer</h2>
+<p>
+  The 10th quiz question is a free-text box. Whatever the student types
+  rides through the schema untouched and lands in the prompt as a top-level
+  <code class="inline">additional_context</code> field. The system prompt
+  has explicit instructions to quote it back.
+</p>
+
+<pre><span class="filename">lib/ai/index.ts <span style="color:#64748b">(excerpt — rationale rules)</span></span>
+<span class="c">- If the student provided "additional_context" (free-text), QUOTE or</span>
+<span class="c">  paraphrase at least one specific detail from it in the rationale of</span>
+<span class="c">  the matches it actually informs. This is what makes the</span>
+<span class="c">  recommendation feel personal rather than generic.</span></pre>
+
+<pre><span class="filename">lib/ai/index.ts <span style="color:#64748b">(excerpt — soft fits)</span></span>
+<span class="c">· additional_context: if the student volunteered free-text (e.g. "I want</span>
+<span class="c">  to work with Prof. X's lab", "my partner is moving to Berlin",</span>
+<span class="c">  "switching from civil engineering"), use that as a strong soft signal.</span>
+<span class="c">  A geographic constraint there can override a generic destination</span>
+<span class="c">  preference. A specific lab, professor, or sub-field mentioned should</span>
+<span class="c">  bias ranking toward programmes that plausibly host it. Family / partner</span>
+<span class="c">  location should weight that city heavily. NEVER fabricate facts about</span>
+<span class="c">  the programme to fit the context — if the catalog doesn't confirm it,</span>
+<span class="c">  just acknowledge the alignment without inventing details.</span></pre>
+
+<p>
+  The <code class="inline">/search</code> page (free-text entry into the
+  matcher) takes a different path: it first calls a second DeepSeek prompt
+  to <em>parse</em> the query into the structured 9 fields, then passes
+  the original verbatim text as
+  <code class="inline">additional_context</code>. So both entry points end
+  up calling the same matcher with the same schema — the only difference
+  is how the structured fields were derived.
+</p>
+
+<pre><span class="filename">lib/ai/parse-query.ts <span style="color:#64748b">(excerpt — preserving the verbatim query)</span></span>
+<span class="c">// Pass the original query through as additional_context (bounded to</span>
+<span class="c">// match the quiz's 500-char limit). This is what makes /search results</span>
+<span class="c">// feel personal — the matcher can quote the student's actual phrasing.</span>
+filled.additional_context = trimmed.<span class="f">slice</span>(<span class="n">0</span>, <span class="n">500</span>);</pre>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2><span class="step">9</span> Why DeepSeek V4 Flash</h2>
+<div class="grid2">
+  <div class="card">
+    <h4>Cost</h4>
+    <p>
+      A full matching run is ~6k input tokens (system + profile + 196
+      programs) and ~1k output tokens. At V4 Flash pricing this is well
+      under a cent per match. Cheap enough to run synchronously inside a
+      single Vercel function.
+    </p>
+  </div>
+  <div class="card">
+    <h4>Latency</h4>
+    <p>
+      Direct-mode (reasoning disabled) returns in ~3-5s on the matcher.
+      The 25s timeout in the client wrapper gives a 5× safety margin.
+      Faster classes of model (Haiku-tier) lose too much rationale
+      quality for the cost saving.
+    </p>
+  </div>
+  <div class="card">
+    <h4>JSON-mode reliability</h4>
+    <p>
+      <code class="inline">response_format: { type: "json_object" }</code>
+      plus an explicit shape in the system prompt yields well-formed JSON
+      ~100% of the time in production. We still defensively
+      <code class="inline">JSON.parse</code> + Zod-validate.
+    </p>
+  </div>
+  <div class="card">
+    <h4>Forced migration</h4>
+    <p>
+      Legacy <code class="inline">deepseek-chat</code> and
+      <code class="inline">deepseek-reasoner</code> retire 2026-07-24, so
+      V4 Flash isn't a preference — it's the only supported model. OpenAI
+      sits behind the same wrapper as a future backup.
+    </p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2><span class="step">10</span> Honest limitations</h2>
+<ul>
+  <li>
+    <strong>Static FX rates.</strong> Budget brackets are quoted in EUR
+    but tuition lives in 7 currencies. The system prompt has approximate
+    GBP/CHF/SEK/NOK/DKK/CZK/PLN-to-EUR rates baked in; they drift over
+    time. See <code class="inline">lib/format/currency.ts</code> for the
+    UI-side equivalents and refresh policy.
+  </li>
+  <li>
+    <strong>No retrieval.</strong> Every program is sent to the model on
+    every call. This is fine at ~200 programs but won't scale past
+    ~1,500 without breaking token budgets. Vector retrieval +
+    re-ranking is the obvious next step.
+  </li>
+  <li>
+    <strong>One-shot, no follow-up.</strong> The matcher can't ask
+    clarifying questions. If the student's
+    <code class="inline">additional_context</code> conflicts with their
+    structured answers (e.g. "I want to be in Berlin" but destinations =
+    Italy), the prompt instructs the model to weight the free-text
+    higher — but we never confirm.
+  </li>
+  <li>
+    <strong>No A/B telemetry.</strong> We can't yet measure whether
+    students with personalised rationales click into matches more often
+    than those without. Adding this is the next high-leverage move and
+    is currently the biggest blind spot in the system.
+  </li>
+</ul>
+
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<h2>Reading list</h2>
+<ul>
+  <li><code class="inline">lib/quiz/schema.ts</code> — answer types, Zod validator, question definitions.</li>
+  <li><code class="inline">lib/ai/index.ts</code> — system prompt, user message builder, output validator.</li>
+  <li><code class="inline">lib/ai/client.ts</code> — shared DeepSeek wrapper with timeout + retry.</li>
+  <li><code class="inline">lib/ai/parse-query.ts</code> — free-text-to-profile parser for <code class="inline">/search</code>.</li>
+  <li><code class="inline">lib/server/persist-and-match.ts</code> — the orchestrator that calls everything.</li>
+  <li><code class="inline">app/results/[matchId]/page.tsx</code> — what the student finally sees.</li>
+</ul>
+
+<footer>
+  Generated from the current <code class="inline">main</code> branch. To
+  refresh: open <code class="inline">docs/ai-matching.html</code> and
+  bring the excerpts back in line with the source files they cite.
+</footer>
+
+</div>
+</body>
+</html>

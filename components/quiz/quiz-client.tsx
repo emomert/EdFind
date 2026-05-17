@@ -145,6 +145,13 @@ function QuizClientInner() {
           return { ...prev, destinations: next };
         }
 
+        // Free-text: rawValue is the textarea's current contents. Empty
+        // string → null so the answer stays "unset" rather than empty.
+        if (question.select === "text") {
+          const trimmed = rawValue.trim();
+          return { ...prev, [question.field]: trimmed === "" ? null : rawValue };
+        }
+
         // Single-select fields: toggling the same value clears it.
         const currentValue = prev[question.field];
         if (currentValue === rawValue) {

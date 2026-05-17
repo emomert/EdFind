@@ -132,7 +132,7 @@ export default async function HomePage() {
                 <>
                   <Button asChild size="lg">
                     <Link href="/quiz">
-                      Take the 9-question quiz
+                      Take the 10-question quiz
                       <ArrowRight />
                     </Link>
                   </Button>
@@ -199,7 +199,8 @@ export default async function HomePage() {
               </p>
               <ol className="mt-4 space-y-3 text-sm text-foreground">
                 <Step n={1}>
-                  Answer 9 questions about your goals, budget, and preferences.
+                  Answer 9 multiple-choice questions plus an optional free-text
+                  prompt about anything we&apos;d miss.
                 </Step>
                 <Step n={2}>
                   Our matcher (DeepSeek V4) ranks programs across all{" "}

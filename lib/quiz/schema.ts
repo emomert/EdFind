@@ -10,7 +10,7 @@
 
 import { z } from "zod";
 
-export const ANSWERS_VERSION = 2;
+export const ANSWERS_VERSION = 3;
 
 // Mirrors the set of countries that actually appear in `universities.country`
 // (currently 18). Adding values here is forward-compatible — old answers that
@@ -105,6 +105,10 @@ export type Answers = {
   career_goal: CareerGoal | null;
   academic_focus: AcademicFocus | null;
   work_experience: WorkExperience | null;
+  // Optional free-text. Lets the student volunteer anything that doesn't fit a
+  // multiple-choice box (specific labs, family in a city, motivation). Fed to
+  // the matcher verbatim and quoted back in the rationale.
+  additional_context: string | null;
 };
 
 export const EMPTY_ANSWERS: Answers = {
@@ -117,7 +121,10 @@ export const EMPTY_ANSWERS: Answers = {
   career_goal: null,
   academic_focus: null,
   work_experience: null,
+  additional_context: null,
 };
+
+export const ADDITIONAL_CONTEXT_MAX_LENGTH = 500;
 
 export type Option<T extends string> = {
   value: T;
@@ -143,6 +150,15 @@ export type MultiQuestion<K extends keyof Answers, V extends string> = QuestionB
   options: ReadonlyArray<Option<V>>;
 };
 
+// Free-text question. The Next button is enabled even with empty text — the
+// field is genuinely optional.
+export type FreeTextQuestion<K extends keyof Answers> = QuestionBase & {
+  field: K;
+  select: "text";
+  placeholder: string;
+  maxLength: number;
+};
+
 export type Question =
   | MultiQuestion<"destinations", Destination>
   | SingleQuestion<"field_of_study", FieldOfStudy>
@@ -152,7 +168,8 @@ export type Question =
   | SingleQuestion<"scholarship_need", ScholarshipNeed>
   | SingleQuestion<"career_goal", CareerGoal>
   | SingleQuestion<"academic_focus", AcademicFocus>
-  | SingleQuestion<"work_experience", WorkExperience>;
+  | SingleQuestion<"work_experience", WorkExperience>
+  | FreeTextQuestion<"additional_context">;
 
 export const QUESTIONS: readonly Question[] = [
   {
@@ -301,6 +318,17 @@ export const QUESTIONS: readonly Question[] = [
       { value: "5_plus_years", label: "5+ years" },
     ],
   },
+  {
+    step: 10,
+    field: "additional_context",
+    select: "text",
+    legend: "Anything else we should know? (optional)",
+    helper:
+      "Specific labs you want to work with, family in a city you'd join, why this field really, anything we'd miss from multiple choice. The AI reads this and quotes it in your rationale.",
+    placeholder:
+      "e.g. I'm switching from civil engineering to data science, or I want to be near my partner in Berlin, or I'm aiming for Prof. Smith's robotics lab at TU Delft…",
+    maxLength: ADDITIONAL_CONTEXT_MAX_LENGTH,
+  },
 ];
 
 export const TOTAL_STEPS = QUESTIONS.length;
@@ -308,6 +336,10 @@ export const TOTAL_STEPS = QUESTIONS.length;
 export function isQuestionAnswered(answers: Answers, question: Question): boolean {
   if (question.field === "destinations") {
     return answers.destinations.length > 0;
+  }
+  // Free-text is optional — Next is always enabled, even with empty input.
+  if (question.select === "text") {
+    return true;
   }
   return answers[question.field] !== null;
 }
@@ -329,9 +361,17 @@ export const AnswersSchema = z.object({
   career_goal: z.enum(CAREER_GOALS),
   academic_focus: z.enum(ACADEMIC_FOCUS),
   work_experience: z.enum(WORK_EXPERIENCES),
+  // Optional and bounded — null or empty string when the student skipped it.
+  // Defaulted on the server when older clients submit a v2 payload.
+  additional_context: z
+    .string()
+    .max(ADDITIONAL_CONTEXT_MAX_LENGTH)
+    .nullable()
+    .optional()
+    .default(null),
 }) satisfies z.ZodType<{
   // Compile-time guard: AnswersSchema's parsed shape must match Answers
-  // (with non-null fields, since validation rejects null at submit time).
+  // (with non-null fields where validation rejects null at submit time).
   destinations: Destination[];
   field_of_study: FieldOfStudy;
   budget_per_year: BudgetBracket;
@@ -341,6 +381,7 @@ export const AnswersSchema = z.object({
   career_goal: CareerGoal;
   academic_focus: AcademicFocus;
   work_experience: WorkExperience;
+  additional_context: string | null;
 }>;
 
 export type ValidatedAnswers = z.infer<typeof AnswersSchema>;
