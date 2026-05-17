@@ -7,13 +7,16 @@
 //
 // Idempotent: overwrites the existing file. Not committed to a build step —
 // re-run only when you want to refresh the source data.
+//
+// 50m gives meaningfully crisper coastlines than 110m at our 480 px globe
+// scale; the cost is bundle size, which we tame below by:
+//   1. Filtering to ~46 European country geometries.
+//   2. Trimming the arcs array down to only those referenced by kept
+//      geometries (and renumbering every arc reference).
 
 import { mkdirSync, writeFileSync, existsSync } from "node:fs";
 
-// 110m (low-detail) is more than enough for a ~400 px globe and roughly
-// a quarter the size of 50m. We further trim to European country
-// geometries + Turkey below.
-const SOURCE_URL = "https://unpkg.com/world-atlas@2/countries-110m.json";
+const SOURCE_URL = "https://unpkg.com/world-atlas@2/countries-50m.json";
 const OUT_DIR = "public/maps";
 const OUT_FILE = `${OUT_DIR}/europe.topo.json`;
 
@@ -64,13 +67,12 @@ const KEEP = new Set([
   "498", // Moldova
   "499", // Montenegro
   "492", // Monaco
-  "499", // Montenegro (dupe-safe)
   "528", // Netherlands
   "578", // Norway
   "616", // Poland
   "620", // Portugal
   "642", // Romania
-  "643", // Russia (kept for visual mass; clipped by projection anyway)
+  "643", // Russia (visual mass; far East clipped by the projection anyway)
   "674", // San Marino
   "688", // Serbia
   "703", // Slovakia
@@ -84,20 +86,97 @@ const KEEP = new Set([
   "826", // United Kingdom
 ]);
 
-const before = topo.objects.countries.geometries.length;
+const beforeCount = topo.objects.countries.geometries.length;
 topo.objects.countries.geometries = topo.objects.countries.geometries.filter(
   (g) => KEEP.has(String(g.id)),
 );
-const after = topo.objects.countries.geometries.length;
-// We deliberately leave the arc array intact — filtering arcs requires
-// rewriting every geometry's arc index references. At 110m the arc array is
-// already tiny enough that this isn't worth the complexity.
+const afterCount = topo.objects.countries.geometries.length;
 
-// Trim land/100m boundaries we don't render to save another few KB.
+// ─────────────────────────────────────────────────────────────────────────
+// Arc trimming
+//
+// In TopoJSON, geometries reference shared arcs by index. Negative indices
+// mean "reverse that arc" (encoded as ~index, so -1 → arc 0 reversed). After
+// filtering geometries we can drop arcs no one references. We must also
+// renumber the surviving arcs so all index references stay valid.
+// ─────────────────────────────────────────────────────────────────────────
+
+const used = new Set();
+
+// Walk an arbitrarily nested arc-reference structure (Polygon, MultiPolygon,
+// LineString, MultiLineString all bottom out at a flat number[]).
+function collectFromArcs(arcs) {
+  if (!arcs) return;
+  if (arcs.length === 0) return;
+  if (typeof arcs[0] === "number") {
+    for (const ref of arcs) {
+      const abs = ref < 0 ? ~ref : ref;
+      used.add(abs);
+    }
+  } else {
+    for (const sub of arcs) collectFromArcs(sub);
+  }
+}
+
+function collectFromGeometry(geom) {
+  if (!geom) return;
+  if (geom.arcs) collectFromArcs(geom.arcs);
+  if (geom.geometries) {
+    for (const child of geom.geometries) collectFromGeometry(child);
+  }
+}
+
+for (const g of topo.objects.countries.geometries) {
+  collectFromGeometry(g);
+}
+
+// Build the old → new index remap. Sort so spatial locality is preserved
+// (gzip compresses contiguous-ish arc data better).
+const oldToNew = new Map();
+const sortedUsed = [...used].sort((a, b) => a - b);
+sortedUsed.forEach((oldIdx, newIdx) => oldToNew.set(oldIdx, newIdx));
+
+function rewriteArcs(arcs) {
+  if (!arcs || arcs.length === 0) return;
+  if (typeof arcs[0] === "number") {
+    for (let i = 0; i < arcs.length; i++) {
+      const ref = arcs[i];
+      const neg = ref < 0;
+      const oldAbs = neg ? ~ref : ref;
+      const newAbs = oldToNew.get(oldAbs);
+      if (newAbs === undefined) {
+        throw new Error(`Arc ${oldAbs} referenced but not in used set`);
+      }
+      arcs[i] = neg ? ~newAbs : newAbs;
+    }
+  } else {
+    for (const sub of arcs) rewriteArcs(sub);
+  }
+}
+
+function rewriteGeometry(geom) {
+  if (!geom) return;
+  if (geom.arcs) rewriteArcs(geom.arcs);
+  if (geom.geometries) {
+    for (const child of geom.geometries) rewriteGeometry(child);
+  }
+}
+
+for (const g of topo.objects.countries.geometries) {
+  rewriteGeometry(g);
+}
+
+const arcsBefore = topo.arcs.length;
+topo.arcs = sortedUsed.map((i) => topo.arcs[i]);
+const arcsAfter = topo.arcs.length;
+
+// Strip the land outline object we don't render.
 if (topo.objects.land) delete topo.objects.land;
 
 const text = JSON.stringify(topo);
 writeFileSync(OUT_FILE, text);
 console.log(
-  `✓ Wrote ${OUT_FILE} (${(text.length / 1024).toFixed(1)} KB, ${after} of ${before} countries)`,
+  `✓ Wrote ${OUT_FILE} (${(text.length / 1024).toFixed(1)} KB, ` +
+    `${afterCount} of ${beforeCount} countries, ` +
+    `${arcsAfter} of ${arcsBefore} arcs)`,
 );

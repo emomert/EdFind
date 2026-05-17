@@ -458,8 +458,9 @@ export function EuropeGlobe({
                 key={`ctx-${f.id}`}
                 d={d}
                 fill="#6f7f4d"
-                stroke="rgba(20,30,15,0.4)"
-                strokeWidth={0.35}
+                stroke="rgba(15,25,10,0.55)"
+                strokeWidth={0.5}
+                strokeLinejoin="round"
               />
             );
           })}
@@ -573,8 +574,9 @@ function SelectablePath({
         fill: isSelected ? "#0d9488" : "#7fc66f",
       }}
       transition={{ duration: 0.18 }}
-      stroke={isSelected ? "#0f766e" : "#3a5a2c"}
-      strokeWidth={isSelected ? 1 : 0.5}
+      stroke={isSelected ? "#0f766e" : "#2c4720"}
+      strokeWidth={isSelected ? 1.25 : 0.7}
+      strokeLinejoin="round"
     >
       <title>{name}</title>
     </motion.path>
