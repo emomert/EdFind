@@ -84,6 +84,9 @@ export function HeaderSearch() {
   // Cmd/Ctrl + K to open / Esc to close
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Defense-in-depth: a topmost overlay (e.g. the welcome tour) claims
+      // these keys via preventDefault in a capture-phase listener.
+      if (e.defaultPrevented) return;
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setOpen((prev) => {

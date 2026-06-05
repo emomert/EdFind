@@ -21,6 +21,10 @@ import {
 } from "@/components/decor/marker";
 import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
 import { Drift, Lift, Reveal, Stagger, StaggerItem } from "@/components/motion";
+import {
+  WelcomeTour,
+  WelcomeTourReplayLink,
+} from "@/components/welcome/welcome-tour";
 
 type FeaturedUniversity = {
   slug: string;
@@ -163,6 +167,7 @@ export default async function HomePage() {
                 ? "Signed in — your matches travel with you across devices."
                 : "Sign in with Google · Takes about 2 minutes · We never silently boost partner universities"}
             </p>
+            <WelcomeTourReplayLink className="mt-3" />
           </div>
 
           <aside className="relative">
@@ -286,6 +291,8 @@ export default async function HomePage() {
           </Button>
         </div>
       </section>
+
+      <WelcomeTour totals={totals} isAuthed={isAuthed} />
     </div>
   );
 }
