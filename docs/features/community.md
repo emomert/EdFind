@@ -120,22 +120,45 @@ also be in Supabase RLS." This page currently makes no DB-write actions —
 everything is read or local. When messaging becomes persistent, the gate
 must move into the Server Action + RLS, not just the React context.
 
+## University verification model (2026-06-05)
+
+A second, independent gate on top of subscription: **write access requires a
+verified university email** (see `docs/features/university-verification.md`
+for the full flow, table, and domain rules). Reading never requires it.
+
+- Server: `app/community/page.tsx` reads `getUniversityVerification(user.id)`
+  and passes it to `CommunityClient`, which wraps the tree in
+  `VerificationProvider` (nested inside `SubscriptionProvider`).
+- Client: `useVerification()` → `{ verification, canWrite }`;
+  `<VerifiedWriterOnly fallback={…}>` mirrors `SubscriberOnly`.
+- The sidebar leads with `VerifyUniversityEmailCard` (request form / pending
+  notice / verified badge). The chat composer shows its compact
+  `variant="input"` for unverified subscribers.
+
 ## Gating mechanics today
 
-| Element | Free | Subscribed |
-|---|---|---|
-| Hero, filters, tabs, group cards (preview) | ✓ | ✓ |
-| Review reading | ✓ | ✓ |
-| Helpful + reply buttons | ✓ | ✓ |
-| "Message X" buttons on review/responsible cards | locked CTA chip | active button (cosmetic) |
-| Group chat modal — read | ✓ | ✓ |
-| Group chat modal — input | `UpgradeCommunityAccessCard variant="input"` | textarea + send (local-only state) |
-| Popular questions reply button | "Preview" label | "Reply" label |
-| Sidebar `UpgradeCommunityAccessCard` panel | shown | hidden |
-| Subscription dev toggle | shown | shown |
+Two axes: subscription (access tier) × verification (write permission).
 
-Nothing actually persists for "subscribed" actions yet — the input writes to
-local React state only. This is intentional for the mock-first scope.
+| Element | Free | Subscribed, unverified | Subscribed + verified |
+|---|---|---|---|
+| Hero, filters, tabs, group cards (preview) | ✓ | ✓ | ✓ |
+| Review reading | ✓ | ✓ | ✓ |
+| Helpful button | ✓ | ✓ | ✓ |
+| "Message X" buttons on review/responsible cards | locked CTA chip | active button (cosmetic) | active button (cosmetic) |
+| Group chat modal — read | ✓ | ✓ | ✓ |
+| Group chat modal — input | `UpgradeCommunityAccessCard variant="input"` | `VerifyUniversityEmailCard variant="input"` | textarea + send (local-only state) |
+| Popular questions reply button | "Preview" | "Verify to reply" | "Reply" |
+| Sidebar "Ask a question" / "Write a review" CTAs | verify note | verify note | active buttons (stubs) |
+| Sidebar `UpgradeCommunityAccessCard` panel | shown | hidden | hidden |
+| Sidebar `VerifyUniversityEmailCard` | form | form / pending notice | verified badge |
+| Subscription dev toggle | shown | shown | shown |
+
+Nothing actually persists for write actions yet — the chat input writes to
+local React state only. This is intentional for the mock-first scope. When
+real community tables land, their INSERT policies must call the no-arg
+`public.is_university_verified()` (checks the current `auth.uid()`) so the
+write gate is enforced in the database too (the helper already ships in the
+verification migration).
 
 ## Reference data (shared)
 

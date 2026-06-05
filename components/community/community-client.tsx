@@ -11,8 +11,12 @@ import type {
   StudentReview,
 } from "@/lib/community/types";
 
+import type { UniversityVerification } from "@/lib/verification/types";
+
 import { SubscriptionProvider } from "./subscription-context";
 import { SubscriptionDevToggle } from "./subscription-dev-toggle";
+import { VerificationProvider } from "./verification-context";
+import { VerifyUniversityEmailCard } from "./verify-university-email-card";
 import { CommunityHero } from "./community-hero";
 import {
   CommunityFilters,
@@ -38,6 +42,7 @@ import { UpgradeCommunityAccessCard } from "./upgrade-community-access-card";
 
 export type CommunityClientProps = {
   isSubscribed: boolean;
+  verification: UniversityVerification;
   users: CommunityUser[];
   groups: CommunityGroup[];
   reviews: StudentReview[];
@@ -251,6 +256,7 @@ export function CommunityClient(props: CommunityClientProps) {
 
   return (
     <SubscriptionProvider isSubscribed={props.isSubscribed}>
+      <VerificationProvider verification={props.verification}>
       <div className="relative">
         {/* Page-level gradient wash so the hero blends into the page. */}
         <div
@@ -326,6 +332,7 @@ export function CommunityClient(props: CommunityClientProps) {
             </div>
 
             <aside className="space-y-4">
+              <VerifyUniversityEmailCard />
               <CommunityStatsCard stats={props.stats} />
               <TopUniversitiesWidget
                 groups={props.groups
@@ -360,6 +367,7 @@ export function CommunityClient(props: CommunityClientProps) {
         />
         </motion.div>
       </div>
+      </VerificationProvider>
     </SubscriptionProvider>
   );
 }

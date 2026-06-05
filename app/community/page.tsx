@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/supabase/auth";
 import { createServiceClient } from "@/lib/supabase/server";
 import { COMMUNITY_ENABLED } from "@/lib/feature-flags";
 import { getSubscriptionState } from "@/lib/community/subscription";
+import { getUniversityVerification } from "@/lib/verification/server";
 import {
   FAKE_MESSAGES_BY_GROUP,
   FAKE_QUESTIONS,
@@ -39,10 +40,10 @@ export default async function CommunityPage() {
   if (!COMMUNITY_ENABLED) notFound();
 
   // Match other gated pages — require auth.
-  await requireUser("/community");
+  const user = await requireUser("/community");
 
   const supabase = createServiceClient();
-  const [unisRes, progsRes, subscription] = await Promise.all([
+  const [unisRes, progsRes, subscription, verification] = await Promise.all([
     supabase
       .from("universities")
       .select("slug, name, country, logo_url")
@@ -55,6 +56,7 @@ export default async function CommunityPage() {
       )
       .order("name"),
     getSubscriptionState(),
+    getUniversityVerification(user.id),
   ]);
 
   const universities = (unisRes.data ?? []) as UniRow[];
@@ -131,6 +133,7 @@ export default async function CommunityPage() {
   return (
     <CommunityClient
       isSubscribed={subscription.isSubscribed}
+      verification={verification}
       users={FAKE_USERS}
       groups={groups}
       reviews={FAKE_REVIEWS}

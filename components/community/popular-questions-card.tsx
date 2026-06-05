@@ -6,6 +6,7 @@ import { BadgeCheck, MessageSquare } from "lucide-react";
 import type { CommunityQuestion, CommunityUser } from "@/lib/community/types";
 import { UserAvatar } from "./user-avatar";
 import { useSubscription } from "./subscription-context";
+import { useVerification } from "./verification-context";
 import { cn } from "@/lib/utils";
 
 export function PopularQuestionsList({
@@ -48,6 +49,11 @@ function QuestionRow({
   onReply: () => void;
 }) {
   const { isSubscribed } = useSubscription();
+  const { canWrite } = useVerification();
+  // Replying writes content → needs subscription AND a verified university
+  // email. Unverified subscribers see "Verify to reply" (the sidebar card
+  // handles the actual flow); free users keep the "Preview" upsell.
+  const canReply = isSubscribed && canWrite;
   const participants = q.participantUserIds
     .map((id) => users[id])
     .filter(Boolean);
@@ -92,13 +98,13 @@ function QuestionRow({
           onClick={onReply}
           className={cn(
             "inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-medium transition",
-            isSubscribed
+            canReply
               ? "bg-teal-600 text-white hover:bg-teal-700"
               : "border border-slate-200 bg-white text-slate-600 hover:border-teal-300 hover:text-teal-700",
           )}
         >
           <MessageSquare className="size-3" />
-          {isSubscribed ? "Reply" : "Preview"}
+          {canReply ? "Reply" : isSubscribed ? "Verify to reply" : "Preview"}
         </button>
       </div>
     </motion.article>

@@ -15,6 +15,17 @@ import {
 import { cn } from "@/lib/utils";
 import type { CommunityGroup } from "@/lib/community/types";
 import { CommunityGroupChip } from "./community-group-card";
+import { VerifiedWriterOnly } from "./verified-writer-only";
+
+/** Shared fallback for write CTAs when the account isn't verified yet. */
+function VerifyToWriteNote({ action }: { action: string }) {
+  return (
+    <p className="mt-3 rounded-xl bg-slate-50 px-3 py-2 text-center text-[11px] leading-relaxed text-slate-500">
+      {action} is for verified students — confirm your university email in the
+      &ldquo;Become a verified student&rdquo; card above.
+    </p>
+  );
+}
 
 export function CommunityStatsCard({
   stats,
@@ -171,13 +182,15 @@ export function AskCommunityCard() {
         Stuck on something specific? Drop a question — verified students and
         responsibles answer fastest when the question is clear and short.
       </p>
-      <button
-        type="button"
-        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-teal-600 px-3 py-2 text-xs font-medium text-white shadow-sm transition hover:bg-teal-700"
-      >
-        <PenSquare className="size-3.5" />
-        Ask a question
-      </button>
+      <VerifiedWriterOnly fallback={<VerifyToWriteNote action="Asking questions" />}>
+        <button
+          type="button"
+          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-teal-600 px-3 py-2 text-xs font-medium text-white shadow-sm transition hover:bg-teal-700"
+        >
+          <PenSquare className="size-3.5" />
+          Ask a question
+        </button>
+      </VerifiedWriterOnly>
     </motion.section>
   );
 }
@@ -201,13 +214,15 @@ export function ShareExperienceCard() {
         Already studying or graduated? Write a verified review and help the
         next cohort make a better decision.
       </p>
-      <button
-        type="button"
-        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-teal-300 hover:text-teal-700"
-      >
-        <PenSquare className="size-3.5" />
-        Write a review
-      </button>
+      <VerifiedWriterOnly fallback={<VerifyToWriteNote action="Writing reviews" />}>
+        <button
+          type="button"
+          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-teal-300 hover:text-teal-700"
+        >
+          <PenSquare className="size-3.5" />
+          Write a review
+        </button>
+      </VerifiedWriterOnly>
     </motion.section>
   );
 }

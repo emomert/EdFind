@@ -15,7 +15,9 @@ import { VerifiedBadge } from "./verified-badge";
 import { UserAvatar } from "./user-avatar";
 import { RoleBadge } from "./role-badge";
 import { useSubscription } from "./subscription-context";
+import { useVerification } from "./verification-context";
 import { UpgradeCommunityAccessCard } from "./upgrade-community-access-card";
+import { VerifyUniversityEmailCard } from "./verify-university-email-card";
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
@@ -131,6 +133,7 @@ function ChatBody({
   users: Readonly<Record<string, CommunityUser>>;
 }) {
   const { isSubscribed } = useSubscription();
+  const { canWrite } = useVerification();
   const [draft, setDraft] = useState("");
   const [optimisticMessages, setOptimisticMessages] = useState<CommunityMessage[]>([]);
 
@@ -180,7 +183,16 @@ function ChatBody({
       </div>
 
       <footer className="border-t border-slate-100 p-4">
-        {isSubscribed ? (
+        {/* Two independent gates: subscription = access tier, university
+            verification = write permission. Read is open to all members. */}
+        {!isSubscribed ? (
+          <UpgradeCommunityAccessCard
+            variant="input"
+            message="Subscribe to send messages in this community."
+          />
+        ) : !canWrite ? (
+          <VerifyUniversityEmailCard variant="input" />
+        ) : (
           <div className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm focus-within:border-teal-400 focus-within:ring-2 focus-within:ring-teal-100">
             <textarea
               rows={1}
@@ -205,11 +217,6 @@ function ChatBody({
               <Send className="size-4" />
             </button>
           </div>
-        ) : (
-          <UpgradeCommunityAccessCard
-            variant="input"
-            message="Subscribe to send messages in this community."
-          />
         )}
       </footer>
     </>

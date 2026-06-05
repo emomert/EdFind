@@ -109,6 +109,50 @@ For MVP, the placeholder matcher inserts exactly one `matches` row per submissio
 
 **RLS:** select by matching `profile_id`'s `client_id`; insert/update service-role only.
 
+## university_email_verifications (2026-06-05)
+
+University email linking for community write-gating — see
+`docs/features/university-verification.md` and ADR 0004.
+
+| column | type | notes |
+|---|---|---|
+| `id` | uuid PK | |
+| `user_id` | uuid FK → `auth.users.id` not null, cascade delete | |
+| `email` | text not null | stored lower-cased |
+| `domain` | text not null | email's domain, for badges/analytics |
+| `token_hash` | text not null | SHA-256 hex of the one-time confirm token; raw token only exists in the email link |
+| `status` | text not null | `pending` \| `verified` |
+| `created_at` / `updated_at` | timestamptz | trigger-maintained |
+| `expires_at` | timestamptz not null | 24 h after request |
+| `verified_at` | timestamptz | null until confirmed |
+
+Partial unique indexes: one `verified` row per `user_id`; one account per
+`lower(email)`; **one `pending` row per `user_id`** (blocks concurrent
+double-submit). Unique on `token_hash`.
+
+**RLS:** select own rows (`auth.uid() = user_id`); **no client write policies**
+— all writes go through server routes with the service-role key.
+
+Helper: `public.is_university_verified()` (no-arg, security definer — checks
+the current `auth.uid()`) — future community-content tables MUST use it in
+their INSERT policies so write-gating is enforced in the database, not just
+app code. A `uid`-parameter overload exists for server use but is not granted
+to `authenticated`.
+
+## verification_email_sends (2026-06-05)
+
+Append-only audit of confirmation emails actually sent — backs the
+per-recipient rate limit (university verification). See ADR 0004.
+
+| column | type | notes |
+|---|---|---|
+| `id` | uuid PK | |
+| `email_lower` | text not null | recipient, lower-cased |
+| `sent_at` | timestamptz not null | default now() |
+
+Index on `(email_lower, sent_at)`. **RLS:** enabled with **no policies** —
+service-role reads/writes only.
+
 ## Field-of-study taxonomy
 
 A small initial taxonomy. Stored as a string for simplicity; if it grows, promote to a `fields_of_study` table.
@@ -141,5 +185,6 @@ Every schema change ships as a new file under `supabase/migrations/` named `YYYY
 |---|---|
 | `20260508120000_init_schema.sql` | `set_updated_at()` helper, `universities`, `programs`, `profiles`, `matches` with RLS enabled and the policies described above |
 | `20260508140000_add_ranking_columns.sql` | `universities.qs_world_rank`, `programs.qs_subject_rank`, `programs.qs_subject_area`, partial index on the program rank |
+| `20260605120000_university_email_verifications.sql` | `university_email_verifications` + `verification_email_sends` tables, partial unique indexes (verified/email/pending), RLS, `is_university_verified()` helper (no-arg + uid overload) |
 
 Seed data lives in `supabase/seed.sql`. Re-running it is idempotent (`ON CONFLICT DO NOTHING` on slug uniques).
