@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { AlertCircle, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -44,8 +45,16 @@ export function LoginClient({
     internalError ?? (error ? ERROR_MESSAGES[error] ?? null : null);
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center px-6 py-20 text-center">
-      <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-primary">
+    <div className="mx-auto flex max-w-md flex-col items-center px-6 py-16 text-center">
+      <Image
+        src="/logo-text.png"
+        alt="EdFind"
+        width={388}
+        height={420}
+        priority
+        className="h-32 w-auto"
+      />
+      <span className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-primary">
         <Sparkles className="size-3.5" />
         Welcome
       </span>

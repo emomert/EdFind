@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Bookmark } from "lucide-react";
 
 export function Logo({ withTagline = true }: { withTagline?: boolean }) {
   return (
@@ -8,9 +8,15 @@ export function Logo({ withTagline = true }: { withTagline?: boolean }) {
       className="flex items-center gap-2 font-semibold tracking-tight"
       aria-label="EdFind home"
     >
-      <span className="inline-flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary">
-        <Bookmark className="size-4" aria-hidden />
-      </span>
+      <Image
+        src="/logo.png"
+        alt=""
+        aria-hidden
+        width={301}
+        height={329}
+        priority
+        className="h-9 w-auto"
+      />
       <span className="text-xl text-foreground">EdFind</span>
       {withTagline ? (
         <span className="hidden text-sm font-normal text-muted-foreground sm:inline">

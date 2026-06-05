@@ -2,6 +2,23 @@
 
 The v1 visual reference is `Website UI Design Ver_1.pdf` in the repo root. This document codifies the design tokens so they can be applied consistently in code (Tailwind theme, shadcn theme variables, illustrations).
 
+## Logo
+
+The brand mark is a cyan compass rose wearing a graduation cap. Source files live in `logo/` (master copies); web-served copies live in `public/`.
+
+| Asset | Source | Served at | Use |
+|---|---|---|---|
+| Mark only | `logo/logo.png` (301×329) | `/logo.png` | Site header (`components/logo.tsx`), favicons |
+| Vertical lockup (mark + "EDFIND" wordmark) | `logo/logo_txt.png` (388×420) | `/logo-text.png` | Login page, centered hero-style placements |
+
+Favicon / app-icon assets (`app/icon.png`, `app/apple-icon.png`, `app/favicon.ico`) are **generated** from the mark — never edit them by hand. Regenerate after changing the source logo with:
+
+```
+node scripts/generate-brand-icons.mjs
+```
+
+In the header the mark sits next to an "EdFind" text wordmark (Inter, semibold) — the horizontal lockup is composed in code, not baked into an image, so it stays crisp and i18n-friendly.
+
 ## Voice
 
 - **Friendly, neutral, encouraging.** EdFind is a guide, not a salesperson. Tagline: _"Find your best education!"_
