@@ -51,6 +51,27 @@ export function Reveal({
 }
 
 /**
+ * PageTransition — a gentle fade applied to every route via app/template.tsx,
+ * which re-mounts on navigation so the animation replays. Deliberately
+ * opacity-only (no transform): a persistent transform on this wrapper would
+ * become the containing block for descendant `position: fixed` elements
+ * (welcome tour, community dev toggle, toasts) and break them.
+ */
+export function PageTransition({ children }: { children: ReactNode }) {
+  const reduce = useReducedMotion();
+  if (reduce) return <>{children}</>;
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, ease: EASE_OUT }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/**
  * Stagger + StaggerItem — for lists where each card should arrive a
  * fraction after the one before it.
  *

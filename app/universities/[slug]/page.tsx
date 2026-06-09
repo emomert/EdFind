@@ -22,6 +22,7 @@ import { formatTuition } from "@/lib/format/currency";
 import { HOUSING_ENABLED } from "@/lib/feature-flags";
 import { getHousing } from "@/lib/housing/server";
 import { HousingSection } from "@/components/housing/housing-section";
+import { Reveal } from "@/components/motion";
 
 type Params = { slug: string };
 
@@ -279,11 +280,13 @@ export default async function UniversityPage({
       </section>
 
       {HOUSING_ENABLED ? (
-        <HousingSection
-          city={housing.city}
-          university={housing.university}
-          cityName={u.city}
-        />
+        <Reveal>
+          <HousingSection
+            city={housing.city}
+            university={housing.university}
+            cityName={u.city}
+          />
+        </Reveal>
       ) : null}
     </div>
   );

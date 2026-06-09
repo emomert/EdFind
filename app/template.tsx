@@ -1,24 +1,15 @@
-"use client";
-
-import { motion } from "framer-motion";
+import { PageTransition } from "@/components/motion";
 
 /**
- * Per-route template that wraps every page in a subtle fade-up transition.
- * App Router re-renders this on navigation (unlike layout), so each route
- * change re-runs the animation.
+ * Per-route template — App Router re-mounts it on navigation (unlike layout),
+ * so the fade replays on every route change for a connected, flowing feel.
+ * Uses the shared PageTransition (reduced-motion aware, opacity-only so it
+ * never breaks descendant `position: fixed` elements).
  */
 export default function RouteTemplate({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.21, 0.6, 0.3, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <PageTransition>{children}</PageTransition>;
 }
