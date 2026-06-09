@@ -4,12 +4,20 @@ The `/applications` dashboard. Started life in Phase 9.3 as a 4-column Kanban
 of applications; redesigned 2026-05-14 into a richer split-view layout with
 its own task board and personalised guidance.
 
+**Shortlist merged in (2026-06-09).** The old separate shortlist is now the
+first stage of the tracker: the `SaveButton` (on results / program / university
+pages) creates an `applications` row at status `'interested'`, and `/shortlist`
+is the `'interested'`-filtered view of the tracker (it still drives `/compare`).
+There is no longer a separate `saved_programs` write path or a distinct "Track"
+button — Save *is* track. See `docs/data-model.md` (`saved_programs` deprecated).
+
 ## Surfaces
 
 | Route | Auth | Renders |
 |---|---|---|
 | `/applications` | Required | Header card + applications list + task kanban + AI recommendations |
-| Program detail pages | n/a | `<TrackButton>` that toggles a program into/out of the tracker |
+| Program detail pages | n/a | `<SaveButton>` that toggles a program into/out of the tracker (status `'interested'`) |
+| `/shortlist` | Required | The `'interested'` view of the tracker; drives `/compare` |
 
 `NEXT_PUBLIC_ENABLE_APPLICATIONS=false` hides every entry point and 404s the
 route — keeps the feature cleanly removable.

@@ -4,14 +4,22 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { setSubscriptionState } from "@/lib/community/subscription";
+import { getUser } from "@/lib/supabase/auth";
 
 const ToggleSchema = z.boolean();
 
 /**
- * Dev-only Server Action that flips the mock community subscription cookie.
- * Replace this when Stripe is wired and entitlements live in the database.
+ * Dev/preview-only Server Action that flips the mock community subscription
+ * cookie. It must NOT be reachable in production — there it would be a paywall
+ * self-grant. Real entitlements arrive with Stripe (see ADR 0005), at which
+ * point this is replaced by a database-backed check.
  */
 export async function toggleSubscriptionAction(next: unknown): Promise<void> {
+  // Fail closed in production regardless of any client call.
+  if (process.env.VERCEL_ENV === "production") return;
+  // Only a signed-in user (the community page already requires auth).
+  const user = await getUser();
+  if (!user) return;
   const parsed = ToggleSchema.parse(next);
   await setSubscriptionState(parsed);
   revalidatePath("/community");

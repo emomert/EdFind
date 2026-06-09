@@ -1,8 +1,7 @@
 -- EdFind seed data
 --
--- 11 universities + 13 master's programs spanning Italy, the Netherlands,
--- Germany, and the United Kingdom. Field-of-study coverage is balanced
--- across all 8 enum values.
+-- 58 universities + 196 master's programs spanning 15 European countries.
+-- Field-of-study coverage is balanced across all 8 enum values.
 --
 -- Idempotent: every INSERT uses ON CONFLICT DO UPDATE keyed on the
 -- relevant unique constraint, so re-running this file converges existing

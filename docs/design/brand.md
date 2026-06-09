@@ -28,15 +28,15 @@ In the header the mark sits next to an "EdFind" text wordmark (Inter, semibold) 
 
 ## Color tokens
 
-The primary accent in the design is a saturated teal. Tokens below map to Tailwind's `teal` and `slate` scales as a starting point; tweak in code if the design intent diverges.
+The primary accent is the **cyan of the compass logo mark** (dominant ≈ `#28B8D8`, ≈ Tailwind cyan-500). Tokens below sit in the cyan family. Because the UI was originally built on Tailwind's `teal` utilities, `app/globals.css` **re-points the whole `teal-*` palette at the cyan ramp** in an `@theme` block — so every existing `teal-*` class renders in the brand hue without rewriting components. (Emerald accents in gradients are intentional and left as-is.)
 
 | Token | Light value | Use |
 |---|---|---|
-| `--primary` | `#0D9488` (≈ teal-600) | Primary buttons, key links, brand marks |
-| `--primary-hover` | `#0F766E` (≈ teal-700) | Hover state on primary |
+| `--primary` | `#0891B2` (≈ cyan-600) | Primary buttons, key links, brand marks |
+| `--primary-hover` | `#0E7490` (≈ cyan-700) | Hover state on primary |
 | `--primary-foreground` | `#FFFFFF` | Text on primary |
-| `--accent` | `#14B8A6` (≈ teal-500) | Secondary highlights, badges, progress fills |
-| `--accent-soft` | `#CCFBF1` (≈ teal-100) | Highlight backgrounds (e.g. selected card border tint) |
+| `--accent` | `#06B6D4` (≈ cyan-500, ≈ logo) | Secondary highlights, badges, progress fills |
+| `--accent-soft` | `#CFFAFE` (≈ cyan-100) | Highlight backgrounds (e.g. selected card border tint) |
 | `--background` | `#FFFFFF` | Page background |
 | `--surface` | `#F8FAFC` (≈ slate-50) | Card backgrounds, alternating sections |
 | `--border` | `#E2E8F0` (≈ slate-200) | Card borders, dividers |

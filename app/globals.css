@@ -15,17 +15,17 @@
   --popover: #ffffff;
   --popover-foreground: #0f172a;
 
-  --primary: #0d9488;             /* teal-600 — brand */
+  --primary: #0891b2;             /* cyan-600 — brand, matches the logo mark */
   --primary-foreground: #ffffff;
 
-  --secondary: #ccfbf1;           /* teal-100 — accent-soft */
-  --secondary-foreground: #115e59; /* teal-800 */
+  --secondary: #cffafe;           /* cyan-100 — accent-soft */
+  --secondary-foreground: #155e75; /* cyan-800 */
 
   --muted: #f8fafc;               /* slate-50 — surface */
   --muted-foreground: #475569;    /* slate-600 */
 
-  --accent: #ccfbf1;              /* same as secondary for now */
-  --accent-foreground: #115e59;
+  --accent: #cffafe;              /* same as secondary for now */
+  --accent-foreground: #155e75;
 
   --destructive: #dc2626;         /* red-600 */
   --destructive-foreground: #ffffff;
@@ -35,9 +35,29 @@
 
   --border: #e2e8f0;              /* slate-200 */
   --input: #e2e8f0;
-  --ring: #0d9488;                /* teal-600 — focus ring */
+  --ring: #0891b2;                /* cyan-600 — focus ring */
 
   --radius: 0.75rem;
+}
+
+/*
+ * Re-point Tailwind's `teal` palette at the logo's cyan (logo dominant
+ * ≈ #28b8d8 ≈ cyan-500). The UI uses `teal-*` utilities heavily; remapping
+ * the ramp here shifts the whole site to the brand mark's hue in one place,
+ * rather than rewriting every component. Emerald accents are left untouched.
+ */
+@theme {
+  --color-teal-50: #ecfeff;
+  --color-teal-100: #cffafe;
+  --color-teal-200: #a5f3fc;
+  --color-teal-300: #67e8f9;
+  --color-teal-400: #22d3ee;
+  --color-teal-500: #06b6d4;
+  --color-teal-600: #0891b2;
+  --color-teal-700: #0e7490;
+  --color-teal-800: #155e75;
+  --color-teal-900: #164e63;
+  --color-teal-950: #083344;
 }
 
 @theme inline {
@@ -77,4 +97,33 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/*
+ * Continuous university marquee on the homepage. The track holds two copies of
+ * the row and slides exactly one copy width for a seamless loop. Two rows run
+ * in opposite directions; both pause on hover and stop for reduced-motion.
+ */
+@keyframes edfind-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.edfind-marquee-track {
+  width: max-content;
+  animation: edfind-marquee 55s linear infinite;
+}
+.edfind-marquee-track.is-reverse {
+  animation-direction: reverse;
+}
+.edfind-marquee-wrap:hover .edfind-marquee-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .edfind-marquee-track {
+    animation: none;
+  }
 }

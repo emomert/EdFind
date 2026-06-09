@@ -308,6 +308,11 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
                       programId={item.program_id}
                       initiallySaved={true}
                       variant="pill"
+                      onToggle={(saved) => {
+                        // Removed from the shortlist — re-fetch so the stale
+                        // card disappears and the count updates immediately.
+                        if (!saved) router.refresh();
+                      }}
                     />
                   </div>
                 </article>

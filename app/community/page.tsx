@@ -148,6 +148,7 @@ export default async function CommunityPage() {
       catalogUniversities={universities}
       catalogCountries={catalogCountries}
       stats={stats}
+      showDevToggle={process.env.VERCEL_ENV !== "production"}
     />
   );
 }

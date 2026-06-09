@@ -58,3 +58,6 @@ pnpm-debug.log*
 scripts/unis.json
 scripts/unis-batch-*.json
 scripts/logos-batch-*.json
+
+resp.bin
+bash.exe.stackdump

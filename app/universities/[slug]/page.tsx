@@ -17,7 +17,12 @@ import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
 import { UniversityLogo } from "@/components/university/university-logo";
+import { UniversityHero } from "@/components/university/university-hero";
 import { formatTuition } from "@/lib/format/currency";
+import { HOUSING_ENABLED } from "@/lib/feature-flags";
+import { getHousing } from "@/lib/housing/server";
+import { HousingSection } from "@/components/housing/housing-section";
+import { Reveal } from "@/components/motion";
 
 type Params = { slug: string };
 
@@ -70,7 +75,7 @@ export default async function UniversityPage({
   const uniRes = await publicDb
     .from("universities")
     .select(
-      "id, slug, name, country, city, institution_type, website, description, established_year, student_count, qs_world_rank, is_partner, logo_url",
+      "id, slug, name, country, city, institution_type, website, description, established_year, student_count, qs_world_rank, is_partner, logo_url, hero_image_url, hero_image_credit, hero_image_source_url",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -89,12 +94,18 @@ export default async function UniversityPage({
 
   const programs: ProgramSummary[] = programsRes.data ?? [];
 
+  const housing = HOUSING_ENABLED
+    ? await getHousing({ universityId: u.id, city: u.city, country: u.country })
+    : { city: null, university: null };
+
   const user = await getUser();
   let savedSet = new Set<string>();
   if (user && programs.length > 0) {
     const userDb = createServiceClient();
+    // "Saved" == the program is in the user's applications (shortlist merged
+    // into the tracker, 2026-06-09).
     const savedRes = await userDb
-      .from("saved_programs")
+      .from("applications")
       .select("program_id")
       .eq("user_id", user.id)
       .in(
@@ -115,6 +126,13 @@ export default async function UniversityPage({
         <ArrowLeft className="size-4" />
         Back to home
       </Link>
+
+      <UniversityHero
+        imageUrl={u.hero_image_url}
+        credit={u.hero_image_credit}
+        sourceUrl={u.hero_image_source_url}
+        alt={u.name}
+      />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
         <div>
@@ -260,6 +278,16 @@ export default async function UniversityPage({
           </div>
         ) : null}
       </section>
+
+      {HOUSING_ENABLED ? (
+        <Reveal>
+          <HousingSection
+            city={housing.city}
+            university={housing.university}
+            cityName={u.city}
+          />
+        </Reveal>
+      ) : null}
     </div>
   );
 }

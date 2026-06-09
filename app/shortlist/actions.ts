@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { createServiceClient } from "@/lib/supabase/server";
@@ -19,9 +20,11 @@ export type ToggleResult =
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
 /**
- * Toggle a program in/out of the shortlist. Auth is required (Phase 9.4).
- * The client_id is still recorded so seed/test data with no user_id stays
- * valid alongside authenticated rows, but reads filter by user_id.
+ * Toggle a program in/out of "saved". The shortlist was merged into the
+ * applications tracker (2026-06-09): saving a program creates an application at
+ * status 'interested' (the first stage); un-saving deletes that application.
+ * "Saved" therefore means "this program is in your applications". The Save
+ * button and the old Track button are now the same action.
  */
 export async function toggleSavedProgram(
   rawInput: unknown,
@@ -53,7 +56,7 @@ export async function toggleSavedProgram(
   const supabase = createServiceClient();
 
   const existing = await supabase
-    .from("saved_programs")
+    .from("applications")
     .select("id")
     .eq("user_id", user.id)
     .eq("program_id", programId)
@@ -61,24 +64,34 @@ export async function toggleSavedProgram(
 
   if (existing.data) {
     const del = await supabase
-      .from("saved_programs")
+      .from("applications")
       .delete()
       .eq("id", existing.data.id);
     if (del.error) {
       console.error("[toggleSavedProgram] delete failed", del.error);
-      return { ok: false, error: "Couldn't update your shortlist." };
+      return { ok: false, error: "Couldn't update your list." };
     }
+    revalidatePath("/applications");
+    revalidatePath("/shortlist");
     return { ok: true, saved: false };
   }
 
-  const ins = await supabase.from("saved_programs").insert({
+  const ins = await supabase.from("applications").insert({
     client_id: clientId,
     user_id: user.id,
     program_id: programId,
+    status: "interested",
   });
   if (ins.error) {
+    // A concurrent save (another tab) already created the row — the unique
+    // (user_id, program_id) index rejects the duplicate. Treat as saved.
+    if ((ins.error as { code?: string }).code === "23505") {
+      return { ok: true, saved: true };
+    }
     console.error("[toggleSavedProgram] insert failed", ins.error);
     return { ok: false, error: "Couldn't save program." };
   }
+  revalidatePath("/applications");
+  revalidatePath("/shortlist");
   return { ok: true, saved: true };
 }

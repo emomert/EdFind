@@ -1,8 +1,9 @@
 -- EdFind — Phase 9.3: application tracker
 --
 -- This table is part of an isolated, removable module. To uninstall, see
--- supabase/migrations/20260511130000_drop_applications.sql (kept in repo
--- alongside this file, NOT applied automatically — run by hand on removal).
+-- supabase/rollbacks/20260511130000_drop_applications.sql (kept OUTSIDE
+-- supabase/migrations/ so db-migrate.mjs never auto-applies it — run by hand
+-- from the dashboard SQL editor on removal).
 
 create type application_status as enum (
   'interested',

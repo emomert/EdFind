@@ -33,3 +33,14 @@ export const APPLICATIONS_ENABLED = !isOff(
 export const COMMUNITY_ENABLED = !isOff(
   process.env.NEXT_PUBLIC_ENABLE_COMMUNITY,
 );
+
+/**
+ * Housing & cost-of-living sections (city + university level) on the
+ * university and program detail pages. AI-researched data lives in the
+ * housing_cities / housing_universities tables (published rows only are
+ * readable). Default on; set NEXT_PUBLIC_ENABLE_HOUSING=false to hide the
+ * sections without touching the data.
+ */
+export const HOUSING_ENABLED = !isOff(
+  process.env.NEXT_PUBLIC_ENABLE_HOUSING,
+);

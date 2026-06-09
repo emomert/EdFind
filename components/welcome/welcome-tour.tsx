@@ -138,7 +138,7 @@ export function WelcomeTour({
         badge: "AI matching",
         title: "Take a short quiz",
         description:
-          "Answer 9 quick questions — plus an optional free-text note for anything we'd miss. Our AI ranks your top 3 programs and explains why each one fits you.",
+          "Answer about a dozen quick questions — plus optional free-text notes for anything we'd miss. Our AI ranks your top 3 programs and explains why each one fits you.",
       },
       {
         key: "search",

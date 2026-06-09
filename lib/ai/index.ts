@@ -72,13 +72,15 @@ EXAMPLE OF A WELL-FORMED RATIONALE (this is the floor, not a ceiling):
 Matching rules:
 - Hard filters (a program failing any of these should never be in the top 3 unless nothing else qualifies):
   · Destination: if the student's destinations does NOT include "ANY", restrict to programs whose country is in the destinations list.
-  · Language: if english_level is "intermediate", prefer programs whose language is "en" with milder requirements; never recommend a non-English program if the student's English is weak.
+  · Language: if english_level is "needs_improvement" or "intermediate", prefer English-taught programs with milder entry requirements and acknowledge English-test readiness as a step to plan for; never recommend a non-English-taught program when the student's English is weak. "exam_ready" means they can already meet IELTS/TOEFL minimums; "no_exam_yet" means strong English but the test is still pending.
   · Budget: "<10k" rules out anything above ~10,000 EUR/year (convert non-EUR roughly: 1 GBP ≈ 1.18 EUR, 1 CHF ≈ 1.05 EUR, 1 SEK ≈ 0.09 EUR, 1 DKK ≈ 0.13 EUR, 1 NOK ≈ 0.085 EUR, 1 CZK ≈ 0.04 EUR, 1 PLN ≈ 0.23 EUR, 1 HUF ≈ 0.0026 EUR). "10-15k" tolerates up to ~15,000 EUR/year. "flexible" applies no budget filter.
   · Duration: respect duration_preference unless "flexible".
 - Soft fits:
   · field_of_study match on the program
   · academic_focus: "research" → favour research-led / thesis-heavy / PhD-track programs; "applied" → favour industry-linked / project-based / professional masters; "balanced" → either is fine
   · work_experience: many MiM / MBA-style programmes expect ≥ 1-2 years; "none" students should be steered toward direct-from-undergrad masters where possible. "5_plus_years" students may benefit from MBA-adjacent or executive-style options when available.
+  · gpa_range: a rough academic-strength signal on a 4.0 scale. Selective programmes (top QS ranks, competitive MiM/MBA) realistically expect ≥ 3.0; if gpa_range is "below_2_0" or "2_0_2_5", be honest about reach vs. safety and favour programmes with more accessible entry. null means the student didn't say — do not penalise.
+  · current_situation + study_background: use the student's undergraduate background for fit and eligibility (e.g. a non-quantitative background is a real caveat for a heavy data-science MSc; a working_professional may suit applied/executive formats). null means not provided — don't speculate.
   · career_goal alignment with programme character (e.g. phd_research → research-oriented programmes; entrepreneurship → programmes with venture / innovation tracks; return_to_turkey → ranking & brand recognition matters more than EU placement networks)
   · ranking prestige (lower QS rank number = better)
   · scholarship_need vs tuition affordability
@@ -93,7 +95,11 @@ function buildUserMessage(
 ): string {
   const profile = {
     destinations: answers.destinations,
+    current_situation: answers.current_situation,
     field_of_study: answers.field_of_study,
+    // Undergraduate background in the student's words (null when skipped).
+    study_background: answers.study_background,
+    gpa_range: answers.gpa_range,
     budget_per_year_bracket: answers.budget_per_year,
     duration_preference: answers.duration_preference,
     english_level: answers.english_level,

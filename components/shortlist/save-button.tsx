@@ -13,6 +13,12 @@ type Props = {
   initiallySaved: boolean;
   className?: string;
   variant?: "pill" | "icon";
+  /**
+   * Called after a successful toggle with the new saved state. The shortlist
+   * page uses this to refresh so an unsaved card disappears immediately
+   * instead of lingering until a manual reload.
+   */
+  onToggle?: (saved: boolean) => void;
 };
 
 export function SaveButton({
@@ -20,6 +26,7 @@ export function SaveButton({
   initiallySaved,
   className,
   variant = "pill",
+  onToggle,
 }: Props) {
   const router = useRouter();
   const [saved, setSaved] = useState(initiallySaved);
@@ -51,6 +58,7 @@ export function SaveButton({
         return;
       }
       setSaved(result.saved);
+      onToggle?.(result.saved);
     });
   };
 

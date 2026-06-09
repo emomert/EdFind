@@ -27,7 +27,7 @@ export default async function ApplicationsPage() {
   const user = await requireUser("/applications");
   const supabase = createServiceClient();
 
-  const [appsRes, tasksRes, profileRes, savedRes] = await Promise.all([
+  const [appsRes, tasksRes, profileRes] = await Promise.all([
     supabase
       .from("applications")
       .select(
@@ -51,10 +51,6 @@ export default async function ApplicationsPage() {
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
-    supabase
-      .from("saved_programs")
-      .select("program_id")
-      .eq("user_id", user.id),
   ]);
 
   const items = ((appsRes.data ?? []) as unknown as ApplicationItem[]).filter(
@@ -80,12 +76,6 @@ export default async function ApplicationsPage() {
     hasProfile: Boolean(profileRow),
   };
 
-  const savedCount = (savedRes.data ?? []).length;
-  const trackedProgramIds = new Set(items.map((i) => i.program_id));
-  const savedNotTracked = (
-    (savedRes.data ?? []) as Array<{ program_id: string }>
-  ).filter((s) => !trackedProgramIds.has(s.program_id)).length;
-
   const recommendations = buildRecommendations({
     apps: items.map((a) => ({
       status: a.status,
@@ -105,7 +95,6 @@ export default async function ApplicationsPage() {
       title: t.title,
     })),
     profile: profileRow ? { destinations, field_of_study: fieldOfStudy } : null,
-    saved: { saved: savedCount, tracked: savedCount - savedNotTracked },
   });
 
   const displayName =

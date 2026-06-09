@@ -20,10 +20,13 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
-import { APPLICATIONS_ENABLED } from "@/lib/feature-flags";
-import { TrackButton } from "@/components/applications/track-button";
 import { UniversityLogo } from "@/components/university/university-logo";
+import { UniversityHero } from "@/components/university/university-hero";
 import { formatTuition } from "@/lib/format/currency";
+import { HOUSING_ENABLED } from "@/lib/feature-flags";
+import { getHousing } from "@/lib/housing/server";
+import { HousingSection } from "@/components/housing/housing-section";
+import { Reveal } from "@/components/motion";
 
 type Params = { universitySlug: string; programSlug: string };
 
@@ -83,7 +86,7 @@ export default async function ProgramPage({
   const uniRes = await publicDb
     .from("universities")
     .select(
-      "id, slug, name, country, city, institution_type, website, description, qs_world_rank, is_partner, logo_url",
+      "id, slug, name, country, city, institution_type, website, description, qs_world_rank, is_partner, logo_url, hero_image_url, hero_image_credit, hero_image_source_url",
     )
     .eq("slug", universitySlug)
     .maybeSingle();
@@ -104,28 +107,24 @@ export default async function ProgramPage({
   const p = progRes.data;
   const requirements: Requirements = (p.requirements as Requirements) ?? {};
 
+  // Program pages inherit their university's city + university housing.
+  const housing = HOUSING_ENABLED
+    ? await getHousing({ universityId: u.id, city: u.city, country: u.country })
+    : { city: null, university: null };
+
   const user = await getUser();
   let isSaved = false;
-  let isTracked = false;
   if (user) {
     const userDb = createServiceClient();
+    // "Saved" == the program is in the user's applications (the shortlist was
+    // merged into the tracker, 2026-06-09 — one Save action, one list).
     const savedRes = await userDb
-      .from("saved_programs")
+      .from("applications")
       .select("id")
       .eq("user_id", user.id)
       .eq("program_id", p.id)
       .maybeSingle();
     isSaved = Boolean(savedRes.data);
-
-    if (APPLICATIONS_ENABLED) {
-      const trackedRes = await userDb
-        .from("applications")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("program_id", p.id)
-        .maybeSingle();
-      isTracked = Boolean(trackedRes.data);
-    }
   }
 
   const peersRes = await publicDb
@@ -159,6 +158,13 @@ export default async function ProgramPage({
         <ArrowLeft className="size-4" />
         Back to {u.name}
       </Link>
+
+      <UniversityHero
+        imageUrl={u.hero_image_url}
+        credit={u.hero_image_credit}
+        sourceUrl={u.hero_image_source_url}
+        alt={u.name}
+      />
 
       <div className="mt-8 flex items-start gap-4">
         <UniversityLogo
@@ -299,10 +305,17 @@ export default async function ProgramPage({
           </Link>
         </Button>
         <SaveButton programId={p.id} initiallySaved={isSaved} />
-        {APPLICATIONS_ENABLED ? (
-          <TrackButton programId={p.id} initiallyTracked={isTracked} />
-        ) : null}
       </div>
+
+      {HOUSING_ENABLED ? (
+        <Reveal>
+          <HousingSection
+            city={housing.city}
+            university={housing.university}
+            cityName={u.city}
+          />
+        </Reveal>
+      ) : null}
 
       {peers.length > 0 ? (
         <section className="mt-16 border-t border-border pt-10">

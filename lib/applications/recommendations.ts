@@ -34,8 +34,6 @@ type ProfileLite = {
   field_of_study: string | null;
 } | null;
 
-type SavedCount = { saved: number; tracked: number };
-
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function daysUntil(dateStr: string | null): number | null {
@@ -55,9 +53,8 @@ export function buildRecommendations(args: {
   apps: AppRow[];
   tasks: TaskRow[];
   profile: ProfileLite;
-  saved: SavedCount;
 }): Recommendation[] {
-  const { apps, tasks, profile, saved } = args;
+  const { apps, tasks, profile } = args;
   const recs: Recommendation[] = [];
 
   const submitted = apps.filter((a) =>
@@ -125,19 +122,6 @@ export function buildRecommendations(args: {
       title: "Pick your top 3 and start drafting.",
       body:
         "Every program in your tracker is still in 'Interested'. Choose the three you're most excited about and move them to Drafting — momentum compounds.",
-    });
-  }
-
-  if (saved.saved > saved.tracked && saved.saved - saved.tracked >= 2) {
-    const diff = saved.saved - saved.tracked;
-    recs.push({
-      id: "shortlist-gap",
-      tone: "info",
-      icon: "lightbulb",
-      title: `${diff} program${diff === 1 ? "" : "s"} in your shortlist aren't tracked yet.`,
-      body:
-        "If you're seriously considering them, add them to the tracker so deadlines and tasks stay in one place.",
-      cta: { label: "Open shortlist", href: "/shortlist" },
     });
   }
 

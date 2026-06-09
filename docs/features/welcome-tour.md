@@ -18,7 +18,7 @@ SEO unaffected, and the gate is purely client-side.
 | # | Key | Shown | Content |
 |---|-----|-------|---------|
 | 1 | `welcome` | always | Brand mark, one-line pitch, live catalog stat chips (universities / programs / countries, passed from the homepage's Supabase totals) |
-| 2 | `quiz` | always | 10-question AI matching quiz (9 multiple-choice + 1 optional free-text) → ranked top 3 with rationale |
+| 2 | `quiz` | always | 13-question AI matching quiz (11 multiple-choice/select + 2 optional free-text) → ranked top 3 with rationale |
 | 3 | `search` | always | Free-text AI search in your own words |
 | 4 | `catalog` | always | Full catalog browse + Ctrl+K header search |
 | 5 | `shortlist` | always | Shortlist + side-by-side compare |
