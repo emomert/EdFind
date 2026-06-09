@@ -18,6 +18,9 @@ import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
 import { UniversityLogo } from "@/components/university/university-logo";
 import { formatTuition } from "@/lib/format/currency";
+import { HOUSING_ENABLED } from "@/lib/feature-flags";
+import { getHousing } from "@/lib/housing/server";
+import { HousingSection } from "@/components/housing/housing-section";
 
 type Params = { slug: string };
 
@@ -88,6 +91,10 @@ export default async function UniversityPage({
     .order("qs_subject_rank", { ascending: true, nullsFirst: false });
 
   const programs: ProgramSummary[] = programsRes.data ?? [];
+
+  const housing = HOUSING_ENABLED
+    ? await getHousing({ universityId: u.id, city: u.city, country: u.country })
+    : { city: null, university: null };
 
   const user = await getUser();
   let savedSet = new Set<string>();
@@ -262,6 +269,14 @@ export default async function UniversityPage({
           </div>
         ) : null}
       </section>
+
+      {HOUSING_ENABLED ? (
+        <HousingSection
+          city={housing.city}
+          university={housing.university}
+          cityName={u.city}
+        />
+      ) : null}
     </div>
   );
 }

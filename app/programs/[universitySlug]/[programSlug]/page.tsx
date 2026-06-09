@@ -22,6 +22,9 @@ import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
 import { UniversityLogo } from "@/components/university/university-logo";
 import { formatTuition } from "@/lib/format/currency";
+import { HOUSING_ENABLED } from "@/lib/feature-flags";
+import { getHousing } from "@/lib/housing/server";
+import { HousingSection } from "@/components/housing/housing-section";
 
 type Params = { universitySlug: string; programSlug: string };
 
@@ -101,6 +104,11 @@ export default async function ProgramPage({
 
   const p = progRes.data;
   const requirements: Requirements = (p.requirements as Requirements) ?? {};
+
+  // Program pages inherit their university's city + university housing.
+  const housing = HOUSING_ENABLED
+    ? await getHousing({ universityId: u.id, city: u.city, country: u.country })
+    : { city: null, university: null };
 
   const user = await getUser();
   let isSaved = false;
@@ -289,6 +297,14 @@ export default async function ProgramPage({
         </Button>
         <SaveButton programId={p.id} initiallySaved={isSaved} />
       </div>
+
+      {HOUSING_ENABLED ? (
+        <HousingSection
+          city={housing.city}
+          university={housing.university}
+          cityName={u.city}
+        />
+      ) : null}
 
       {peers.length > 0 ? (
         <section className="mt-16 border-t border-border pt-10">

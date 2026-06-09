@@ -211,6 +211,54 @@ Append-only audit of confirmation emails actually sent — backs the per-recipie
 
 Index on `(email_lower, sent_at)`. **RLS:** enabled, **no policies** — service-role only.
 
+## Housing (2026-06-09)
+
+City- and university-level student-housing info — see `docs/features/housing.md`.
+AI-researched, with `sources` + a `researched_on` date and a `status` so figures
+are reviewable and clearly dated. **Public reads see `status='published'` only**;
+writes are service-role only. Money is `numeric(10,2)` ranges in the local
+`currency`.
+
+### `housing_cities`
+
+Keyed by `(city, country)` (shared across universities in the same city).
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | uuid PK | |
+| `city` / `country` | text not null | `country` ISO-2, matches `universities.country`; `unique (city, country)` |
+| `rent_room_min/max`, `rent_studio_min/max`, `rent_shared_min/max` | numeric(10,2) | monthly rent ranges |
+| `currency` | text not null default 'EUR' | local currency (GBP/CHF/EUR…) |
+| `monthly_living_min/max` | numeric(10,2) | living costs excluding rent |
+| `student_neighborhoods` | jsonb | `[{name, note}]` |
+| `how_to_find` | jsonb | `[{name, url}]` |
+| `deposit_norms` / `tips` | text | |
+| `sources` | jsonb | `[{title, url}]` |
+| `researched_on` | date | |
+| `status` | text not null default 'draft' | `check (status in ('draft','published'))` |
+| `created_at` / `updated_at` | timestamptz | trigger-maintained |
+
+**RLS:** `housing_cities_public_read` (select where `status='published'`); writes service-role only.
+
+### `housing_universities`
+
+Keyed by `university_id` (`unique`).
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | uuid PK | |
+| `university_id` | uuid FK → `universities.id` not null, cascade, unique | |
+| `has_dorms` | boolean | |
+| `dorm_note` / `housing_office_url` / `commute_note` / `tips` | text | |
+| `on_campus_monthly_min/max`, `near_campus_monthly_min/max` | numeric(10,2) | monthly ranges |
+| `currency` | text not null default 'EUR' | |
+| `sources` | jsonb | `[{title, url}]` |
+| `researched_on` | date | |
+| `status` | text not null default 'draft' | `check (status in ('draft','published'))` |
+| `created_at` / `updated_at` | timestamptz | trigger-maintained |
+
+**RLS:** `housing_universities_public_read` (select where `status='published'`); writes service-role only.
+
 ## SECURITY DEFINER functions
 
 All run as table owner (bypass RLS) with `set search_path = public`. Callers must verify the session server-side first; these helpers do not re-authenticate. Execute is revoked from `anon`/`authenticated` unless noted.
@@ -266,6 +314,7 @@ Every schema change ships as a new file under `supabase/migrations/` named `YYYY
 | `20260605120000_university_email_verifications.sql` | `university_email_verifications`, `verification_email_sends`, `is_university_verified()` (+ uid overload) |
 | `20260609120000_audit_hardening.sql` | Drop `profiles_anon_insert`; guard `profiles.tier` writes (service-role-only trigger); tighten `application_tasks` RLS to verify application ownership; harden `reset_user_progress` anon sweep; pin `set_updated_at` search_path |
 | `20260609130000_shortlist_into_applications.sql` | Backfill `saved_programs` rows into `applications` at status `'interested'` (shortlist merged into the tracker; `saved_programs` deprecated, not yet dropped) |
+| `20260609140000_housing.sql` | `housing_cities` + `housing_universities` (AI-researched, draft/published, public-read on published only) |
 
 The `schema_migrations` ledger table itself is created by `db-migrate.mjs` (not a migration file).
 
