@@ -20,8 +20,6 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
-import { APPLICATIONS_ENABLED } from "@/lib/feature-flags";
-import { TrackButton } from "@/components/applications/track-button";
 import { UniversityLogo } from "@/components/university/university-logo";
 import { formatTuition } from "@/lib/format/currency";
 
@@ -106,26 +104,17 @@ export default async function ProgramPage({
 
   const user = await getUser();
   let isSaved = false;
-  let isTracked = false;
   if (user) {
     const userDb = createServiceClient();
+    // "Saved" == the program is in the user's applications (the shortlist was
+    // merged into the tracker, 2026-06-09 — one Save action, one list).
     const savedRes = await userDb
-      .from("saved_programs")
+      .from("applications")
       .select("id")
       .eq("user_id", user.id)
       .eq("program_id", p.id)
       .maybeSingle();
     isSaved = Boolean(savedRes.data);
-
-    if (APPLICATIONS_ENABLED) {
-      const trackedRes = await userDb
-        .from("applications")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("program_id", p.id)
-        .maybeSingle();
-      isTracked = Boolean(trackedRes.data);
-    }
   }
 
   const peersRes = await publicDb
@@ -299,9 +288,6 @@ export default async function ProgramPage({
           </Link>
         </Button>
         <SaveButton programId={p.id} initiallySaved={isSaved} />
-        {APPLICATIONS_ENABLED ? (
-          <TrackButton programId={p.id} initiallyTracked={isTracked} />
-        ) : null}
       </div>
 
       {peers.length > 0 ? (

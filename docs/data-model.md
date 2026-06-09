@@ -113,7 +113,15 @@ The output of a matching run for one profile (DeepSeek V4 Flash; top-3 ranked).
 
 **RLS:** `matches_owner_select` — authenticated, `user_id = auth.uid()`. Writes are service-role only (matches are produced by the matcher pipeline).
 
-### `saved_programs` (shortlist)
+### `saved_programs` (shortlist) — **deprecated 2026-06-09**
+
+> **Superseded by `applications`.** The shortlist was merged into the tracker:
+> "saving" a program now creates an `applications` row at status `'interested'`,
+> and `/shortlist` is the `'interested'` view of the tracker. App code no longer
+> reads or writes this table; existing rows were backfilled into `applications`
+> by `20260609130000`. The table is kept (still referenced by the
+> `attach_anon_rows_to_user` / `reset_user_progress` functions) and will be
+> dropped in a follow-up cleanup once the merge is verified in production.
 
 Per-user bookmarked programs.
 
@@ -257,6 +265,7 @@ Every schema change ships as a new file under `supabase/migrations/` named `YYYY
 | `20260516140000_rls_defense_in_depth.sql` | Owner-scoped RLS policies on profiles/matches/saved_programs/applications/application_tasks |
 | `20260605120000_university_email_verifications.sql` | `university_email_verifications`, `verification_email_sends`, `is_university_verified()` (+ uid overload) |
 | `20260609120000_audit_hardening.sql` | Drop `profiles_anon_insert`; guard `profiles.tier` writes (service-role-only trigger); tighten `application_tasks` RLS to verify application ownership; harden `reset_user_progress` anon sweep; pin `set_updated_at` search_path |
+| `20260609130000_shortlist_into_applications.sql` | Backfill `saved_programs` rows into `applications` at status `'interested'` (shortlist merged into the tracker; `saved_programs` deprecated, not yet dropped) |
 
 The `schema_migrations` ledger table itself is created by `db-migrate.mjs` (not a migration file).
 

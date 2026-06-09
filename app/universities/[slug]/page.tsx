@@ -93,8 +93,10 @@ export default async function UniversityPage({
   let savedSet = new Set<string>();
   if (user && programs.length > 0) {
     const userDb = createServiceClient();
+    // "Saved" == the program is in the user's applications (shortlist merged
+    // into the tracker, 2026-06-09).
     const savedRes = await userDb
-      .from("saved_programs")
+      .from("applications")
       .select("program_id")
       .eq("user_id", user.id)
       .in(

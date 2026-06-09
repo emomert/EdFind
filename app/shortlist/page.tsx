@@ -12,12 +12,16 @@ export const metadata: Metadata = {
   description: "Programs you've saved.",
 };
 
+// The shortlist was merged into the applications tracker (2026-06-09): a
+// "saved" program is an application at status 'interested'. This page is the
+// 'interested' view of the tracker — the things you've shortlisted but not yet
+// started — and still drives the compare flow.
 export default async function ShortlistPage() {
   const user = await requireUser("/shortlist");
 
   const supabase = createServiceClient();
   const res = await supabase
-    .from("saved_programs")
+    .from("applications")
     .select(
       `id, program_id, created_at,
        program:programs!inner(
@@ -30,6 +34,7 @@ export default async function ShortlistPage() {
        )`,
     )
     .eq("user_id", user.id)
+    .eq("status", "interested")
     .order("created_at", { ascending: false });
 
   const items = ((res.data ?? []) as unknown as ShortlistItem[]).filter(

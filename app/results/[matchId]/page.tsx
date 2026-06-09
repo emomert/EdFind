@@ -101,8 +101,10 @@ export default async function ResultsPage({
   >;
   const programIds = rawMatches.map((m) => m.program_id);
 
+  // "Saved" == the program is in the user's applications (the shortlist was
+  // merged into the tracker, 2026-06-09).
   const savedRes = await supabase
-    .from("saved_programs")
+    .from("applications")
     .select("program_id")
     .eq("user_id", user.id)
     .in("program_id", programIds);
