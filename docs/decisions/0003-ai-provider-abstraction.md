@@ -4,6 +4,8 @@
 - **Date:** 2026-05-07
 - **Deciders:** Beyza, Claude
 
+> **Status (2026-06-09):** The abstraction exists in `lib/ai/` (feature code routes every call through it, never the provider SDK directly), but **only DeepSeek V4 Flash is wired**. The "OpenAI is the configured backup" language below is aspirational — there is no OpenAI failover in code today, and `OPENAI_API_KEY` is unused. Adding OpenAI as a real backup is still a one-file change when we choose to do it.
+
 ## Context
 
 EdFind uses AI inference for several features: the matching engine's reasoning step, the free-text "AI Search" entry path, parsing scraped university data into structured records, and (later) generating application-helper content. The user has working keys for both DeepSeek and OpenAI. AI provider pricing, latency, and quality shift fast — the choice we make today will likely not be the choice we want in twelve months.

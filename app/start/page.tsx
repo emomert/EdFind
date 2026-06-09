@@ -39,12 +39,12 @@ const PATHS: Path[] = [
   {
     href: "/quiz",
     eyebrow: "Structured",
-    title: "Take the 10-question quiz",
+    title: "Take the 13-question quiz",
     description:
-      "Walk through nine quick questions about destination, budget, field of study, and goals, then add anything else we'd miss in a free-text box. Best if you're still figuring out what you want.",
+      "Walk through about a dozen quick questions covering your background, destination, budget, field of study, and goals, then add anything else we'd miss in a free-text box. Best if you're still figuring out what you want.",
     icon: <ListChecks className="size-5" />,
     bullets: [
-      "9 multiple-choice + 1 optional free-text",
+      "11 multiple-choice + 2 optional free-text",
       "Drafts saved automatically",
       "Same AI matcher under the hood",
     ],
@@ -102,7 +102,7 @@ export default function StartPage() {
               ?
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
-              Both paths feed the same DeepSeek V4 matcher and the same 197-program
+              Both paths feed the same DeepSeek V4 matcher and the same 196-program
               catalog — pick whichever feels easier. You can always switch.
             </p>
           </div>

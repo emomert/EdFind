@@ -7,10 +7,12 @@ import {
   AnswersSchema,
   BUDGET_BRACKETS,
   CAREER_GOALS,
+  CURRENT_SITUATIONS,
   DESTINATIONS,
   DURATIONS,
   ENGLISH_LEVELS,
   FIELDS_OF_STUDY,
+  GPA_RANGES,
   SCHOLARSHIP_NEEDS,
   WORK_EXPERIENCES,
   type ValidatedAnswers,
@@ -24,7 +26,9 @@ const DEEPSEEK_MODEL = "deepseek-v4-flash";
 // hallucinate a defensible default.
 const ParserOutputSchema = z.object({
   destinations: z.array(z.enum(DESTINATIONS)).nullable(),
+  current_situation: z.enum(CURRENT_SITUATIONS).nullable(),
   field_of_study: z.enum(FIELDS_OF_STUDY).nullable(),
+  gpa_range: z.enum(GPA_RANGES).nullable(),
   budget_per_year: z.enum(BUDGET_BRACKETS).nullable(),
   duration_preference: z.enum(DURATIONS).nullable(),
   english_level: z.enum(ENGLISH_LEVELS).nullable(),
@@ -34,13 +38,15 @@ const ParserOutputSchema = z.object({
   work_experience: z.enum(WORK_EXPERIENCES).nullable(),
 });
 
-const SYSTEM_PROMPT = `You are EdFind's free-text query parser. EdFind helps Turkish students find master's programs in Europe. The student typed a natural-language description of what they want; your job is to map it onto EdFind's 9-field structured profile.
+const SYSTEM_PROMPT = `You are EdFind's free-text query parser. EdFind helps Turkish students find master's programs in Europe. The student typed a natural-language description of what they want; your job is to map it onto EdFind's 11-field structured profile.
 
 Output strict JSON in this exact shape, with no markdown, no commentary, no extra keys:
 
 {
   "destinations": <array of country codes from the allowed list, or null if no country/region is mentioned>,
+  "current_situation": <one allowed value, or null if not mentioned>,
   "field_of_study": <one allowed value, or null if not mentioned>,
+  "gpa_range": <one allowed value, or null if not mentioned>,
   "budget_per_year": <one allowed value, or null if not mentioned>,
   "duration_preference": <one allowed value, or null if not mentioned>,
   "english_level": <one allowed value, or null if not mentioned>,
@@ -52,10 +58,12 @@ Output strict JSON in this exact shape, with no markdown, no commentary, no extr
 
 Allowed values:
 - destinations: IT (Italy), NL (Netherlands), DE (Germany), GB (UK / Britain / England), ES (Spain), FR (France), CH (Switzerland), SE (Sweden), DK (Denmark), IE (Ireland), AT (Austria), BE (Belgium), CZ (Czechia / Czech Republic), EE (Estonia), FI (Finland), NO (Norway), PL (Poland), PT (Portugal), or ANY for "anywhere / no preference". For multiple countries, return all of them.
-- field_of_study: business_management, engineering, computer_science_ai, design, architecture_built_environment, economics_finance, data_science, social_sciences. Map "management" → business_management, "MBA" → business_management, "CS"/"AI"/"machine learning" → computer_science_ai, "fintech" → economics_finance, "DS" → data_science, "humanities" → social_sciences, "architecture" → architecture_built_environment, etc.
+- current_situation: undergraduate, recent_graduate, working_professional, gap_year, other. Map "final-year student"/"still studying" → undergraduate, "just graduated"/"new graduate" → recent_graduate, "working"/"I'm an engineer at X" → working_professional, "taking a gap year" → gap_year. Leave null if not mentioned.
+- field_of_study: business_management, engineering, computer_science_ai, design, architecture_built_environment, economics_finance, data_science, social_sciences. Map "management" → business_management, "MBA" → business_management, "CS"/"AI"/"machine learning" → computer_science_ai, "fintech" → economics_finance, "DS" → data_science, "humanities" → social_sciences, "architecture" → architecture_built_environment, etc. This is the field they want to STUDY NEXT.
+- gpa_range: below_2_0, 2_0_2_5, 2_5_3_0, 3_0_3_5, 3_5_plus. Map a stated GPA on a 4.0 scale to the nearest bracket — e.g. "3.2 GPA" → 3_0_3_5, "3.8/4" → 3_5_plus, "around 2.7" → 2_5_3_0. Leave null if no GPA is mentioned.
 - budget_per_year: <10k, 10-15k, 15-20k, 20-25k, 25k+, flexible. Map any concrete number to the nearest bracket — e.g. "under 5k" → <10k, "around 12k" → 10-15k, "no budget limit" → flexible.
 - duration_preference: 12mo, 18mo, 24mo, flexible. "1 year" → 12mo, "2 years" → 24mo, "any" → flexible.
-- english_level: intermediate (B1), upper-intermediate (B2), advanced (C1), proficient (C2). Map "decent English" → upper-intermediate, "fluent" → advanced, "native-like" → proficient, "okay English" → intermediate. Default to upper-intermediate ONLY if the student says "my English is fine" or similar; otherwise leave null.
+- english_level: exam_ready (already has or is ready for IELTS/TOEFL), no_exam_yet (good English but no exam taken yet), intermediate, needs_improvement. Map "fluent"/"native-like"/"have IELTS"/"C1" → exam_ready, "my English is good"/"comfortable in English" → no_exam_yet, "okay English"/"B1" → intermediate, "weak English"/"need to improve my English" → needs_improvement. Leave null if not mentioned.
 - scholarship_need: required, helpful, not_needed. Map "need scholarship" → required, "would love scholarship but can pay" → helpful, "self-funded" → not_needed.
 - career_goal: work_in_europe, work_internationally, return_to_turkey, phd_research, entrepreneurship, unsure. Map "want to stay in Europe" → work_in_europe, "PhD afterwards" → phd_research, "want to come back to Turkey" → return_to_turkey, "start my own company" → entrepreneurship.
 - academic_focus: research, applied, balanced. Map "thesis-heavy" / "research-led" / "PhD-bound" → research, "industry-focused" / "job-oriented" / "internship-heavy" → applied. Otherwise null (do NOT default to balanced).
@@ -67,15 +75,18 @@ Rules:
 - Never invent a value not in the allowed lists.
 - Output JSON only.`;
 
-// Note: additional_context is intentionally NOT in FALLBACKS — it isn't
-// extracted by the parser, it's set further down to the student's original
-// free-text query (which IS additional context, by definition).
+// Note: additional_context and study_background are intentionally NOT in the
+// parser output. additional_context is set below to the student's original
+// free-text query; study_background isn't inferred for /search (stays null).
 const FALLBACKS = {
   destinations: ["ANY"] as const,
+  current_situation: null,
   field_of_study: "business_management",
+  study_background: null,
+  gpa_range: null,
   budget_per_year: "flexible",
   duration_preference: "flexible",
-  english_level: "upper-intermediate",
+  english_level: "no_exam_yet",
   scholarship_need: "helpful",
   career_goal: "unsure",
   academic_focus: "balanced",
@@ -137,12 +148,14 @@ export async function parseFreeTextToProfile(
   const inferredFields: Array<keyof ValidatedAnswers> = [];
   const filled = { ...FALLBACKS } as Record<keyof ValidatedAnswers, unknown>;
 
-  // The parser only extracts the 9 structured fields. additional_context is
-  // handled separately below — we set it to the student's verbatim query so
-  // the matcher gets the full free-text as a soft signal.
+  // The parser extracts the 11 structured fields. additional_context and
+  // study_background are handled separately — additional_context is set below
+  // to the student's verbatim query; study_background stays null for /search.
   const PARSED_FIELDS = [
     "destinations",
+    "current_situation",
     "field_of_study",
+    "gpa_range",
     "budget_per_year",
     "duration_preference",
     "english_level",

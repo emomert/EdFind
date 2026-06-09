@@ -8,14 +8,6 @@ import { cn } from "@/lib/utils";
 import type { ApplicationItem, ProfileSummary } from "./types";
 import { COUNTRY_NAMES, FIELD_LABELS, STATUS_PROGRESS_WEIGHT } from "./types";
 
-function initialsOf(email: string | null | undefined): string {
-  if (!email) return "EF";
-  const local = email.split("@")[0];
-  const parts = local.split(/[._-]/).filter(Boolean);
-  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-  return local.slice(0, 2).toUpperCase();
-}
-
 function deriveTargetCountries(
   apps: ApplicationItem[],
   profile: ProfileSummary,
@@ -70,7 +62,6 @@ export function StudentProgressCard({
   applications: ApplicationItem[];
   profile: ProfileSummary;
 }) {
-  const initials = initialsOf(email);
   // Title-case the first token only. We avoid /\b\w/ here: in JS regex (no /u
   // flag with \w), `\w` is [A-Za-z0-9_], so Turkish letters like ğ/ş/ç/ı/ü/ö
   // are not word chars — that creates a fake word boundary inside names like
@@ -123,10 +114,10 @@ export function StudentProgressCard({
             initial={{ scale: 0.7, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.15, type: "spring", stiffness: 220, damping: 18 }}
-            className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-2xl font-semibold ring-1 ring-white/30 backdrop-blur-sm sm:size-20 sm:text-3xl"
+            className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-3xl ring-1 ring-white/30 backdrop-blur-sm sm:size-20 sm:text-4xl"
             aria-hidden
           >
-            {initials}
+            🧑‍🎓
           </motion.div>
           <div className="min-w-0">
             <motion.span

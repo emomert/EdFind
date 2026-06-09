@@ -49,3 +49,6 @@ What did we choose, in one or two sentences.
 - [0001 — Tech stack](0001-tech-stack.md)
 - [0002 — Database: Supabase Postgres](0002-database-supabase.md)
 - [0003 — AI provider abstraction](0003-ai-provider-abstraction.md)
+- [0004 — Resend transactional email](0004-resend-transactional-email.md)
+- [0005 — Entitlements not on `profiles.tier`](0005-entitlements-not-on-profiles.md) *(Proposed)*
+- [0006 — AI rate limiting](0006-ai-rate-limiting.md) *(Proposed)*

@@ -112,6 +112,17 @@ export function CatalogClient({
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [programs]);
 
+  // Derive duration options from the data so no real program length is ever
+  // unselectable (previously hardcoded to 12/18/24, which hid every other
+  // length — see audit 2026-06-09 U4).
+  const durations = useMemo(() => {
+    const set = new Set<number>();
+    programs.forEach((p) => {
+      if (p.duration_months != null) set.add(p.duration_months);
+    });
+    return Array.from(set).sort((a, b) => a - b);
+  }, [programs]);
+
   // ─── Filter passes ──────────────────────────────────────────────────
   const filteredUniversities = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -343,9 +354,11 @@ export function CatalogClient({
                 className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
               >
                 <option value="">Any duration</option>
-                <option value="12">12 months</option>
-                <option value="18">18 months</option>
-                <option value="24">24 months</option>
+                {durations.map((d) => (
+                  <option key={d} value={String(d)}>
+                    {d} months
+                  </option>
+                ))}
               </select>
             </>
           )}

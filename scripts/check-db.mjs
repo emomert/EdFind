@@ -32,12 +32,13 @@ const supabase = createClient(url, key, {
 
 console.log(`→ Connecting to ${url}`);
 
-// Baseline reflects the post-Phase-8 catalog (58 universities, 99 programs).
-// profiles + matches grow over time as users submit the quiz, so we just
-// require them to be non-negative rather than pinning to a snapshot.
+// Baseline reflects the current catalog (>=58 universities, >=196 programs).
+// The catalog only grows, so these are floors, not exact pins — a future
+// catalog drop must not turn this health check into a false alarm. profiles +
+// matches grow as users submit the quiz, so they're floored at 0.
 const checks = [
-  { table: "universities", expect: 58 },
-  { table: "programs", expect: 99 },
+  { table: "universities", expect: ">=58" },
+  { table: "programs", expect: ">=196" },
   { table: "profiles", expect: ">=0" },
   { table: "matches", expect: ">=0" },
   { table: "saved_programs", expect: ">=0" },
@@ -57,7 +58,10 @@ for (const { table, expect } of checks) {
     continue;
   }
 
-  const ok = expect === ">=0" ? count >= 0 : count === expect;
+  const ok =
+    typeof expect === "string" && expect.startsWith(">=")
+      ? count >= Number(expect.slice(2))
+      : count === expect;
   const status = ok ? "✓" : "✗";
   console.log(`${status} ${table.padEnd(15)} count=${count} (expected ${expect})`);
   if (!ok) allOk = false;

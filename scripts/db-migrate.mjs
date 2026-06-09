@@ -4,15 +4,28 @@
 //   node --env-file=.env.local scripts/db-migrate.mjs
 //
 // Workflow:
-//   1. Walks supabase/migrations/ in filename order, runs each migration
-//      inside a transaction.
-//   2. Runs supabase/seed.sql afterwards.
+//   1. Ensures a public.schema_migrations ledger exists.
+//   2. Walks supabase/migrations/ in filename order. A file already recorded
+//      in the ledger (matching checksum) is skipped without re-running.
+//      Otherwise it runs inside a transaction and, on success, its filename +
+//      checksum are recorded in the SAME transaction (so tracking and apply
+//      are atomic).
+//   3. Runs supabase/seed.sql afterwards.
 //
-// Idempotency: schema migrations may have been applied previously via the
-// dashboard SQL editor. Postgres errors that mean "this DDL already exists"
-// (relations, columns, indexes, functions) are treated as already-applied
-// and the migration is skipped without failing the run. Anything else is a
-// real error and aborts.
+// Migrations are immutable: once a file is recorded as applied, editing it is
+// a mistake — add a NEW migration instead. If a recorded file's checksum
+// changes, this script warns loudly and skips it (it will NOT silently
+// re-apply or report the edit as applied).
+//
+// Adoption of pre-existing objects: the first run after the ledger was
+// introduced finds none of the legacy migrations recorded. Those objects
+// already exist in production (applied out-of-band via the dashboard before
+// tracking existed), so re-running them raises a "already exists" SQLSTATE.
+// We treat that as "already applied", adopt the file into the ledger so it is
+// skipped cleanly next time, and continue. This adoption path assumes the
+// legacy file was applied IN FULL out-of-band (verified true for this project
+// by scripts/check-db.mjs); it is a one-time backfill, not the normal path.
+// Every NEW migration applies cleanly and is tracked precisely.
 //
 // Seed file uses ON CONFLICT DO UPDATE — re-running converges existing rows
 // to whatever the file currently says.
@@ -24,6 +37,7 @@
 
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { createHash } from "node:crypto";
 import pg from "pg";
 
 const dbUrl = process.env.SUPABASE_DB_URL;
@@ -34,10 +48,9 @@ if (!dbUrl) {
   process.exit(1);
 }
 
-// Postgres SQLSTATE codes that mean "this DDL was already applied". When a
-// migration uses bare CREATE TABLE / ALTER TABLE ADD COLUMN (no IF NOT EXISTS),
-// re-running it produces these errors — safe to swallow at the migration
-// level since we're not in a partial-apply state.
+// Postgres SQLSTATE codes that mean "this DDL was already applied". Only used
+// on the one-time adoption path for legacy migrations applied out-of-band
+// before the ledger existed (see header).
 const IDEMPOTENT_ERROR_CODES = new Set([
   "42P07", // duplicate_table — relation already exists
   "42701", // duplicate_column
@@ -46,6 +59,8 @@ const IDEMPOTENT_ERROR_CODES = new Set([
   "42723", // duplicate_function
   "42P16", // invalid_table_definition — usually triggers already attached
 ]);
+
+const checksum = (sql) => createHash("sha256").update(sql).digest("hex");
 
 const client = new pg.Client({ connectionString: dbUrl });
 
@@ -57,8 +72,20 @@ try {
   process.exit(1);
 }
 
+// 1. Ledger.
+await client.query(`
+  create table if not exists public.schema_migrations (
+    filename text primary key,
+    checksum text not null,
+    applied_at timestamptz not null default now()
+  )
+`);
+const ledger = await client.query("select filename, checksum from public.schema_migrations");
+const applied = new Map(ledger.rows.map((r) => [r.filename, r.checksum]));
+
 let migrationsRun = 0;
 let migrationsSkipped = 0;
+let migrationsAdopted = 0;
 
 const migrationFiles = readdirSync("supabase/migrations")
   .filter((f) => f.endsWith(".sql"))
@@ -67,18 +94,41 @@ const migrationFiles = readdirSync("supabase/migrations")
 for (const file of migrationFiles) {
   const path = join("supabase", "migrations", file);
   const sql = readFileSync(path, "utf8");
+  const sum = checksum(sql);
+  const recorded = applied.get(file);
+
+  if (recorded !== undefined) {
+    if (recorded !== sum) {
+      console.warn(
+        `⚠ ${file} — checksum differs from the applied version. Migrations are immutable; ` +
+          `add a NEW migration instead of editing this one. Skipping (NOT re-applied).`,
+      );
+    }
+    migrationsSkipped++;
+    continue;
+  }
 
   try {
     await client.query("BEGIN");
     await client.query(sql);
+    await client.query(
+      `insert into public.schema_migrations (filename, checksum) values ($1, $2)`,
+      [file, sum],
+    );
     await client.query("COMMIT");
     console.log(`✓ ${file}`);
     migrationsRun++;
   } catch (err) {
     await client.query("ROLLBACK").catch(() => {});
     if (err.code && IDEMPOTENT_ERROR_CODES.has(err.code)) {
-      console.log(`⊙ ${file} (already applied — ${err.code})`);
-      migrationsSkipped++;
+      // Legacy object already present — adopt into the ledger (one-time).
+      await client.query(
+        `insert into public.schema_migrations (filename, checksum) values ($1, $2)
+           on conflict (filename) do nothing`,
+        [file, sum],
+      );
+      console.log(`⊙ ${file} (already present — adopted into ledger, ${err.code})`);
+      migrationsAdopted++;
     } else {
       console.error(`✗ ${file}`);
       console.error(`  ${err.code ?? ""} ${err.message}`);
@@ -106,7 +156,7 @@ try {
 
 console.log("");
 console.log(
-  `Done. ${migrationsRun} migration${migrationsRun === 1 ? "" : "s"} applied, ${migrationsSkipped} already present, seed converged.`,
+  `Done. ${migrationsRun} applied, ${migrationsAdopted} adopted (pre-existing), ${migrationsSkipped} already tracked, seed converged.`,
 );
 
 await client.end();

@@ -29,8 +29,10 @@ export type PersistAndMatchResult =
  * `/results/[matchId]`.
  *
  * All DB work runs as service-role because profiles RLS denies anon SELECT
- * and matches has no client policies (MVP). The cookie is what authorises
- * reads on the results page.
+ * and matches has no client policies (MVP). Authenticated results reads are
+ * authorised by `user_id = auth.uid()` (matched in app code and enforced by
+ * RLS); the `client_id` cookie set below only feeds the first-sign-in
+ * row-attach in app/auth/callback/route.ts, not results-page authorisation.
  */
 export async function persistAndMatch(
   clientId: string,

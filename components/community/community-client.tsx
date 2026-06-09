@@ -57,6 +57,12 @@ export type CommunityClientProps = {
   catalogUniversities: { slug: string; name: string; country: string }[];
   catalogCountries: { code: string; name: string }[];
   stats: React.ComponentProps<typeof CommunityStatsCard>["stats"];
+  /**
+   * Whether to show the mock subscription dev toggle. Evaluated server-side
+   * (non-production only) so it never ships to the live site. See audit
+   * 2026-06-09 S7.
+   */
+  showDevToggle: boolean;
 };
 
 export function CommunityClient(props: CommunityClientProps) {
@@ -349,7 +355,7 @@ export function CommunityClient(props: CommunityClientProps) {
           </div>
         </div>
 
-        <SubscriptionDevToggle />
+        {props.showDevToggle && <SubscriptionDevToggle />}
 
         <GroupChatModal
           open={openGroup !== null}

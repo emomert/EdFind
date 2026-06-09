@@ -6,9 +6,9 @@ EdFind is a SaaS web app that helps graduating students in Turkey discover and a
 
 ## Status
 
-**MVP shipped.** Live at **https://ed-find.vercel.app/**, hosted on Vercel, backed by Supabase (eu-west). The full end-to-end works in production: 9-question profile quiz (or AI free-text search) → Server Action → Supabase profile + match → personalized results page. Real submissions verified on launch day (2026-05-08).
+**MVP shipped.** Live at **https://ed-find.vercel.app/**, hosted on Vercel, backed by Supabase (eu-west). The full end-to-end works in production: 13-question profile quiz (or AI free-text search) → Server Action → Supabase profile + match → personalized results page. Real submissions verified on launch day (2026-05-08).
 
-Live features beyond the original MVP: Google sign-in (required for `/quiz`, `/search`, `/results*`, `/shortlist`, `/applications`, `/compare`), shortlist + side-by-side compare, application tracker with task kanban, community pages, public `/catalog` browse, and a header command-palette search. Catalog covers **58 universities / 197 programs across 15 European countries**. Matching runs on **DeepSeek V4 Flash** (`deepseek-v4-flash`). What's next: Stripe / tier billing, Turkish localization.
+Live features beyond the original MVP: Google sign-in (required for `/quiz`, `/search`, `/results*`, `/shortlist`, `/applications`, `/compare`), shortlist + side-by-side compare, application tracker with task kanban, community pages, public `/catalog` browse, and a header command-palette search. Catalog covers **58 universities / 196 programs across 15 European countries**. Matching runs on **DeepSeek V4 Flash** (`deepseek-v4-flash`). What's next: Stripe / tier billing, Turkish localization.
 
 See [`docs/architecture.md`](docs/architecture.md) for the phased roadmap.
 
@@ -23,7 +23,7 @@ See [`docs/architecture.md`](docs/architecture.md) for the phased roadmap.
 - **Tailwind CSS** + **shadcn/ui** + **Lucide** — styling and component primitives
 - **Supabase** — Postgres, auth, storage, row-level security
 - **Vercel** — hosting (web + API routes)
-- **DeepSeek** (primary), **OpenAI** (backup) — AI inference, accessed via a provider-agnostic wrapper
+- **DeepSeek V4 Flash** — AI inference, accessed via a provider-agnostic wrapper (`lib/ai/`). The wrapper is OpenAI-compatible, but no second provider is wired today (aspirational)
 - **Stripe** — payments (deferred until pricing tiers go live)
 
 ## Project structure

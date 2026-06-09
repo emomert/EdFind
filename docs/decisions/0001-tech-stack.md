@@ -13,7 +13,7 @@ EdFind is a SaaS web app with a content-heavy public surface (university and pro
 - **Web framework:** Next.js 16 (App Router, Turbopack stable) with TypeScript and React 19.
 - **Styling and components:** Tailwind CSS + shadcn/ui + Lucide icons.
 - **Database, auth, storage:** Supabase (Postgres + Auth + Storage + RLS) — see ADR 0002.
-- **AI:** DeepSeek (primary), OpenAI (backup), accessed via a provider-agnostic wrapper — see ADR 0003.
+- **AI:** DeepSeek (primary), accessed via a provider-agnostic wrapper — see ADR 0003. The wrapper is OpenAI-compatible so a second provider can be added later, but as of 2026-06-09 DeepSeek V4 Flash is the only provider wired in code.
 - **Hosting:** Vercel for the Next.js app, Supabase for data.
 - **Payments:** Stripe (deferred until tiers go live).
 

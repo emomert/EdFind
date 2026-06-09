@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/supabase/auth";
-import { UniversityLogo } from "@/components/university/university-logo";
 import {
   MarkerArrow,
   MarkerRoute,
@@ -20,7 +19,8 @@ import {
   MarkerStar,
 } from "@/components/decor/marker";
 import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
-import { Drift, Lift, Reveal, Stagger, StaggerItem } from "@/components/motion";
+import { Drift, Reveal } from "@/components/motion";
+import { UniversityMarquee } from "@/components/home/university-marquee";
 import {
   WelcomeTour,
   WelcomeTourReplayLink,
@@ -49,7 +49,7 @@ async function loadFeatured(): Promise<{
       .from("universities")
       .select("slug, name, country, city, qs_world_rank, description, logo_url")
       .order("qs_world_rank", { ascending: true, nullsFirst: false })
-      .limit(6),
+      .limit(40),
     supabase.from("programs").select("id", { count: "exact", head: true }),
     supabase.from("universities").select("country"),
   ]);
@@ -136,7 +136,7 @@ export default async function HomePage() {
                 <>
                   <Button asChild size="lg">
                     <Link href="/quiz">
-                      Take the 10-question quiz
+                      Take the 13-question quiz
                       <ArrowRight />
                     </Link>
                   </Button>
@@ -204,8 +204,8 @@ export default async function HomePage() {
               </p>
               <ol className="mt-4 space-y-3 text-sm text-foreground">
                 <Step n={1}>
-                  Answer 9 multiple-choice questions plus an optional free-text
-                  prompt about anything we&apos;d miss.
+                  Answer 11 quick questions plus a couple of optional free-text
+                  prompts about anything we&apos;d miss.
                 </Step>
                 <Step n={2}>
                   Our matcher (DeepSeek V4) ranks programs across all{" "}
@@ -220,72 +220,33 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section
-        id="featured"
-        className="relative mx-auto max-w-6xl px-6 py-12 sm:py-16"
-      >
+      <section id="featured" className="relative py-12 sm:py-16">
         <Reveal>
-          <div className="flex items-baseline justify-between">
-            <h2 className="relative text-2xl font-semibold tracking-tight sm:text-3xl">
-              Featured universities
-              <MarkerStar
-                aria-hidden
-                className="absolute -right-7 -top-3 size-5 text-primary/40 sm:-right-9 sm:-top-4 sm:size-6"
-              />
-            </h2>
-            <p className="hidden text-sm text-muted-foreground sm:block">
-              Top-ranked institutions in our catalog
-            </p>
+          <div className="mx-auto max-w-6xl px-6">
+            <div className="flex items-baseline justify-between">
+              <h2 className="relative text-2xl font-semibold tracking-tight sm:text-3xl">
+                Universities from across Europe
+                <MarkerStar
+                  aria-hidden
+                  className="absolute -right-7 -top-3 size-5 text-primary/40 sm:-right-9 sm:-top-4 sm:size-6"
+                />
+              </h2>
+              <p className="hidden text-sm text-muted-foreground sm:block">
+                {totals.universities} institutions across {totals.countries}{" "}
+                countries — and growing
+              </p>
+            </div>
           </div>
         </Reveal>
 
-        <Stagger className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {universities.map((u) => (
-            <StaggerItem key={u.slug}>
-              <Lift>
-                <Link
-                  href={`/universities/${u.slug}`}
-                  className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition-all hover:border-primary/40 hover:shadow-md"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <UniversityLogo
-                      name={u.name}
-                      slug={u.slug}
-                      logoUrl={u.logo_url}
-                      size="md"
-                    />
-                    {u.qs_world_rank ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                        <Award className="size-3" />
-                        QS #{u.qs_world_rank}
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    {u.city}, {u.country}
-                  </p>
-                  <h3 className="mt-1 text-lg font-semibold leading-snug tracking-tight transition-colors group-hover:text-primary">
-                    {u.name}
-                  </h3>
-                  {u.description ? (
-                    <p className="mt-2 line-clamp-3 flex-1 text-sm text-muted-foreground">
-                      {u.description}
-                    </p>
-                  ) : null}
-                  <p className="mt-4 text-xs text-muted-foreground">
-                    {u.program_count} program{u.program_count === 1 ? "" : "s"} in
-                    catalog
-                  </p>
-                </Link>
-              </Lift>
-            </StaggerItem>
-          ))}
-        </Stagger>
+        <div className="mt-8">
+          <UniversityMarquee universities={universities} />
+        </div>
 
         <div className="mt-8 text-center">
           <Button asChild variant="outline">
-            <Link href="/quiz">
-              Take the quiz to get matched
+            <Link href="/catalog">
+              Browse the full catalog
               <ArrowRight />
             </Link>
           </Button>

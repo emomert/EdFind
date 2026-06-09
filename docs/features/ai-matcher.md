@@ -7,7 +7,7 @@ Replaces the Phase-4 placeholder ("Polimi MSc Management Engineering for everyon
 When a student submits the profile quiz (or a free-text query via `/search`):
 
 1. `lib/server/persist-and-match.ts` persists the profile against the authenticated `user_id`.
-2. It loads the entire program catalog (currently **197 programs across 58 universities** in 15 European countries) joined to university metadata.
+2. It loads the entire program catalog (currently **196 programs across 58 universities** in 15 European countries) joined to university metadata.
 3. It calls `matchProgramsToProfile` in `lib/ai/index.ts`, which sends the profile + compressed catalog to **DeepSeek V4 Flash** (`deepseek-v4-flash`) with `response_format: { type: "json_object" }`.
 4. The model returns a ranked top-3 with `program_id`, `score` (0–100), and a 70–130-word `rationale` per match.
 5. All three matches are inserted into `matches` with their scores and rationales.
@@ -45,9 +45,9 @@ The system prompt lives in `lib/ai/index.ts` as `SYSTEM_PROMPT`. It tells the mo
 - To apply soft fits: field-of-study match, career goal alignment, ranking prestige, scholarship need vs tuition
 - To prefer 3 substantively different options over near-clones
 
-The user message contains the profile (compact JSON, all 9 quiz fields including `academic_focus` and `work_experience`) and a compressed catalog (program id, name, university, country, city, field, language, duration, tuition, currency, QS ranks, first 240 chars of description). Temperature is **0.55** to leave room for prose-style rationales while keeping ranking decisions stable.
+The user message contains the profile (compact JSON, all 10 quiz fields including `academic_focus`, `work_experience`, and the optional `additional_context` free text) and a compressed catalog (program id, name, university, country, city, field, language, duration, tuition, currency, QS ranks, first 240 chars of description). Temperature is **0.55** to leave room for prose-style rationales while keeping ranking decisions stable.
 
-At today's catalog size (99 programs) the request is roughly **16k input tokens / ~250 output tokens** — about **$0.003 per match**.
+At today's catalog size (196 programs) the request is roughly **30k input tokens / ~250 output tokens** — about **$0.005 per match**.
 
 ## Output validation
 
@@ -87,4 +87,4 @@ After updating either, re-run `scripts/smoke-deepseek.mjs` locally to verify.
 - No caching — each profile is unique and submissions are infrequent. Consider when traffic grows.
 - No A/B between Flash and Pro — Flash is sufficient now. Reassess if the matcher feels weak in user testing.
 - No per-user rate limit — current traffic doesn't warrant it. Add Upstash / KV-backed quota before opening up free access more broadly.
-- No explicit cost cap — at $0.003/submission, 100 submissions/day = $0.30/day. Revisit if traffic grows ~100x.
+- No explicit cost cap — at ~$0.005/submission, 100 submissions/day ≈ $0.50/day. Revisit if traffic grows ~100x.

@@ -1,6 +1,6 @@
-# CLAUDE.md — Agent brief for EdFind
+# AGENTS.md — Agent brief for EdFind
 
-If you are an AI agent (Claude Code, Cursor, etc.) opening this repo, **read this file first.** It tells you what the project is, how it's structured, and the conventions you must follow.
+If you are an AI agent (Codex, Cursor, etc.) opening this repo, **read this file first.** It tells you what the project is, how it's structured, and the conventions you must follow.
 
 ## Project in one paragraph
 
@@ -18,12 +18,6 @@ The 5-phase MVP is complete. Phases 0–1 finished on 2026-05-07; Phases 2–5 f
   - **9.2 Shortlist + compare** at `/shortlist` and `/compare?ids=…`. `SaveButton` lives on results / program / university pages.
   - **9.3 Application tracker** at `/applications` — gated by `NEXT_PUBLIC_ENABLE_APPLICATIONS`. Originally a 4-column applications kanban (Phase 9.3); redesigned 2026-05-14 into a split-view dashboard with `StudentProgressCard` header (avatar + target countries + field + progress bar), an `ApplicationsOverview` list with search/filter/sort, a separate task `KanbanBoard` (todo/doing/done) backed by a new `application_tasks` table, and a heuristic `AiRecommendationsPanel` (no AI call yet — see `lib/applications/recommendations.ts`). Drop migration lives in `supabase/uninstall/` so `db-migrate.mjs` doesn't auto-run it. Full spec in `docs/features/applications.md`.
   - **9.4 Google auth — required**. `/quiz`, `/search`, `/results*`, `/shortlist`, `/applications`, `/compare` redirect to `/login`. Public surfaces: `/`, `/login`, `/universities/*`, `/programs/*`. OAuth callback (`app/auth/callback/route.ts`) attaches any pre-auth rows with the same cookie `client_id` to the new `user_id`.
-
-- **Community / Verified Student Insights** at `/community` (2026-05-14) — gated by `NEXT_PUBLIC_ENABLE_COMMUNITY`. Mock-data-only first cut: every university and program in the catalog gets a community group (rich content for 8 hand-picked unis, auto-generated stubs for the rest). 4 tabs (Reviews · Groups · Questions · Campus Responsibles), filter bar, group-chat modal, AI-style sidebar widgets. Subscription gating uses a cookie (`edfind_community_subscribed`) with a floating dev toggle until Stripe is wired — `useSubscription()` hook + `<SubscriberOnly>` wrapper isolate the source so the swap is one-file when billing arrives. Fake data + group generator live in `lib/community/`. Full spec in `docs/features/community.md`.
-- **`/catalog` browse + header search (Cmd+K)** (2026-05-14) — public `/catalog` page lists every university and program with filters (country, field, language, duration, partner-only) and links to existing detail pages. A "Search" pill in the site header opens a command-palette modal that lazy-fetches `/api/catalog-search` and lets you jump straight to a uni or program (↑↓ + ↵ keyboard nav, sectioned results). Discovery flows now: `/quiz` (matched), `/search` (AI free-text), `/catalog` (browse everything), header search (known-item lookup). Full spec in `docs/features/catalog.md`.
-- **Welcome tour** (2026-06-05) — first-visit overlay walkthrough on the homepage (`components/welcome/welcome-tour.tsx`): modal carousel showcasing each feature in step-by-step boxes with progress bar + dots. Auto-opens once per browser for signed-out visitors (localStorage `edfind_welcome_tour_seen_v1`); replayable via the hero's "Take the quick tour" link. Spec in `docs/features/welcome-tour.md`.
-- **Brand logo** (2026-06-05) — real compass-mark logo adopted: `logo/` holds master files, `public/logo.png` + `public/logo-text.png` are served, favicons are generated via `scripts/generate-brand-icons.mjs` (never hand-edit `app/icon.png` / `app/apple-icon.png` / `app/favicon.ico`). See `docs/design/brand.md` § Logo.
-- **University email verification** (2026-06-05) — community is read-for-all / **write-for-verified-students-only**. Users link an academic email to their Google account via a confirmation mail (Resend, ADR 0004; dev-link fallback in the UI until `RESEND_API_KEY` is set). `university_email_verifications` table + `is_university_verified()` RLS helper; `VerificationProvider`/`useVerification()`/`<VerifiedWriterOnly>` mirror the subscription pattern. Any academic domain counts (TLD patterns + curated list + live catalog `website` domains). Spec in `docs/features/university-verification.md`. Email/password sign-up deliberately deferred — Google stays the only sign-in.
 
 Next: Stripe / tier billing, Turkish localization. See `docs/architecture.md` for the full phased plan.
 
@@ -67,7 +61,6 @@ If you find yourself reaching for an alternative (Firebase, Express backend, MUI
 | Why we picked X                                     | `docs/decisions/`                                               |
 | Brand colors, typography, voice                     | `docs/design/brand.md`                                          |
 | Per-feature specs                                   | `docs/features/`                                                |
-| How to add new universities / programs              | `docs/runbooks/add-programs.md` (read before any catalog drop)  |
 | v1 visual reference                                 | `Website UI Design Ver_1.pdf` (repo root)                       |
 | Long-term memory across sessions (Claude Code)      | `~/.claude/projects/.../memory/`                                |
 
