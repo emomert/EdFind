@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
 import { UniversityLogo } from "@/components/university/university-logo";
+import { UniversityHero } from "@/components/university/university-hero";
 import { formatTuition } from "@/lib/format/currency";
 import { HOUSING_ENABLED } from "@/lib/feature-flags";
 import { getHousing } from "@/lib/housing/server";
@@ -73,7 +74,7 @@ export default async function UniversityPage({
   const uniRes = await publicDb
     .from("universities")
     .select(
-      "id, slug, name, country, city, institution_type, website, description, established_year, student_count, qs_world_rank, is_partner, logo_url",
+      "id, slug, name, country, city, institution_type, website, description, established_year, student_count, qs_world_rank, is_partner, logo_url, hero_image_url, hero_image_credit, hero_image_source_url",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -124,6 +125,13 @@ export default async function UniversityPage({
         <ArrowLeft className="size-4" />
         Back to home
       </Link>
+
+      <UniversityHero
+        imageUrl={u.hero_image_url}
+        credit={u.hero_image_credit}
+        sourceUrl={u.hero_image_source_url}
+        alt={u.name}
+      />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
         <div>

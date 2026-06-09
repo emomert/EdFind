@@ -39,7 +39,9 @@ Reference data describing each institution.
 | `established_year` | int | |
 | `student_count` | int | Approximate, optional |
 | `logo_url` | text | Stored in Supabase Storage (`university-logos` bucket) |
-| `hero_image_url` | text | Optional campus image |
+| `hero_image_url` | text | Real licensed campus photo (Wikimedia/CC); shown as a hero banner |
+| `hero_image_credit` | text | Attribution string, e.g. "Photo: X / Wikimedia, CC BY-SA 4.0" (`20260610120000`) |
+| `hero_image_source_url` | text | Link to the image's source / licensing page (`20260610120000`) |
 | `is_partner` | boolean not null default false | True for Partner Universities tier |
 | `qs_world_rank` | int | Nullable. Most recent QS World University Ranking known. |
 | `created_at` / `updated_at` | timestamptz | trigger-maintained |
@@ -315,6 +317,7 @@ Every schema change ships as a new file under `supabase/migrations/` named `YYYY
 | `20260609120000_audit_hardening.sql` | Drop `profiles_anon_insert`; guard `profiles.tier` writes (service-role-only trigger); tighten `application_tasks` RLS to verify application ownership; harden `reset_user_progress` anon sweep; pin `set_updated_at` search_path |
 | `20260609130000_shortlist_into_applications.sql` | Backfill `saved_programs` rows into `applications` at status `'interested'` (shortlist merged into the tracker; `saved_programs` deprecated, not yet dropped) |
 | `20260609140000_housing.sql` | `housing_cities` + `housing_universities` (AI-researched, draft/published, public-read on published only) |
+| `20260610120000_university_hero_images.sql` | `universities.hero_image_credit` + `hero_image_source_url` (attribution for real licensed hero photos) |
 
 The `schema_migrations` ledger table itself is created by `db-migrate.mjs` (not a migration file).
 
