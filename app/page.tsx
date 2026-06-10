@@ -18,6 +18,7 @@ import {
   MarkerSquiggle,
   MarkerStar,
 } from "@/components/decor/marker";
+import { EuropeSkyline } from "@/components/decor/europe-skyline";
 import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
 import { Drift, Reveal } from "@/components/motion";
 import { TOTAL_STEPS } from "@/lib/quiz/schema";
@@ -106,8 +107,9 @@ export default async function HomePage() {
     <div className="relative">
       <DecorativeBackdrop />
 
-      <section className="relative overflow-hidden mx-auto max-w-6xl px-6 pb-12 pt-16 sm:pb-16 sm:pt-24">
+      <section className="relative overflow-hidden mx-auto max-w-6xl px-6 pb-16 pt-16 sm:pb-24 sm:pt-24">
         <HeroBackgroundGraphics variant="programs" density="medium" />
+        <EuropeSkyline className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-24 w-full text-primary/15 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] sm:block" />
         <div className="relative z-10 grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:items-center">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-primary">

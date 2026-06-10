@@ -1,9 +1,10 @@
 /**
  * HeroBackgroundGraphics — low-opacity atmospheric decoration for hero
  * sections. Sits behind page content as a quiet "study abroad / journey"
- * theme: lucide icons (graduation cap, plane, building, calendar) plus a
- * thin SVG skyline along the bottom edge, a dotted travel arc, and a
- * couple of soft cyan blobs.
+ * theme: lucide icons (graduation cap, plane, building, calendar), a
+ * dotted travel arc with a paper plane at its head, and a couple of soft
+ * cyan blobs. (The hand-drawn European skyline is a separate component —
+ * components/decor/europe-skyline.tsx — used on the homepage hero.)
  *
  * Design rules this component enforces so it stays subtle:
  *   - Opacity 8–15% on every element (no full-saturation icons).
@@ -90,16 +91,25 @@ function SoftBlobs() {
 }
 
 function DottedTravelArc({ variant }: { variant: Variant }) {
-  // A curved dotted line that reads as "your application journey". On
-  // the tracking variant the arc dips downward (steady forward motion);
-  // on programs it arcs upward like a flight path; on community it's a
-  // gentler horizontal wave.
+  // A curved dotted line that reads as "your application journey", with a
+  // small paper plane flying at its head so the dashes read as a flight
+  // path rather than a stray line. On the tracking variant the arc dips
+  // downward (steady forward motion); on programs it arcs upward like a
+  // flight path; on community it's a gentler horizontal wave.
   const d =
     variant === "tracking"
       ? "M -20 80 C 200 180, 500 30, 820 200 C 980 280, 1080 220, 1240 320"
       : variant === "community"
         ? "M -20 140 C 220 110, 440 180, 680 140 C 880 110, 1080 180, 1240 140"
         : "M -20 320 C 280 60, 600 80, 880 180 C 1020 230, 1140 160, 1240 60";
+
+  // Approximate position + heading of the arc near its right end, per path.
+  const plane =
+    variant === "tracking"
+      ? { x: 1080, y: 252, r: 32 }
+      : variant === "community"
+        ? { x: 1100, y: 142, r: -6 }
+        : { x: 1095, y: 138, r: -28 };
 
   return (
     <svg
@@ -116,6 +126,17 @@ function DottedTravelArc({ variant }: { variant: Variant }) {
         strokeLinecap="round"
         strokeDasharray="2 8"
       />
+      <g
+        transform={`translate(${plane.x} ${plane.y}) rotate(${plane.r})`}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M0 8 L34 0 L26 21 L15 14 Z" />
+        <path d="M15 14 L21 7" />
+      </g>
     </svg>
   );
 }
