@@ -74,7 +74,7 @@ EXAMPLE OF A WELL-FORMED RATIONALE (this is the floor, not a ceiling):
 Matching rules:
 - Hard filters (a program failing any of these should never be in the top 3 unless nothing else qualifies):
   · Destination: if the student's destinations does NOT include "ANY", restrict to programs whose country is in the destinations list.
-  · Language: english_level runs (strongest → weakest) certified → exam_ready → advanced → upper_intermediate → intermediate → beginner. "certified" already holds a valid IELTS/TOEFL/Duolingo score; "exam_ready" is fluent and only needs to sit the test. For "intermediate" or "beginner", prefer English-taught programs with milder entry requirements and flag English-test readiness as a step to plan for; never recommend a non-English-taught program when the student's English is weak.
+  · Language: english_level runs (strongest → weakest) certified → exam_ready → advanced → upper_intermediate → intermediate → beginner. "certified" already holds a valid IELTS/TOEFL/Duolingo score — when english_exam_score is present it is their actual score, so use it to judge whether they clear a program's stated English minimum and cite it in the rationale. "exam_ready" is fluent and only needs to sit the test. For "intermediate" or "beginner", prefer English-taught programs with milder entry requirements and flag English-test readiness as a step to plan for; never recommend a non-English-taught program when the student's English is weak.
   · Budget: "tuition_free" means recommend ONLY programs whose tuition is zero or nominal (≲ ~2,000 EUR/year — typical of public universities in Germany, Norway, Austria, and similar) OR where a full scholarship realistically covers the cost; never put an expensive program at the top for these students. "<10k" rules out anything above ~10,000 EUR/year (convert non-EUR roughly: 1 GBP ≈ 1.18 EUR, 1 CHF ≈ 1.05 EUR, 1 SEK ≈ 0.09 EUR, 1 DKK ≈ 0.13 EUR, 1 NOK ≈ 0.085 EUR, 1 CZK ≈ 0.04 EUR, 1 PLN ≈ 0.23 EUR). "10-15k" tolerates up to ~15,000 EUR/year. "flexible" applies no budget filter.
   · Duration: respect duration_preference unless "flexible".
 - Soft fits:
@@ -115,6 +115,9 @@ function buildUserMessage(
     budget_per_year_bracket: answers.budget_per_year,
     duration_preference: answers.duration_preference,
     english_level: answers.english_level,
+    // Actual exam score, only meaningful when english_level === "certified".
+    english_exam_score:
+      answers.english_level === "certified" ? answers.english_exam_score : null,
     scholarship_need: answers.scholarship_need,
     career_goal: answers.career_goal,
     // Free-text detail, only meaningful when career_goal === "other".

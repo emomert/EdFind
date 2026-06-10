@@ -96,6 +96,7 @@ const FALLBACKS = {
   budget_per_year: "flexible",
   duration_preference: "flexible",
   english_level: "upper_intermediate",
+  english_exam_score: null,
   scholarship_need: "helpful",
   career_goal: "unsure",
   career_goal_other: null,

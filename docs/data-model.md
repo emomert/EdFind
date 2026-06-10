@@ -88,7 +88,7 @@ A single submitted quiz response (or free-text `/search` query parsed into the s
 | `id` | uuid PK | |
 | `client_id` | uuid not null | Anonymous localStorage identity (indexed) |
 | `user_id` | uuid FK → `auth.users.id`, nullable, `on delete cascade` | Set on first sign-in via `attach_anon_rows_to_user` (indexed) |
-| `answers` | jsonb not null | Raw quiz answers, schema-versioned (`ANSWERS_VERSION`, currently **5**). `field_of_study` is now AI-inferred and nullable; see `docs/features/profile-quiz.md` for the v5 shape. |
+| `answers` | jsonb not null | Raw quiz answers, schema-versioned (`ANSWERS_VERSION`, currently **6**). `field_of_study` is now AI-inferred and nullable; see `docs/features/profile-quiz.md` for the current shape. |
 | `answers_version` | int not null | Bumps when the quiz schema changes |
 | `tier` | text not null default 'free' | `check (tier in ('free','partner','full'))`. **Client write revoked** (see RLS). |
 | `created_at` | timestamptz | |

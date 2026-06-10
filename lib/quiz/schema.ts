@@ -21,6 +21,12 @@
  *   - budget_per_year gained a "tuition_free" option.
  *   - career_goal gained options + a writable "Other" (career_goal_other).
  *
+ * v6 (2026-06-10): added `english_exam_score` (free-text, revealed when
+ * english_level === "certified") so a student can record their actual IELTS/
+ * TOEFL/Duolingo score. The GPA question also became a two-step "journey"
+ * (pick the grading scale, then enter the value) — a pure UI change in
+ * question-screen.tsx, no new field.
+ *
  * UI-required-but-data-nullable fields (current_situation, institution,
  * study_background, gpa_*): the guided quiz requires them, but the /search
  * free-text path can't reliably infer them and we'd rather store null than
@@ -29,7 +35,7 @@
 
 import { z } from "zod";
 
-export const ANSWERS_VERSION = 5;
+export const ANSWERS_VERSION = 6;
 
 // Mirrors the set of countries that actually appear in `universities.country`.
 // Adding values here is forward-compatible — old answers that reference a
@@ -158,6 +164,7 @@ export const INSTITUTION_MAX_LENGTH = 120;
 export const SITUATION_OTHER_MAX_LENGTH = 120;
 export const CAREER_OTHER_MAX_LENGTH = 200;
 export const EXACT_GPA_MAX_LENGTH = 24;
+export const ENGLISH_EXAM_SCORE_MAX_LENGTH = 40;
 
 export type Answers = {
   destinations: Destination[];
@@ -179,6 +186,8 @@ export type Answers = {
   budget_per_year: BudgetBracket | null;
   duration_preference: Duration | null;
   english_level: EnglishLevel | null;
+  // Free-text exam score, shown only when english_level === "certified".
+  english_exam_score: string | null;
   scholarship_need: ScholarshipNeed | null;
   career_goal: CareerGoal | null;
   // Free-text companion shown when career_goal === "other".
@@ -204,6 +213,7 @@ export const EMPTY_ANSWERS: Answers = {
   budget_per_year: null,
   duration_preference: null,
   english_level: null,
+  english_exam_score: null,
   scholarship_need: null,
   career_goal: null,
   career_goal_other: null,
@@ -229,6 +239,8 @@ type QuestionBase = {
 export type OtherSpec = {
   whenValue: string;
   field: keyof Answers;
+  // Accessible label for the revealed input (falls back to a generic one).
+  label?: string;
   placeholder: string;
   maxLength: number;
 };
@@ -421,6 +433,14 @@ export const QUESTIONS: readonly Question[] = [
       },
       { value: "beginner", label: "Beginner / basic (A2 or below)" },
     ],
+    // Revealed when "certified" is picked — capture the actual score.
+    other: {
+      whenValue: "certified",
+      field: "english_exam_score",
+      label: "Your IELTS / TOEFL / Duolingo score",
+      placeholder: "e.g. IELTS 7.5, TOEFL 102, or Duolingo 125",
+      maxLength: ENGLISH_EXAM_SCORE_MAX_LENGTH,
+    },
   },
   {
     step: 7,
@@ -558,8 +578,10 @@ export function isQuestionAnswered(answers: Answers, question: Question): boolea
       answers.institution.trim().length > 0
     );
   }
-  // GPA: answered once the student gives either an exact value or a rough band.
+  // GPA: a two-step journey — the grading scale must be chosen first, then an
+  // exact value or a rough band.
   if (question.select === "gpa") {
+    if (answers.gpa_scale === null) return false;
     const hasExact =
       typeof answers.exact_gpa === "string" && answers.exact_gpa.trim().length > 0;
     return hasExact || answers.gpa_range !== null;
@@ -621,6 +643,12 @@ export const AnswersSchema = z.object({
   budget_per_year: z.enum(BUDGET_BRACKETS),
   duration_preference: z.enum(DURATIONS),
   english_level: z.enum(ENGLISH_LEVELS),
+  english_exam_score: z
+    .string()
+    .max(ENGLISH_EXAM_SCORE_MAX_LENGTH)
+    .nullable()
+    .optional()
+    .default(null),
   scholarship_need: z.enum(SCHOLARSHIP_NEEDS),
   career_goal: z.enum(CAREER_GOALS),
   career_goal_other: z
@@ -654,6 +682,7 @@ export const AnswersSchema = z.object({
   budget_per_year: BudgetBracket;
   duration_preference: Duration;
   english_level: EnglishLevel;
+  english_exam_score: string | null;
   scholarship_need: ScholarshipNeed;
   career_goal: CareerGoal;
   career_goal_other: string | null;

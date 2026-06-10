@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { AnswerCard } from "@/components/quiz/answer-card";
 import { InstitutionCombobox } from "@/components/quiz/institution-combobox";
 import { MarkerSparkles, MarkerStar } from "@/components/decor/marker";
+import { EXACT_GPA_MAX_LENGTH } from "@/lib/quiz/schema";
 import type {
   Answers,
   CurrentSituation,
@@ -189,42 +190,56 @@ function GpaPicker({
   answers: Answers;
   onPatch: (patch: Partial<Answers>) => void;
 }) {
-  // The 4.0-scale quick-pick bands only make sense on a 4.0 scale, so hide them
-  // for other grading systems (the exact-GPA field is scale-agnostic). Switching
-  // to a non-4.0 scale also clears any stale band so the matcher never receives
-  // a band that contradicts the chosen scale.
-  const showRange =
-    answers.gpa_scale === null || answers.gpa_scale === "4_point";
+  const scale = answers.gpa_scale;
+  const scaleChosen = scale !== null;
+  // The 4.0-scale quick-pick bands only make sense on a 4.0 scale.
+  const showRange = scale === "4_point";
   const pickScale = (next: GpaScale | null) => {
+    // Switching to a non-4.0 scale clears any stale 4.0 band so the matcher
+    // never receives a band that contradicts the chosen scale.
     if (next === null || next === "4_point") onPatch({ gpa_scale: next });
     else onPatch({ gpa_scale: next, gpa_range: null });
   };
+  const scaleLabel =
+    question.scaleOptions.find((o) => o.value === scale)?.label ?? "";
 
+  // Step 1 — choose the grading scale. The picker collapses once a scale is set.
+  if (!scaleChosen) {
+    return (
+      <div className="mt-8">
+        <p className="text-sm font-medium text-foreground">
+          First, which grading scale does your school use?
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {question.scaleOptions.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => pickScale(opt.value)}
+              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-accent/40"
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Step 2 — scale chosen: collapse it to a summary and reveal the GPA entry.
   return (
     <div className="mt-8 space-y-6">
-      <div>
-        <p className="text-sm font-medium text-foreground">Grading scale</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {question.scaleOptions.map((opt) => {
-            const active = answers.gpa_scale === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                aria-pressed={active}
-                onClick={() => pickScale(active ? null : opt.value)}
-                className={cn(
-                  "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
-                  active
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-accent/40",
-                )}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-        </div>
+      <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-secondary/40 px-4 py-2.5">
+        <p className="text-sm text-foreground">
+          Grading scale: <span className="font-semibold">{scaleLabel}</span>
+        </p>
+        <button
+          type="button"
+          onClick={() => pickScale(null)}
+          className="shrink-0 text-xs font-medium text-primary hover:underline"
+        >
+          Change
+        </button>
       </div>
 
       <div>
@@ -232,14 +247,15 @@ function GpaPicker({
           htmlFor="exact-gpa"
           className="text-sm font-medium text-foreground"
         >
-          Your GPA
+          Now enter your GPA
         </label>
         <input
           id="exact-gpa"
           type="text"
           inputMode="decimal"
+          autoFocus
           value={answers.exact_gpa ?? ""}
-          maxLength={24}
+          maxLength={EXACT_GPA_MAX_LENGTH}
           placeholder={question.exactPlaceholder}
           onChange={(e) =>
             onPatch({
@@ -297,9 +313,19 @@ function OtherTextInput({
   value: string;
   onPatch: (patch: Partial<Answers>) => void;
 }) {
+  const inputId = `other-${spec.field}`;
   return (
     <div className="mt-3">
+      {spec.label ? (
+        <label
+          htmlFor={inputId}
+          className="mb-1.5 block text-sm font-medium text-foreground"
+        >
+          {spec.label}
+        </label>
+      ) : null}
       <input
+        id={inputId}
         type="text"
         value={value}
         maxLength={spec.maxLength}
@@ -312,7 +338,7 @@ function OtherTextInput({
           } as Partial<Answers>)
         }
         className="w-full rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-        aria-label="Please describe"
+        aria-label={spec.label ?? "Please describe"}
       />
     </div>
   );

@@ -13,9 +13,9 @@ Collect enough structured signal about a student's preferences in ≤ 2 minutes 
 3. They see a "Creating your profile…" loading screen while the server stores the profile and runs the matcher.
 4. They land on the results page (`/results/:matchId`) with their best matches.
 
-## Question schema (v5)
+## Question schema (v6)
 
-`answers_version: 5`. Version history: bumped 1→2 in Phase 8 when `academic_focus` and `work_experience` were added; 2→3 when the optional free-text `additional_context` question was added; 3→4 (2026-06-09) when `current_situation` and `gpa_range` single-selects and the optional free-text `study_background` question were added, and `english_level` was reframed to exam-readiness wording; **4→5 (2026-06-10)** — the feedback-round-2 overhaul (see below). Older profiles in the DB still validate at read time because we never destructive-migrate quiz data — new fields default to `null` for older payloads, and superseded enum values (the old `english_level` / `current_situation` / `career_goal` labels) remain stored as-is.
+`answers_version: 6`. Version history: bumped 1→2 in Phase 8 when `academic_focus` and `work_experience` were added; 2→3 when the optional free-text `additional_context` question was added; 3→4 (2026-06-09) when `current_situation` and `gpa_range` single-selects and the optional free-text `study_background` question were added, and `english_level` was reframed to exam-readiness wording; **4→5 (2026-06-10)** — the feedback-round-2 overhaul (see below); **5→6 (2026-06-10)** added `english_exam_score` (revealed when `english_level === "certified"`) and made the GPA question a two-step journey (pick scale → enter value; UI-only). Older profiles in the DB still validate at read time because we never destructive-migrate quiz data — new fields default to `null` for older payloads, and superseded enum values (the old `english_level` / `current_situation` / `career_goal` labels) remain stored as-is.
 
 **What changed in v5:**
 - `current_situation` split the overlapping recent-grad/gap-year choices, added `graduating_soon`, and gained a writable **"Other"** companion (`current_situation_other`).
@@ -26,7 +26,7 @@ Collect enough structured signal about a student's preferences in ≤ 2 minutes 
 - `budget_per_year` gained **`tuition_free`** (tuition-free / fully-funded only).
 - `career_goal` gained options (`industry_expert`, `career_switch`) and a writable **"Other"** (`career_goal_other`).
 
-**Data-layer nullability:** `current_situation`, `institution`, `study_background`, `gpa_scale`, `gpa_range`, `exact_gpa`, and `field_of_study` are **nullable at the data layer** (`AnswersSchema`) — several are required in the guided quiz UI, but the `/search` free-text path can't reliably infer them and we store `null` rather than fabricate. `*_other` companions and `additional_context` are optional free-text. All other selects are required enums.
+**Data-layer nullability:** `current_situation`, `institution`, `study_background`, `gpa_scale`, `gpa_range`, `exact_gpa`, and `field_of_study` are **nullable at the data layer** (`AnswersSchema`) — several are required in the guided quiz UI, but the `/search` free-text path can't reliably infer them and we store `null` rather than fabricate. `*_other` companions, `english_exam_score`, and `additional_context` are optional free-text. All other selects are required enums.
 
 | # | Question | Field | Type | Notes |
 |---|---|---|---|---|
@@ -34,8 +34,8 @@ Collect enough structured signal about a student's preferences in ≤ 2 minutes 
 | 2 | _"What best describes your current situation?"_ | `current_situation` (+ `current_situation_other`) | enum + free-text | `undergraduate`, `graduating_soon`, `recent_graduate`, `gap_year`, `working_professional`, `other`. Selecting "Other" reveals a write-in. **UI-required, nullable at data layer.** |
 | 3 | _"Which university are you studying at / will graduate from / did you graduate from?"_ (added v5) | `institution` | free text (searchable picker) | Searchable list of Turkish universities + free-text fallback. Legend adapts to `current_situation`. **UI-required, nullable at data layer.** |
 | 4 | _"What did you study?"_ (now required v5) | `study_background` | free text **(required)** | The student's undergraduate background in their own words. `maxLength` 200. Replaces the old field-of-study picker; the AI infers `field_of_study` from it. Nullable at the data layer (always `null` on `/search`). |
-| 5 | _"What's your GPA?"_ (compound v5) | `gpa_scale` + `exact_gpa` + `gpa_range` | enum + free-text + enum | Pick the grading scale (`4_point`, `100_point`, `5_point`, `10_point`, `ects_letter`, `uk_class`, `other`), type the exact value, and/or pick a rough 4.0 band. **UI-required, nullable at data layer.** |
-| 6 | _"How would you describe your English?"_ (reframed v5) | `english_level` | enum | `certified`, `exam_ready`, `advanced`, `upper_intermediate`, `intermediate`, `beginner` (strongest → weakest). |
+| 5 | _"What's your GPA?"_ (compound v5) | `gpa_scale` + `exact_gpa` + `gpa_range` | enum + free-text + enum | Rendered as a **two-step journey (v6):** pick the grading scale (`4_point`, `100_point`, `5_point`, `10_point`, `ects_letter`, `uk_class`, `other`) → it collapses to a summary → type the exact value (and, on a 4.0 scale only, optionally pick a rough band). Scale is required to advance. **UI-required, nullable at data layer.** |
+| 6 | _"How would you describe your English?"_ (reframed v5) | `english_level` (+ `english_exam_score`) | enum + free-text | `certified`, `exam_ready`, `advanced`, `upper_intermediate`, `intermediate`, `beginner` (strongest → weakest). Selecting `certified` reveals a free-text **`english_exam_score`** (v6) for the actual IELTS/TOEFL/Duolingo score. |
 | 7 | _"What's your budget per year?"_ | `budget_per_year` | enum bracket | `tuition_free`, `<10k`, `10-15k`, `15-20k`, `20-25k`, `25k+`, `flexible`. `tuition_free` is a hard filter in the matcher. |
 | 8 | _"How long do you want your program to be?"_ | `duration_preference` | enum | `12mo`, `18mo`, `24mo`, `flexible`. |
 | 9 | _"Do you need scholarship support?"_ | `scholarship_need` | enum | `required`, `helpful`, `not_needed`. |
@@ -66,9 +66,9 @@ The schema is **versioned** (`answers_version`). When we add or change a questio
 ## Server flow on submit
 
 1. Sign-in is required (`/quiz` is auth-gated since Phase 9.4) — unauthenticated visitors are redirected to `/login?next=/quiz`.
-2. Validate answers against the v5 `AnswersSchema` (Zod). Reject if any required key is missing or unknown; `current_situation`, `institution`, `study_background`, `gpa_*`, and `field_of_study` are nullable at the data layer, and the `*_other` / `additional_context` free-text fields default to `null`.
+2. Validate answers against the v6 `AnswersSchema` (Zod). Reject if any required key is missing or unknown; `current_situation`, `institution`, `study_background`, `gpa_*`, and `field_of_study` are nullable at the data layer, and the `*_other` / `additional_context` free-text fields default to `null`.
 3. Generate a `client_id` if the browser doesn't already have one (UUIDv4, persisted to localStorage and a signed cookie). The same `client_id` survives sign-in via the auth callback's `attach_anon_rows_to_user` RPC.
-4. Insert into `profiles` with `tier='free'`, `answers_version=5`, the validated `answers` blob, the `client_id`, and the authenticated `user_id`.
+4. Insert into `profiles` with `tier='free'`, `answers_version=6`, the validated `answers` blob, the `client_id`, and the authenticated `user_id`.
 5. Run the real DeepSeek V4 Flash matcher (see `docs/features/ai-matcher.md`) over the full catalog and return the top 3.
 6. Insert one row per match into `matches`, each with its score and rationale.
 7. Return `{ matchId }` for the highest-scoring match.
