@@ -18,10 +18,10 @@ SEO unaffected, and the gate is purely client-side.
 | # | Key | Shown | Content |
 |---|-----|-------|---------|
 | 1 | `welcome` | always | Brand mark, one-line pitch, live catalog stat chips (universities / programs / countries, passed from the homepage's Supabase totals) |
-| 2 | `quiz` | always | 13-question AI matching quiz (11 multiple-choice/select + 2 optional free-text) → ranked top 3 with rationale |
+| 2 | `quiz` | always | 13-question AI matching quiz (v6: selects + institution search + required background free-text + compound GPA) → ranked top 3 with rationale |
 | 3 | `search` | always | Free-text AI search in your own words |
 | 4 | `catalog` | always | Full catalog browse + Ctrl+K header search |
-| 5 | `shortlist` | always | Shortlist + side-by-side compare |
+| 5 | `shortlist` | always | Save + side-by-side compare (saved programs land in the applications tracker) |
 | 6 | `applications` | if `APPLICATIONS_ENABLED` | Application tracker dashboard |
 | 7 | `community` | if `COMMUNITY_ENABLED` | Verified student insights |
 | 8 | `cta` | always | "Let's find your program" → `/start` (secondary: `/catalog`) |

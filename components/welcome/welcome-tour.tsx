@@ -163,9 +163,9 @@ export function WelcomeTour({
         icon: Bookmark,
         accent: "rose",
         badge: "Decide",
-        title: "Shortlist and compare",
+        title: "Save and compare",
         description:
-          "Save programs you like, then put them side by side — tuition, deadlines, language, rankings — to pick with confidence.",
+          "Save programs you like — they land in your applications tracker — then put them side by side: tuition, deadlines, language, rankings.",
       },
     ];
     if (APPLICATIONS_ENABLED) {

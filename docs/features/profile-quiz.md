@@ -117,5 +117,5 @@ Loading-screen timing: the staged sequence and the Server Action run in parallel
 
 ## Open questions
 
-- Do we want a "skip this question" option for any of the 11 multiple-choice/select questions? Current default: all required at the UI level (the two free-text questions — `study_background` and `additional_context` — are optional, and `current_situation`/`gpa_range` are nullable at the data layer for the `/search` path).
+- Do we want a "skip this question" option for the select questions? Current default: every step is required at the UI level except the final `additional_context` free-text (since v6, `study_background` is required and the institution + GPA steps must be answered to advance; several fields stay nullable at the data layer for the `/search` path).
 - Should "career_goal" be multi-select? The design shows single-select; revisit once we have real signal data on what matters.

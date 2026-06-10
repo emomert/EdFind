@@ -8,7 +8,7 @@ EdFind is a SaaS web app that helps graduating students in Turkey discover and a
 
 **MVP shipped.** Live at **https://ed-find.vercel.app/**, hosted on Vercel, backed by Supabase (eu-west). The full end-to-end works in production: 13-question profile quiz (or AI free-text search) → Server Action → Supabase profile + match → personalized results page. Real submissions verified on launch day (2026-05-08).
 
-Live features beyond the original MVP: Google sign-in (required for `/quiz`, `/search`, `/results*`, `/shortlist`, `/applications`, `/compare`), shortlist + side-by-side compare, application tracker with task kanban, community pages, public `/catalog` browse, and a header command-palette search. Catalog covers **58 universities / 196 programs across 15 European countries**. Matching runs on **DeepSeek V4 Flash** (`deepseek-v4-flash`). What's next: Stripe / tier billing, Turkish localization.
+Live features beyond the original MVP: Google sign-in (required for `/quiz`, `/search`, `/results*`, `/shortlist`, `/applications`, `/compare`), saving + side-by-side compare (saved programs land in the applications tracker), an application tracker with deadline strip and drag-and-drop task board, community pages, public `/catalog` browse, a header command-palette search, AI-researched housing & cost-of-living data, attributed campus hero images, and public legal/transparency pages (`/terms`, `/privacy`, `/technical-report`). Catalog covers **58 universities / 196 programs across 15 European countries**. Matching runs on **DeepSeek V4 Flash** (`deepseek-v4-flash`); the quiz schema is at `ANSWERS_VERSION` 6. What's next: Stripe / tier billing, Turkish localization.
 
 See [`docs/architecture.md`](docs/architecture.md) for the phased roadmap.
 

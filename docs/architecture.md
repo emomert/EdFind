@@ -52,9 +52,11 @@ Personalized routes require a Google sign-in (Phase 9.4). Unauthenticated visito
 1. User lands on /              (Server Component, public)
 2. Clicks "Profile Quiz"        → /quiz   (or "Describe what you want" → /search)
 3. Answers 13 questions         (client state — no server roundtrip per step)
-   - 11 multiple-choice/select + 2 optional free-text (`study_background`,
-     `additional_context`); v4 added `current_situation` + `gpa_range`
-     (UI-required, nullable at the data layer) and reframed `english_level`
+   - v6 (2026-06-10): destinations + 9 single-selects, a searchable Turkish-
+     university `institution` picker, a REQUIRED `study_background` free-text
+     (the AI infers `field_of_study` from it — no picker), a compound GPA
+     question (`gpa_scale` → `exact_gpa` / `gpa_range`), and an optional
+     `additional_context` note. See docs/features/profile-quiz.md.
    - /search instead: types a free-text query that DeepSeek parses into
      the same `ValidatedAnswers` shape
 4. Submits                      → lib/server/persist-and-match.ts
@@ -84,6 +86,7 @@ The matcher is real AI: `lib/server/persist-and-match.ts` is the shared backend 
 | **8 — Real AI matcher + detail pages** | Replace the placeholder with the DeepSeek V4 Flash matcher; add detail pages; expand the quiz | Shipped — DeepSeek V4 Flash ranked top-3; `/universities/[slug]` + `/programs/[universitySlug]/[programSlug]` detail pages; quiz grew 7→9 questions (`academic_focus`, `work_experience`; `ANSWERS_VERSION` 1→2); catalog reached 58 universities / 15 countries |
 | **9 — Discovery + auth (2026-05-11)** | Free-text AI search, shortlist/compare, application tracker, required Google auth | Shipped — `9.1` `/search` (DeepSeek parses query → shared `persist-and-match.ts`); `9.2` `/shortlist` + `/compare`; `9.3` `/applications` task dashboard (flag `NEXT_PUBLIC_ENABLE_APPLICATIONS`); `9.4` Google sign-in required for personalized routes. Quiz later grew to 10 questions (`additional_context` free-text; `ANSWERS_VERSION` 2→3); catalog reached 58 universities / 196 programs |
 | **Community + verification (2026-05-14 → 06-05)** | Verified Student Insights pages, `/catalog` browse + header search, welcome tour, brand logo, university email verification | Shipped — `/community` (flag `NEXT_PUBLIC_ENABLE_COMMUNITY`, mock data + cookie subscription gate); public `/catalog` + Cmd+K header search; first-visit welcome tour; real compass-mark logo; community writes gated behind verified academic email (`is_university_verified()` RLS helper, Resend confirmation mail) |
+| **Feedback rounds (2026-06-09 → 06-10)** | Security audit hardening, shortlist→applications merge, housing data, hero images, quiz v6, legal pages, UI polish | Shipped — RLS/audit fixes (`20260609120000`); saving a program now creates an `applications` row (`'interested'`); AI-researched housing & cost-of-living (42 cities / 58 unis, flag `NEXT_PUBLIC_ENABLE_HOUSING`); attributed campus hero images on all 58 universities; quiz reworked to `ANSWERS_VERSION` 6; site footer + `/terms` + `/privacy` + `/technical-report`; mobile nav, breadcrumbs, marquee, graphics polish |
 
 **Next** (deferred, unordered): Stripe / tier billing, Turkish localization.
 

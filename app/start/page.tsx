@@ -41,10 +41,10 @@ const PATHS: Path[] = [
     eyebrow: "Structured",
     title: "Take the 13-question quiz",
     description:
-      "Walk through about a dozen quick questions covering your background, destination, budget, field of study, and goals, then add anything else we'd miss in a free-text box. Best if you're still figuring out what you want.",
+      "Walk through 13 quick questions covering your situation, university, background, GPA, budget, and goals — mostly single taps, plus a couple of short text answers. Best if you're still figuring out what you want.",
     icon: <ListChecks className="size-5" />,
     bullets: [
-      "11 multiple-choice + 2 optional free-text",
+      "Mostly taps — a school search and two short text boxes",
       "Drafts saved automatically",
       "Same AI matcher under the hood",
     ],
