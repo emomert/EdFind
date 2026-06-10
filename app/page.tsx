@@ -119,7 +119,7 @@ export default async function HomePage() {
             <h1 className="mt-5 text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Find the right{" "}
               <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/75 bg-clip-text text-transparent">
                   master&apos;s in Europe
                 </span>
                 <MarkerSquiggle
@@ -302,7 +302,7 @@ function DecorativeBackdrop() {
       className="pointer-events-none absolute inset-x-0 top-0 -z-10 overflow-hidden"
     >
       <Drift className="absolute -top-20 left-1/4 size-[500px]" amplitude={18} duration={16}>
-        <div className="size-full rounded-full bg-primary/10 opacity-60 blur-3xl" />
+        <div className="size-full rounded-full bg-primary/[0.06] opacity-60 blur-3xl" />
       </Drift>
       <Drift
         className="absolute right-1/4 top-40 size-[400px]"
@@ -310,7 +310,7 @@ function DecorativeBackdrop() {
         duration={20}
         delay={1.5}
       >
-        <div className="size-full rounded-full bg-secondary/40 blur-3xl" />
+        <div className="size-full rounded-full bg-secondary/25 blur-3xl" />
       </Drift>
       <svg
         className="absolute inset-x-0 top-0 -z-10 h-64 w-full text-border/40 [mask-image:linear-gradient(to_bottom,white,transparent)]"

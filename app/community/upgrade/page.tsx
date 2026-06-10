@@ -40,7 +40,7 @@ export default async function CommunityUpgradePage() {
       </Link>
 
       <div className="relative mt-6 overflow-hidden rounded-3xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-emerald-50 p-6 shadow-sm sm:p-10">
-        <div className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-teal-200/40 blur-3xl" />
+        <div className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-teal-100/25 blur-3xl" />
         <div className="relative">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-teal-700 shadow-sm ring-1 ring-inset ring-teal-200">
             <Sparkles className="size-3.5" />

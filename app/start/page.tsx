@@ -77,8 +77,8 @@ export default function StartPage() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] overflow-hidden"
       >
-        <div className="absolute -top-24 left-1/3 size-[420px] rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute right-1/4 top-32 size-[320px] rounded-full bg-secondary/40 blur-3xl" />
+        <div className="absolute -top-24 left-1/3 size-[420px] rounded-full bg-primary/[0.06] blur-3xl" />
+        <div className="absolute right-1/4 top-32 size-[320px] rounded-full bg-secondary/25 blur-3xl" />
       </div>
 
       <section className="relative overflow-hidden mx-auto max-w-5xl px-6 pb-12 pt-16 sm:pb-16 sm:pt-24">
@@ -92,7 +92,7 @@ export default function StartPage() {
             <h1 className="mt-5 text-balance text-4xl font-bold tracking-tight sm:text-5xl">
               How would you like to{" "}
               <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/75 bg-clip-text text-transparent">
                   find your matches
                 </span>
                 <MarkerSquiggle

@@ -21,8 +21,8 @@ export function CommunityHero() {
       transition={{ duration: 0.5, ease: [0.21, 0.6, 0.3, 1] }}
       className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-50/50 via-transparent to-emerald-50/50 p-6 sm:p-10"
     >
-      <div className="pointer-events-none absolute -right-16 -top-16 size-72 rounded-full bg-teal-300/30 blur-3xl" aria-hidden />
-      <div className="pointer-events-none absolute -bottom-20 left-12 size-60 rounded-full bg-emerald-200/40 blur-3xl" aria-hidden />
+      <div className="pointer-events-none absolute -right-16 -top-16 size-72 rounded-full bg-teal-200/20 blur-3xl" aria-hidden />
+      <div className="pointer-events-none absolute -bottom-20 left-12 size-60 rounded-full bg-emerald-100/25 blur-3xl" aria-hidden />
       <HeroBackgroundGraphics variant="community" density="low" />
 
       <div className="relative z-10 grid gap-8 lg:grid-cols-[1.4fr,1fr] lg:items-center">

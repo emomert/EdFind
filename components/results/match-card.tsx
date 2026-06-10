@@ -132,11 +132,11 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-primary/10 blur-3xl"
+        className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-primary/[0.06] blur-3xl"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-24 -left-16 size-64 rounded-full bg-secondary/40 blur-3xl"
+        className="pointer-events-none absolute -bottom-24 -left-16 size-64 rounded-full bg-secondary/25 blur-3xl"
       />
 
       <HeroBackgroundGraphics variant="programs" density="low" />

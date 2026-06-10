@@ -65,7 +65,7 @@ export function UpgradeCommunityAccessCard({
         className,
       )}
     >
-      <div className="pointer-events-none absolute -right-12 -top-12 size-40 rounded-full bg-teal-200/40 blur-3xl" />
+      <div className="pointer-events-none absolute -right-12 -top-12 size-40 rounded-full bg-teal-100/25 blur-3xl" />
       <div className="relative flex items-start gap-4">
         <div className="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-500 text-white shadow-sm">
           <Sparkles className="size-5" />

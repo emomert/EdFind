@@ -83,9 +83,9 @@ function SoftBlobs() {
   // gradients without sharp edges, never quite stopping anywhere.
   return (
     <>
-      <div className="absolute -top-40 -right-32 size-[640px] rounded-full bg-cyan-300/18 blur-3xl" />
-      <div className="absolute -bottom-48 -left-32 size-[560px] rounded-full bg-teal-200/22 blur-3xl" />
-      <div className="absolute left-1/2 top-1/2 size-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-200/12 blur-3xl" />
+      <div className="absolute -top-40 -right-32 size-[640px] rounded-full bg-cyan-200/10 blur-3xl" />
+      <div className="absolute -bottom-48 -left-32 size-[560px] rounded-full bg-teal-100/15 blur-3xl" />
+      <div className="absolute left-1/2 top-1/2 size-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-100/8 blur-3xl" />
     </>
   );
 }
