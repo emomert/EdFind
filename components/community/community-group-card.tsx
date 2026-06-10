@@ -68,12 +68,10 @@ export function CommunityGroupCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.21, 0.6, 0.3, 1] }}
       whileHover={{ y: -3 }}
-      className={cn(
-        "group relative flex flex-col gap-3 rounded-2xl border bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-shadow hover:shadow-[0_12px_30px_-20px_rgba(13,148,136,0.35)] sm:p-5",
-        isProgram
-          ? "border-l-4 border-l-violet-300 border-y-slate-200 border-r-slate-200"
-          : "border-l-4 border-l-teal-400 border-y-slate-200 border-r-slate-200",
-      )}
+      // No accent stroke — the uni/program distinction already reads from the
+      // type badge. A soft dark outer glow separates the white card from the
+      // light page background instead.
+      className="group relative flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_2px_14px_rgba(15,23,42,0.10)] transition-shadow hover:shadow-[0_14px_34px_-16px_rgba(15,23,42,0.28)] sm:p-5"
     >
       <header className="flex items-start gap-3">
         <UniversityLogo

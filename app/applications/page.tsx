@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { createServiceClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/auth";
 import { APPLICATIONS_ENABLED } from "@/lib/feature-flags";
-import { buildRecommendations } from "@/lib/applications/recommendations";
 import { ApplicationsClient } from "@/components/applications/applications-client";
 import type {
   ApplicationItem,
@@ -76,27 +75,6 @@ export default async function ApplicationsPage() {
     hasProfile: Boolean(profileRow),
   };
 
-  const recommendations = buildRecommendations({
-    apps: items.map((a) => ({
-      status: a.status,
-      deadline_at: a.deadline_at,
-      program: {
-        application_deadline: a.program.application_deadline,
-        name: a.program.name,
-        university: {
-          name: a.program.university.name,
-          country: a.program.university.country,
-        },
-      },
-    })),
-    tasks: tasks.map((t) => ({
-      status: t.status,
-      category: t.category,
-      title: t.title,
-    })),
-    profile: profileRow ? { destinations, field_of_study: fieldOfStudy } : null,
-  });
-
   const displayName =
     (user.user_metadata?.full_name as string | undefined) ??
     (user.user_metadata?.name as string | undefined) ??
@@ -109,7 +87,6 @@ export default async function ApplicationsPage() {
       items={items}
       tasks={tasks}
       profile={profile}
-      recommendations={recommendations}
     />
   );
 }

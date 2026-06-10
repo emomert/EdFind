@@ -2,7 +2,8 @@
 
 The `/applications` dashboard. Started life in Phase 9.3 as a 4-column Kanban
 of applications; redesigned 2026-05-14 into a richer split-view layout with
-its own task board and personalised guidance.
+its own task board. (A heuristic "personalised guidance" panel shipped with
+that redesign and was removed 2026-06-10 on user feedback.)
 
 **Shortlist merged in (2026-06-09).** The old separate shortlist is now the
 first stage of the tracker: the `SaveButton` (on results / program / university
@@ -15,7 +16,7 @@ button — Save *is* track. See `docs/data-model.md` (`saved_programs` deprecate
 
 | Route | Auth | Renders |
 |---|---|---|
-| `/applications` | Required | Header card + applications list + task kanban + AI recommendations |
+| `/applications` | Required | Header card + deadline strip + applications list + task kanban |
 | Program detail pages | n/a | `<SaveButton>` that toggles a program into/out of the tracker (status `'interested'`) |
 | `/shortlist` | Required | The `'interested'` view of the tracker; drives `/compare` |
 
@@ -50,9 +51,6 @@ for the stack so each section gets the full width.
 │     · click-to-move (arrow buttons)                                │
 │   · Suggestion strip for first-time users                          │
 └────────────────────────────────────────────────────────────────────┘
-┌────────────────────────────────────────────────────────────────────┐
-│  AiRecommendationsPanel  — heuristic, no AI call                   │
-└────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Component hierarchy
@@ -65,8 +63,7 @@ for the stack so each section gets the full width.
 | `ApplicationCard` | `components/applications/application-card.tsx` | One application row, expandable to edit status/deadline/notes |
 | `StatusPill` | `components/applications/status-pill.tsx` | Color-tinted status badge |
 | `KanbanBoard` | `components/applications/kanban-board.tsx` | Three columns, new-task draft, suggestion strip |
-| `TaskCard` | `components/applications/task-card.tsx` | One task — category badge, due date, move-left/right |
-| `AiRecommendationsPanel` | `components/applications/ai-recommendations.tsx` | Renders the heuristic recs |
+| `TaskCard` | `components/applications/task-card.tsx` | One task — category badge, due date, drag + move-left/right |
 
 Shared types live in `components/applications/types.ts`.
 
@@ -143,32 +140,12 @@ rejected application has been worked through and shouldn't drag the average
 down forever. The "win rate" view (accepted / submitted) belongs in a later
 analytics panel.
 
-## Recommendation engine
+## Recommendation engine — removed (2026-06-10)
 
-`lib/applications/recommendations.ts` is a pure, deterministic function:
-`buildRecommendations({ apps, tasks, profile, saved }) → Recommendation[]`.
-
-Rules (each emits at most one card):
-
-| Rule | Fires when |
-|---|---|
-| `accepted` | At least one app in `accepted` |
-| `deadline` | An app deadline lands within 30 days |
-| `empty` | Zero tracked applications |
-| `kickoff` | All apps still in `interested` |
-| `shortlist-gap` | Shortlist - Tracked ≥ 2 |
-| `language-test` | No language-test task started or finished |
-| `waiting` | ≥ 3 submitted and no acceptances yet |
-| `no-tasks` | Has applications but zero tasks |
-| `encouragement` | Catch-all closer when nothing is warning-toned |
-
-Output is clipped to 4 cards. Tones (`celebrate / nudge / info / warn`) drive
-the panel's gradient tinting.
-
-When the matcher catalog gets real signal data we can replace this with a
-DeepSeek call. The function signature is the same shape an AI matcher would
-return, so the swap is `recs = await aiRecommend(args)` instead of
-`recs = buildRecommendations(args)`.
+The heuristic guidance panel (`lib/applications/recommendations.ts` +
+`AiRecommendationsPanel`) was removed on user feedback. If guidance ever
+returns it should be a real AI call, not heuristics — see git history for the
+old rule set.
 
 ## Animation choices (Framer Motion)
 
@@ -238,9 +215,6 @@ prep like "Book IELTS" or "Translate transcript".
 - **Within-column drag reordering.** Cross-column drag works; reordering
   inside a column still follows `sort_order` (append-to-end on move). Add
   `@dnd-kit/sortable` if per-card ordering ever matters.
-- **Real AI guidance.** Heuristics are predictable and cheap. Swap for a
-  DeepSeek call once we have signal data on what users actually do after
-  reading a recommendation.
 - **Mobile-specific layout polish.** Kanban columns stack vertically below
   `md`. A horizontally-scrolling carousel would feel nicer on small phones.
   Backlog.

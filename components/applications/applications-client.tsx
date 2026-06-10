@@ -7,13 +7,11 @@ import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getOrCreateClientId } from "@/lib/quiz/client-id";
 import { resetAllProgress } from "@/app/applications/actions";
-import type { Recommendation } from "@/lib/applications/recommendations";
 
 import { StudentProgressCard } from "./student-progress-card";
 import { DeadlineStrip } from "./deadline-strip";
 import { ApplicationsOverview } from "./applications-overview";
 import { KanbanBoard } from "./kanban-board";
-import { AiRecommendationsPanel } from "./ai-recommendations";
 import type {
   ApplicationItem,
   ProfileSummary,
@@ -28,14 +26,12 @@ export function ApplicationsClient({
   items: initialApps,
   tasks: initialTasks,
   profile,
-  recommendations,
 }: {
   email: string | null | undefined;
   displayName: string | null | undefined;
   items: ApplicationItem[];
   tasks: TaskItem[];
   profile: ProfileSummary;
-  recommendations: Recommendation[];
 }) {
   const [items, setItems] = useState<ApplicationItem[]>(initialApps);
   const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
@@ -73,10 +69,6 @@ export function ApplicationsClient({
       >
         <KanbanBoard tasks={tasks} setTasks={setTasks} applications={items} />
       </motion.div>
-
-      <div className="mt-8">
-        <AiRecommendationsPanel items={recommendations} />
-      </div>
 
       <details className="mt-10 flex justify-end text-right">
         <summary className="inline-flex cursor-pointer list-none items-center text-xs text-muted-foreground/70 transition-colors hover:text-muted-foreground [&::-webkit-details-marker]:hidden">

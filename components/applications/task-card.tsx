@@ -64,6 +64,7 @@ export function TaskCard({
   const [pending, startTransition] = useTransition();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [editingDue, setEditingDue] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   const setDue = (value: string) => {
     const next = value === "" ? null : value;
@@ -127,6 +128,9 @@ export function TaskCard({
         "group rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-shadow hover:shadow-[0_8px_24px_-14px_rgba(13,148,136,0.3)]",
         task.status === "done" && "bg-slate-50/60",
         pending && "opacity-60",
+        // While dragging, dim the source card and outline it so it's obvious
+        // which card is in flight and where it came from.
+        dragging && "opacity-40 outline-dashed outline-2 outline-teal-400",
       )}
     >
       {/* HTML5 drag lives on a plain div: framer-motion swallows onDragStart
@@ -137,7 +141,27 @@ export function TaskCard({
         onDragStart={(e) => {
           e.dataTransfer.setData("text/task-id", task.id);
           e.dataTransfer.effectAllowed = "move";
+          // The browser's default drag ghost is a ~50%-transparent snapshot of
+          // the card — a white card on a white page is invisible. Hand it a
+          // high-contrast clone instead: solid background, primary border, and
+          // a strong shadow, removed again right after the snapshot is taken.
+          const node = e.currentTarget;
+          const ghost = node.cloneNode(true) as HTMLElement;
+          ghost.style.position = "fixed";
+          ghost.style.top = "-2000px";
+          ghost.style.left = "-2000px";
+          ghost.style.width = `${node.offsetWidth}px`;
+          ghost.style.boxSizing = "border-box";
+          ghost.style.borderRadius = "12px";
+          ghost.style.border = "2px solid #0891b2"; // --primary (cyan-600)
+          ghost.style.backgroundColor = "#ffffff";
+          ghost.style.boxShadow = "0 16px 40px rgba(8, 145, 178, 0.45)";
+          document.body.appendChild(ghost);
+          e.dataTransfer.setDragImage(ghost, 24, 24);
+          requestAnimationFrame(() => ghost.remove());
+          setDragging(true);
         }}
+        onDragEnd={() => setDragging(false)}
         className="cursor-grab p-3 active:cursor-grabbing"
       >
       <div className="flex items-start gap-2">
