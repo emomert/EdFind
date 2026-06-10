@@ -5,18 +5,30 @@ and program detail pages. Gated by `NEXT_PUBLIC_ENABLE_HOUSING` (default on).
 
 ## What it shows
 
-A "Housing & cost of living" section with:
-- **City rents** — monthly ranges for a room in a shared flat, a studio, and a
-  place in student housing, in the city's local currency.
-- **Living costs** — monthly estimate excluding rent.
-- **Where students live** — a few neighborhoods with one-line notes.
-- **University accommodation** — whether the university offers housing, the
-  housing-office link, typical on-campus / near-campus monthly costs, commute.
-- **Where to look** — the portals/offices students actually use.
-- **Deposits & tips**, plus **sources** and a "researched on" date with an
-  explicit "estimates, not quotes" disclaimer.
+A "Housing & cost of living" section, structured as a **summary + expandable
+detail** (2026-06-10) so the page leads with the numbers and tucks the depth
+behind a disclosure:
 
-Program pages inherit their university's city + university housing.
+- **Summary (always visible):** the headline monthly rent ranges — room in a
+  shared flat, studio, student housing — plus living costs (ex-rent).
+- **Detail (collapsed `<details>` "See the full housing breakdown"):**
+  - **Where students live** — a few neighborhoods with one-line notes.
+  - **University accommodation** — whether the university offers housing, the
+    housing-office link, typical on-campus / near-campus monthly costs, commute.
+  - **Where to look** — the portals/offices students actually use.
+  - **Deposits & tips**, plus **sources** and a "researched on" date with an
+    explicit "estimates, not quotes" disclaimer.
+
+**Euro equivalents (2026-06-10):** every non-EUR figure (CHF for Swiss
+universities, GBP for the UK, SEK/NOK/DKK/CZK/PLN, …) carries an approximate
+`≈ €…` conversion alongside the local price, using the shared FX table in
+`lib/format/currency.ts` (`eurEquivalent()`) — the same convention as the
+tuition formatter. Local prices stay primary (you pay them locally); euros are
+the at-a-glance number for the Turkish audience.
+
+The section is a server component; the expander is a native `<details>` element
+(no client JS). Program pages inherit their university's city + university
+housing.
 
 ## Data model
 

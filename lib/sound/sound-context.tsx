@@ -29,13 +29,14 @@ const SoundContext = createContext<SoundContextValue | null>(null);
  * mute preference in localStorage so it survives reload, and exposes a
  * single `play(name)` function that's a no-op when the user has muted.
  *
- * Default is enabled — the quiz feels deliberately interactive with sound
- * on. Users who don't want it mute via the toggle in the quiz header and
- * the choice sticks.
+ * Default is DISABLED — a quiz that plays sound the user can't immediately
+ * silence is more annoying than delightful, and the in-quiz toggle was
+ * removed (2026-06-10) for being unclear. The provider stays so `play()`
+ * is a safe no-op and sound can be re-enabled later behind a clear control.
  */
 export function SoundProvider({ children }: { children: ReactNode }) {
-  // SSR-safe: render with `true` server-side and rehydrate on mount.
-  const [enabled, setEnabled] = useState<boolean>(true);
+  // SSR-safe: render with `false` server-side and rehydrate on mount.
+  const [enabled, setEnabled] = useState<boolean>(false);
 
   useEffect(() => {
     try {

@@ -38,7 +38,9 @@ const ParserOutputSchema = z.object({
   work_experience: z.enum(WORK_EXPERIENCES).nullable(),
 });
 
-const SYSTEM_PROMPT = `You are EdFind's free-text query parser. EdFind helps Turkish students find master's programs in Europe. The student typed a natural-language description of what they want; your job is to map it onto EdFind's 11-field structured profile.
+// Exported so the public /technical-report page can render the exact
+// instructions we send to the model (single source of truth — no drift).
+export const SYSTEM_PROMPT = `You are EdFind's free-text query parser. EdFind helps Turkish students find master's programs in Europe. The student typed a natural-language description of what they want; your job is to map it onto EdFind's 11-field structured profile.
 
 Output strict JSON in this exact shape, with no markdown, no commentary, no extra keys:
 
@@ -58,14 +60,14 @@ Output strict JSON in this exact shape, with no markdown, no commentary, no extr
 
 Allowed values:
 - destinations: IT (Italy), NL (Netherlands), DE (Germany), GB (UK / Britain / England), ES (Spain), FR (France), CH (Switzerland), SE (Sweden), DK (Denmark), IE (Ireland), AT (Austria), BE (Belgium), CZ (Czechia / Czech Republic), EE (Estonia), FI (Finland), NO (Norway), PL (Poland), PT (Portugal), or ANY for "anywhere / no preference". For multiple countries, return all of them.
-- current_situation: undergraduate, recent_graduate, working_professional, gap_year, other. Map "final-year student"/"still studying" → undergraduate, "just graduated"/"new graduate" → recent_graduate, "working"/"I'm an engineer at X" → working_professional, "taking a gap year" → gap_year. Leave null if not mentioned.
-- field_of_study: business_management, engineering, computer_science_ai, design, architecture_built_environment, economics_finance, data_science, social_sciences. Map "management" → business_management, "MBA" → business_management, "CS"/"AI"/"machine learning" → computer_science_ai, "fintech" → economics_finance, "DS" → data_science, "humanities" → social_sciences, "architecture" → architecture_built_environment, etc. This is the field they want to STUDY NEXT.
-- gpa_range: below_2_0, 2_0_2_5, 2_5_3_0, 3_0_3_5, 3_5_plus. Map a stated GPA on a 4.0 scale to the nearest bracket — e.g. "3.2 GPA" → 3_0_3_5, "3.8/4" → 3_5_plus, "around 2.7" → 2_5_3_0. Leave null if no GPA is mentioned.
-- budget_per_year: <10k, 10-15k, 15-20k, 20-25k, 25k+, flexible. Map any concrete number to the nearest bracket — e.g. "under 5k" → <10k, "around 12k" → 10-15k, "no budget limit" → flexible.
+- current_situation: undergraduate, graduating_soon, recent_graduate, gap_year, working_professional, other. Map "still studying"/"sophomore"/"junior" → undergraduate, "final-year"/"about to graduate"/"graduating this year" → graduating_soon, "just graduated"/"new graduate" → recent_graduate, "taking a gap year"/"on a break" → gap_year, "working"/"I'm an engineer at X" → working_professional. Leave null if not mentioned.
+- field_of_study: business_management, engineering, computer_science_ai, design, architecture_built_environment, economics_finance, data_science, social_sciences. Map "management" → business_management, "MBA" → business_management, "CS"/"AI"/"machine learning" → computer_science_ai, "fintech" → economics_finance, "DS" → data_science, "humanities" → social_sciences, "architecture" → architecture_built_environment, etc. This is the field they want to STUDY NEXT — infer it from what they describe even if they only state their background.
+- gpa_range: below_2_0, 2_0_2_5, 2_5_3_0, 3_0_3_5, 3_5_plus. Map a stated GPA on a 4.0 scale to the nearest bracket — e.g. "3.2 GPA" → 3_0_3_5, "3.8/4" → 3_5_plus, "around 2.7" → 2_5_3_0. For a /100 grade, convert first (e.g. "85/100" ≈ 3.4 → 3_0_3_5). Leave null if no GPA is mentioned.
+- budget_per_year: tuition_free, <10k, 10-15k, 15-20k, 20-25k, 25k+, flexible. Map "free"/"no tuition"/"tuition-free"/"fully funded only"/"can only do public/free universities" → tuition_free, "under 5k" → <10k, "around 12k" → 10-15k, "no budget limit" → flexible.
 - duration_preference: 12mo, 18mo, 24mo, flexible. "1 year" → 12mo, "2 years" → 24mo, "any" → flexible.
-- english_level: exam_ready (already has or is ready for IELTS/TOEFL), no_exam_yet (good English but no exam taken yet), intermediate, needs_improvement. Map "fluent"/"native-like"/"have IELTS"/"C1" → exam_ready, "my English is good"/"comfortable in English" → no_exam_yet, "okay English"/"B1" → intermediate, "weak English"/"need to improve my English" → needs_improvement. Leave null if not mentioned.
+- english_level: certified (already holds a valid IELTS/TOEFL/Duolingo score), exam_ready (fluent and ready to sit the test, just hasn't), advanced (C1, comfortable academically), upper_intermediate (B2), intermediate (B1), beginner (A2 or below). Map "have IELTS 7"/"TOEFL 100"/"got my Duolingo" → certified, "fluent"/"native-like" → exam_ready, "C1"/"very strong English" → advanced, "B2"/"good English" → upper_intermediate, "okay English"/"B1" → intermediate, "weak/basic English" → beginner. Leave null if not mentioned.
 - scholarship_need: required, helpful, not_needed. Map "need scholarship" → required, "would love scholarship but can pay" → helpful, "self-funded" → not_needed.
-- career_goal: work_in_europe, work_internationally, return_to_turkey, phd_research, entrepreneurship, unsure. Map "want to stay in Europe" → work_in_europe, "PhD afterwards" → phd_research, "want to come back to Turkey" → return_to_turkey, "start my own company" → entrepreneurship.
+- career_goal: work_in_europe, return_to_turkey, work_internationally, phd_research, industry_expert, career_switch, entrepreneurship, unsure, other. Map "want to stay in Europe" → work_in_europe, "come back to Turkey" → return_to_turkey, "work anywhere globally" → work_internationally, "PhD afterwards"/"academia" → phd_research, "become a senior/specialist"/"expert in my field" → industry_expert, "switch fields"/"pivot careers" → career_switch, "start my own company" → entrepreneurship.
 - academic_focus: research, applied, balanced. Map "thesis-heavy" / "research-led" / "PhD-bound" → research, "industry-focused" / "job-oriented" / "internship-heavy" → applied. Otherwise null (do NOT default to balanced).
 - work_experience: none, 1-2_years, 3-5_years, 5_plus_years. Map "fresh graduate" / "no experience" → none, "couple years" → 1-2_years, "five years" → 5_plus_years, "few years" → 1-2_years.
 
@@ -77,18 +79,26 @@ Rules:
 
 // Note: additional_context and study_background are intentionally NOT in the
 // parser output. additional_context is set below to the student's original
-// free-text query; study_background isn't inferred for /search (stays null).
+// free-text query; study_background, institution, gpa_scale/exact_gpa and the
+// "_other" companions aren't inferred for /search (they stay null). field_of_
+// study defaults to null when unstated — the matcher leans on additional_context
+// (the verbatim query) instead of a fabricated field.
 const FALLBACKS = {
   destinations: ["ANY"] as const,
   current_situation: null,
-  field_of_study: "business_management",
+  current_situation_other: null,
+  institution: null,
+  field_of_study: null,
   study_background: null,
+  gpa_scale: null,
   gpa_range: null,
+  exact_gpa: null,
   budget_per_year: "flexible",
   duration_preference: "flexible",
-  english_level: "no_exam_yet",
+  english_level: "upper_intermediate",
   scholarship_need: "helpful",
   career_goal: "unsure",
+  career_goal_other: null,
   academic_focus: "balanced",
   work_experience: "none",
   additional_context: null,

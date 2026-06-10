@@ -209,7 +209,7 @@ function EmptyApplicationsState({ hasAnyApps }: { hasAnyApps: boolean }) {
       <p className="mx-auto mt-1 max-w-sm text-sm text-slate-500">
         {hasAnyApps
           ? "Try a different status or clear the search."
-          : "Open any program page and hit “Track this application”. It'll show up here."}
+          : "Open any program page and hit “Save”. It'll show up here as one you're interested in."}
       </p>
       {!hasAnyApps && (
         <div className="mt-5 flex justify-center gap-2">
@@ -217,7 +217,7 @@ function EmptyApplicationsState({ hasAnyApps }: { hasAnyApps: boolean }) {
             <Link href="/quiz">Find programs with the quiz</Link>
           </Button>
           <Button asChild size="sm" variant="outline">
-            <Link href="/shortlist">Open shortlist</Link>
+            <Link href="/catalog">Browse the catalog</Link>
           </Button>
         </div>
       )}
