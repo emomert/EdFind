@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
+  ArrowRight,
   Building2,
-  ExternalLink,
   GraduationCap,
   MapPin,
   Search,
@@ -206,19 +206,19 @@ export function CatalogClient({
       {/* Hero — borderless and very lightly tinted so the surrounding page
           background flows through it. The HeroBackgroundGraphics blobs bleed
           past the rounded edges and carry that gradient outward. */}
-      <header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-50/40 via-transparent to-emerald-50/40 p-6 sm:p-10">
+      <header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-secondary/30 p-6 sm:p-10">
         <HeroBackgroundGraphics variant="programs" density="medium" />
         <div className="relative z-10 grid gap-6 lg:grid-cols-[1.5fr,auto] lg:items-end">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-teal-700 shadow-sm ring-1 ring-inset ring-teal-200">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-card/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary shadow-sm ring-1 ring-inset ring-primary/20">
               <Sparkles className="size-3.5" />
               EdFind Catalog
             </span>
-            <h1 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-4xl">
+            <h1 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl">
               Browse every university and master&apos;s program{" "}
-              <span className="text-teal-700">we&apos;ve verified.</span>
+              <span className="text-primary">we&apos;ve verified.</span>
             </h1>
-            <p className="mt-3 max-w-xl text-sm text-slate-600">
+            <p className="mt-3 max-w-xl text-sm text-muted-foreground">
               Filter by country, field, language, or tuition — or jump straight
               to a university you already have in mind. Every entry links to a
               detailed program page.
@@ -528,7 +528,7 @@ function UniversityCard({ uni }: { uni: CatalogUniversity }) {
           </span>
           <span className="inline-flex items-center gap-1 text-teal-700 group-hover:underline">
             View university
-            <ExternalLink className="size-3" />
+            <ArrowRight className="size-3" />
           </span>
         </div>
       </Link>
@@ -604,7 +604,7 @@ function ProgramCard({ prog }: { prog: CatalogProgram }) {
           )}
           <span className="inline-flex items-center gap-1 text-teal-700 group-hover:underline">
             View program
-            <ExternalLink className="size-3" />
+            <ArrowRight className="size-3" />
           </span>
         </div>
       </Link>

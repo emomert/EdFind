@@ -20,6 +20,7 @@ import {
 } from "@/components/decor/marker";
 import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
 import { Drift, Reveal } from "@/components/motion";
+import { TOTAL_STEPS } from "@/lib/quiz/schema";
 import { UniversityMarquee } from "@/components/home/university-marquee";
 import {
   WelcomeTour,
@@ -136,7 +137,7 @@ export default async function HomePage() {
                 <>
                   <Button asChild size="lg">
                     <Link href="/quiz">
-                      Take the 13-question quiz
+                      Take the {TOTAL_STEPS}-question quiz
                       <ArrowRight />
                     </Link>
                   </Button>
@@ -156,7 +157,7 @@ export default async function HomePage() {
                     </Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
-                    <Link href="#featured">Browse universities</Link>
+                    <Link href="/catalog">Browse universities</Link>
                   </Button>
                 </>
               )}
@@ -204,8 +205,9 @@ export default async function HomePage() {
               </p>
               <ol className="mt-4 space-y-3 text-sm text-foreground">
                 <Step n={1}>
-                  Answer 11 quick questions plus a couple of optional free-text
-                  prompts about anything we&apos;d miss.
+                  Answer {TOTAL_STEPS} quick questions — where you&apos;re headed,
+                  what you studied, budget, goals — plus an optional note about
+                  anything we&apos;d miss.
                 </Step>
                 <Step n={2}>
                   Our matcher (DeepSeek V4) ranks programs across all{" "}

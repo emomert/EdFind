@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  ArrowLeft,
   Award,
   Building2,
   ExternalLink,
@@ -13,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
@@ -119,13 +119,13 @@ export default async function UniversityPage({
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" />
-        Back to home
-      </Link>
+      <Breadcrumbs
+        items={[
+          { href: "/", label: "Home" },
+          { href: "/catalog", label: "Catalog" },
+          { label: u.name },
+        ]}
+      />
 
       <UniversityHero
         imageUrl={u.hero_image_url}
@@ -215,13 +215,6 @@ export default async function UniversityPage({
               label="Programs on EdFind"
               value={String(programs.length)}
             />
-            {u.qs_world_rank ? (
-              <Row
-                icon={<Award className="size-3.5" />}
-                label="QS World rank"
-                value={`#${u.qs_world_rank}`}
-              />
-            ) : null}
           </dl>
         </aside>
       </div>

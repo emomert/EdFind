@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  ArrowLeft,
   Award,
   Building2,
   CalendarDays,
@@ -17,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/supabase/auth";
 import { SaveButton } from "@/components/shortlist/save-button";
@@ -151,13 +151,14 @@ export default async function ProgramPage({
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
-      <Link
-        href={`/universities/${u.slug}`}
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" />
-        Back to {u.name}
-      </Link>
+      <Breadcrumbs
+        items={[
+          { href: "/", label: "Home" },
+          { href: "/catalog", label: "Catalog" },
+          { href: `/universities/${u.slug}`, label: u.name },
+          { label: p.name },
+        ]}
+      />
 
       <UniversityHero
         imageUrl={u.hero_image_url}

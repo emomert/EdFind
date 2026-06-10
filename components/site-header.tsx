@@ -6,6 +6,7 @@ import { Logo } from "@/components/logo";
 import { APPLICATIONS_ENABLED, COMMUNITY_ENABLED } from "@/lib/feature-flags";
 import { getUser } from "@/lib/supabase/auth";
 import { HeaderSearch } from "@/components/header-search";
+import { MobileNav } from "@/components/mobile-nav";
 
 // Shortlist was merged into the applications tracker (2026-06-09): saving a
 // program creates an application at status 'interested', so a separate
@@ -54,6 +55,7 @@ export async function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <HeaderSearch />
+          <MobileNav links={navLinks} />
           {user ? (
             <>
               <span

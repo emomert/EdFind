@@ -28,7 +28,7 @@ export function SiteFooter() {
     { href: "/privacy", label: "Privacy Policy" },
   ];
 
-  const year = "2026"; // Date.now() is unavailable in this runtime; bump on the yearly review.
+  const year = new Date().getFullYear();
 
   return (
     <footer className="mt-auto border-t border-border/60 bg-muted/30">
