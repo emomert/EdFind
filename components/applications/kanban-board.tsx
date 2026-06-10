@@ -2,11 +2,12 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { GitBranch, Plus, Sparkles } from "lucide-react";
+import { Plus, SlidersHorizontal, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
   createTask,
+  moveTask,
   type TaskCategory,
   type TaskStatus,
 } from "@/app/applications/actions";
@@ -69,6 +70,7 @@ export function KanbanBoard({
     title: string;
     category: TaskCategory;
     applicationId: string | null;
+    dueAt: string | null;
   } | null>(null);
   const [appFilter, setAppFilter] = useState<AppFilter>("all");
 
@@ -90,6 +92,7 @@ export function KanbanBoard({
     category: TaskCategory,
     applicationId: string | null,
     status: TaskStatus = "todo",
+    dueAt: string | null = null,
   ) => {
     const t = title.trim();
     if (!t) return;
@@ -98,7 +101,7 @@ export function KanbanBoard({
       title: t,
       category,
       status,
-      due_at: null,
+      due_at: dueAt,
       application_id: applicationId,
       sort_order: Number.MAX_SAFE_INTEGER,
     };
@@ -109,6 +112,7 @@ export function KanbanBoard({
         title: t,
         category,
         status,
+        dueAt,
         applicationId: applicationId ?? null,
       });
       setTasks((prev) =>
@@ -123,6 +127,25 @@ export function KanbanBoard({
     });
   };
 
+  // Shared by the cards' arrow buttons (via TaskCard) and column drag-drop:
+  // optimistic move with rollback on failure.
+  const moveTaskTo = (taskId: string, to: TaskStatus) => {
+    const current = tasks.find((t) => t.id === taskId);
+    if (!current || current.status === to) return;
+    const prev = current;
+    setTasks((prevTasks) =>
+      prevTasks.map((t) => (t.id === taskId ? { ...t, status: to } : t)),
+    );
+    startTransition(async () => {
+      const res = await moveTask({ id: taskId, status: to });
+      if (!res.ok) {
+        setTasks((prevTasks) =>
+          prevTasks.map((t) => (t.id === taskId ? prev : t)),
+        );
+      }
+    });
+  };
+
   const buckets = COLUMNS.map((col) => ({
     col,
     items: visibleTasks
@@ -134,12 +157,12 @@ export function KanbanBoard({
     <section className="flex h-full flex-col gap-4">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">
             Your task board
           </h2>
-          <p className="text-sm text-slate-500">
-            Small steps, one at a time. Link tasks to a specific program when it
-            helps, or keep them general.
+          <p className="text-sm text-muted-foreground">
+            Small steps, one at a time. Drag cards between columns (or use the
+            arrows), and link tasks to a program when it helps.
           </p>
         </div>
         <button
@@ -152,10 +175,11 @@ export function KanbanBoard({
                 appFilter === "unassigned" || appFilter === "all"
                   ? null
                   : appFilter,
+              dueAt: null,
             })
           }
           disabled={pending}
-          className="inline-flex items-center gap-1.5 rounded-full bg-teal-600 px-3.5 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-teal-700 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-50"
         >
           <Plus className="size-4" />
           New task
@@ -195,14 +219,15 @@ export function KanbanBoard({
             countBg={col.countBg}
             count={items.length}
             isDoneColumn={col.key === "done"}
+            onDropTask={(taskId) => moveTaskTo(taskId, col.key)}
           >
             {col.key === "todo" && draft && (
               <DraftTaskCard
                 draft={draft}
                 setDraft={setDraft}
                 applications={applications}
-                onCommit={(title, category, appId) =>
-                  addTask(title, category, appId, "todo")
+                onCommit={(title, category, appId, dueAt) =>
+                  addTask(title, category, appId, "todo", dueAt)
                 }
                 onCancel={() => setDraft(null)}
               />
@@ -274,8 +299,8 @@ function AppFilterStrip({
       className="flex items-center gap-2"
     >
       <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-slate-500">
-        <GitBranch className="size-3.5" />
-        Branch:
+        <SlidersHorizontal className="size-3.5" />
+        Show:
       </span>
       <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto">
         {chips.map((chip) => {
@@ -322,6 +347,7 @@ function KanbanColumn({
   countBg,
   count,
   isDoneColumn,
+  onDropTask,
   children,
 }: {
   label: string;
@@ -330,18 +356,39 @@ function KanbanColumn({
   countBg: string;
   count: number;
   isDoneColumn: boolean;
+  onDropTask: (taskId: string) => void;
   children: React.ReactNode;
 }) {
+  const [dragOver, setDragOver] = useState(false);
   return (
     <motion.section
       layout
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.21, 0.6, 0.3, 1] }}
+      onDragOver={(e) => {
+        if (e.dataTransfer.types.includes("text/task-id")) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+          setDragOver(true);
+        }
+      }}
+      onDragLeave={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+          setDragOver(false);
+        }
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDragOver(false);
+        const taskId = e.dataTransfer.getData("text/task-id");
+        if (taskId) onDropTask(taskId);
+      }}
       className={cn(
-        "flex flex-col gap-2.5 rounded-2xl bg-gradient-to-b p-3.5 ring-1 ring-inset",
+        "flex flex-col gap-2.5 rounded-2xl bg-gradient-to-b p-3.5 ring-1 ring-inset transition-shadow",
         accent,
         tint,
+        dragOver && "ring-2 ring-teal-400 shadow-[0_0_0_4px_rgba(8,145,178,0.08)]",
       )}
     >
       <header className="flex items-baseline justify-between px-1">
@@ -368,6 +415,13 @@ function KanbanColumn({
   );
 }
 
+type Draft = {
+  title: string;
+  category: TaskCategory;
+  applicationId: string | null;
+  dueAt: string | null;
+};
+
 function DraftTaskCard({
   draft,
   setDraft,
@@ -375,17 +429,14 @@ function DraftTaskCard({
   onCommit,
   onCancel,
 }: {
-  draft: { title: string; category: TaskCategory; applicationId: string | null };
-  setDraft: (d: {
-    title: string;
-    category: TaskCategory;
-    applicationId: string | null;
-  }) => void;
+  draft: Draft;
+  setDraft: (d: Draft) => void;
   applications: ApplicationItem[];
   onCommit: (
     title: string,
     category: TaskCategory,
     applicationId: string | null,
+    dueAt: string | null,
   ) => void;
   onCancel: () => void;
 }) {
@@ -406,7 +457,7 @@ function DraftTaskCard({
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
-            onCommit(draft.title, draft.category, draft.applicationId);
+            onCommit(draft.title, draft.category, draft.applicationId, draft.dueAt);
           } else if (e.key === "Escape") {
             onCancel();
           }
@@ -434,22 +485,37 @@ function DraftTaskCard({
           ))}
         </select>
         <div className="flex items-center justify-between gap-2">
-          <select
-            value={draft.category}
-            onChange={(e) =>
-              setDraft({
-                ...draft,
-                category: e.target.value as TaskCategory,
-              })
-            }
-            className="rounded-md bg-slate-50 px-1.5 py-1 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-100"
-          >
-            {(Object.keys(TASK_CATEGORY_LABELS) as TaskCategory[]).map((c) => (
-              <option key={c} value={c}>
-                {TASK_CATEGORY_LABELS[c]}
-              </option>
-            ))}
-          </select>
+          <div className="flex min-w-0 items-center gap-1.5">
+            <select
+              value={draft.category}
+              onChange={(e) =>
+                setDraft({
+                  ...draft,
+                  category: e.target.value as TaskCategory,
+                })
+              }
+              className="rounded-md bg-slate-50 px-1.5 py-1 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-100"
+            >
+              {(Object.keys(TASK_CATEGORY_LABELS) as TaskCategory[]).map((c) => (
+                <option key={c} value={c}>
+                  {TASK_CATEGORY_LABELS[c]}
+                </option>
+              ))}
+            </select>
+            <input
+              type="date"
+              value={draft.dueAt ?? ""}
+              onChange={(e) =>
+                setDraft({
+                  ...draft,
+                  dueAt: e.target.value === "" ? null : e.target.value,
+                })
+              }
+              className="rounded-md bg-slate-50 px-1.5 py-1 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-100"
+              aria-label="Due date (optional)"
+              title="Due date (optional)"
+            />
+          </div>
           <div className="flex gap-1">
             <button
               type="button"
@@ -461,10 +527,10 @@ function DraftTaskCard({
             <button
               type="button"
               onClick={() =>
-                onCommit(draft.title, draft.category, draft.applicationId)
+                onCommit(draft.title, draft.category, draft.applicationId, draft.dueAt)
               }
               disabled={!draft.title.trim()}
-              className="rounded-md bg-teal-600 px-2.5 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-teal-700 disabled:opacity-50"
+              className="rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-50"
             >
               Add
             </button>

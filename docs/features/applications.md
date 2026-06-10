@@ -199,20 +199,45 @@ Tasks can optionally branch off a specific application:
 - **On the task card:** linked tasks show a teal chip with the program +
   university name. Hover reveals an unlink button that nulls
   `application_id` via `updateTask`.
-- **Filtering:** the kanban header has a "Branch:" chip strip — "All tasks",
+- **Filtering:** the kanban header has a "Show:" chip strip — "All tasks",
   "Unassigned", and one chip per tracked application. Each chip shows its
-  task count. Picking a non-default branch also pre-fills the application
-  link when adding a new task.
+  task count. Picking a non-default filter also pre-fills the application
+  link when adding a new task. (Renamed from "Branch:" 2026-06-10 — git
+  jargon meant nothing to the audience.)
 - **On the application card:** a "X / Y tasks" badge renders when at least
   one task is linked; turns emerald when all are done.
 
 Tasks that aren't linked to a program stay valid — useful for cross-cutting
 prep like "Book IELTS" or "Translate transcript".
 
+## Polish round (2026-06-10)
+
+- **One-click status:** the status pill on each application card is now a
+  dropdown menu, and `interested`/`drafting` cards show an inline advance
+  button ("Start drafting" / "Mark submitted") so the most common action no
+  longer requires opening the Edit panel.
+- **Deadline strip:** `DeadlineStrip` (components/applications/deadline-strip.tsx)
+  renders the nearest deadlines (next 60 days + recently passed, non-terminal
+  statuses only) as color-coded chips under the progress header; clicking a
+  chip scrolls to that application card (cards carry `id="application-<id>"`).
+- **Task drag-and-drop:** native HTML5 drag between kanban columns (no new
+  dependency; the drag handle is a plain inner div because framer-motion
+  swallows `onDragStart` on `motion.*` nodes). Arrow buttons remain for
+  mobile/keyboard. Cards land at the end of the target column (`moveTask`
+  re-tails `sort_order`).
+- **Due dates are now settable:** task cards have a click-to-edit due date
+  ("Add due date" affordance on hover) and the new-task draft has a date
+  input — previously `due_at` was display-only with no UI to set it.
+- **Cosmetics:** section headers and primary buttons migrated to semantic
+  theme tokens; progress header gradient calmed to `from-primary to-primary/85`;
+  the "Reset all progress" testing button is tucked behind a "Testing tools"
+  disclosure.
+
 ## What's intentionally not done
 
-- **Drag-and-drop.** Click-to-move covers the use case; sort_order is in place
-  so adding `@dnd-kit/sortable` later is the only change needed.
+- **Within-column drag reordering.** Cross-column drag works; reordering
+  inside a column still follows `sort_order` (append-to-end on move). Add
+  `@dnd-kit/sortable` if per-card ordering ever matters.
 - **Real AI guidance.** Heuristics are predictable and cheap. Swap for a
   DeepSeek call once we have signal data on what users actually do after
   reading a recommendation.

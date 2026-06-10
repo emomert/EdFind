@@ -1,5 +1,6 @@
 import "server-only";
 
+import { TOTAL_STEPS } from "@/lib/quiz/schema";
 import type { ApplicationStatus, TaskStatus } from "@/app/applications/actions";
 
 export type RecommendationTone = "celebrate" | "nudge" | "info" | "warn";
@@ -109,7 +110,7 @@ export function buildRecommendations(args: {
       title: "Start tracking programs you're considering.",
       body: profile?.destinations.length
         ? "Take the quiz again or browse universities to find programs that fit your destinations and field."
-        : "The 9-question quiz takes about two minutes and gives you AI-ranked matches.",
+        : `The ${TOTAL_STEPS}-question quiz takes about two minutes and gives you AI-ranked matches.`,
       cta: profile
         ? { label: "Find programs", href: "/quiz" }
         : { label: "Take the quiz", href: "/quiz" },

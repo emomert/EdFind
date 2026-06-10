@@ -10,6 +10,7 @@ import { resetAllProgress } from "@/app/applications/actions";
 import type { Recommendation } from "@/lib/applications/recommendations";
 
 import { StudentProgressCard } from "./student-progress-card";
+import { DeadlineStrip } from "./deadline-strip";
 import { ApplicationsOverview } from "./applications-overview";
 import { KanbanBoard } from "./kanban-board";
 import { AiRecommendationsPanel } from "./ai-recommendations";
@@ -53,6 +54,8 @@ export function ApplicationsClient({
         profile={profile}
       />
 
+      <DeadlineStrip items={items} />
+
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -75,9 +78,14 @@ export function ApplicationsClient({
         <AiRecommendationsPanel items={recommendations} />
       </div>
 
-      <div className="mt-10 flex justify-end">
-        <ResetButton />
-      </div>
+      <details className="mt-10 flex justify-end text-right">
+        <summary className="inline-flex cursor-pointer list-none items-center text-xs text-muted-foreground/70 transition-colors hover:text-muted-foreground [&::-webkit-details-marker]:hidden">
+          Testing tools
+        </summary>
+        <div className="mt-2">
+          <ResetButton />
+        </div>
+      </details>
     </motion.div>
   );
 }

@@ -71,10 +71,10 @@ export function ApplicationsOverview({
     <section className="flex h-full flex-col gap-4">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">
             Your applications
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             {items.length === 0
               ? "Programs you start tracking will show up here."
               : `${filtered.length} of ${items.length} program${items.length === 1 ? "" : "s"}`}

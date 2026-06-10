@@ -102,7 +102,7 @@ export function StudentProgressCard({
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.21, 0.6, 0.3, 1] }}
-      className="relative overflow-hidden rounded-3xl border border-teal-100 bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-600 p-6 text-white shadow-[0_18px_60px_-25px_rgba(13,148,136,0.55)] sm:p-8"
+      className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary to-primary/85 p-6 text-white shadow-[0_18px_60px_-30px_rgba(8,145,178,0.45)] sm:p-8"
     >
       {/* decorative orbs */}
       <div className="pointer-events-none absolute -right-16 -top-16 size-60 rounded-full bg-white/15 blur-3xl" aria-hidden />

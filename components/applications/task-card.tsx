@@ -7,6 +7,7 @@ import {
   ArrowRight,
   CalendarDays,
   FileText,
+  GraduationCap,
   Languages,
   Banknote,
   PenLine,
@@ -14,7 +15,6 @@ import {
   CircleDashed,
   Trash2,
   Check,
-  GitBranch,
   Unlink,
 } from "lucide-react";
 
@@ -63,6 +63,18 @@ export function TaskCard({
 }) {
   const [pending, startTransition] = useTransition();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [editingDue, setEditingDue] = useState(false);
+
+  const setDue = (value: string) => {
+    const next = value === "" ? null : value;
+    const prev = task;
+    onChange({ ...task, due_at: next });
+    setEditingDue(false);
+    startTransition(async () => {
+      const res = await updateTask({ id: task.id, dueAt: next });
+      if (!res.ok) onChange(prev);
+    });
+  };
 
   const move = (to: TaskStatus) => {
     const prev = task;
@@ -112,11 +124,22 @@ export function TaskCard({
       transition={{ duration: 0.3, ease: [0.21, 0.6, 0.3, 1] }}
       whileHover={{ y: -1 }}
       className={cn(
-        "group rounded-xl border border-slate-200 bg-white p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-shadow hover:shadow-[0_8px_24px_-14px_rgba(13,148,136,0.3)]",
+        "group rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-shadow hover:shadow-[0_8px_24px_-14px_rgba(13,148,136,0.3)]",
         task.status === "done" && "bg-slate-50/60",
         pending && "opacity-60",
       )}
     >
+      {/* HTML5 drag lives on a plain div: framer-motion swallows onDragStart
+          on motion.* elements (it's reserved for its own drag gesture), so the
+          native event must attach to a non-motion node. */}
+      <div
+        draggable
+        onDragStart={(e) => {
+          e.dataTransfer.setData("text/task-id", task.id);
+          e.dataTransfer.effectAllowed = "move";
+        }}
+        className="cursor-grab p-3 active:cursor-grabbing"
+      >
       <div className="flex items-start gap-2">
         <span
           className={cn(
@@ -143,7 +166,7 @@ export function TaskCard({
           layout
           className="mt-2 flex items-center gap-1.5 rounded-md bg-teal-50/70 px-2 py-1 text-[11px] text-teal-800 ring-1 ring-inset ring-teal-100"
         >
-          <GitBranch className="size-3 text-teal-600" />
+          <GraduationCap className="size-3 text-teal-600" />
           <span className="min-w-0 flex-1 truncate" title={application.program.name}>
             <span className="font-medium">{application.program.name}</span>
             <span className="ml-1 text-teal-600/80">
@@ -163,12 +186,26 @@ export function TaskCard({
         </motion.div>
       )}
 
-      {due && (
-        <div
+      {editingDue ? (
+        <input
+          type="date"
+          autoFocus
+          defaultValue={due ?? ""}
+          onChange={(e) => setDue(e.target.value)}
+          onBlur={() => setEditingDue(false)}
+          onKeyDown={(e) => e.key === "Escape" && setEditingDue(false)}
+          className="mt-2 w-full rounded-md border border-slate-200 bg-white px-1.5 py-1 text-[11px] text-slate-700 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
+          aria-label="Due date"
+        />
+      ) : due ? (
+        <button
+          type="button"
+          onClick={() => setEditingDue(true)}
+          title="Change due date"
           className={cn(
-            "mt-2 inline-flex items-center gap-1 text-[11px] text-slate-500",
-            daysToDue != null && daysToDue <= 7 && daysToDue >= 0 && "text-amber-700",
-            daysToDue != null && daysToDue < 0 && "text-rose-700",
+            "mt-2 inline-flex items-center gap-1 rounded text-[11px] text-slate-500 transition-colors hover:text-slate-700",
+            daysToDue != null && daysToDue <= 7 && daysToDue >= 0 && "text-amber-700 hover:text-amber-800",
+            daysToDue != null && daysToDue < 0 && "text-rose-700 hover:text-rose-800",
           )}
         >
           <CalendarDays className="size-3" />
@@ -178,7 +215,16 @@ export function TaskCard({
           })}
           {daysToDue != null && daysToDue >= 0 && ` · ${daysToDue}d`}
           {daysToDue != null && daysToDue < 0 && " · overdue"}
-        </div>
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setEditingDue(true)}
+          className="mt-2 inline-flex items-center gap-1 rounded text-[11px] text-slate-400 opacity-0 transition-opacity hover:text-slate-600 focus-visible:opacity-100 group-hover:opacity-100"
+        >
+          <CalendarDays className="size-3" />
+          Add due date
+        </button>
       )}
 
       <div className="mt-3 flex items-center justify-between gap-1 border-t border-slate-100 pt-2 opacity-80 transition-opacity group-hover:opacity-100">
@@ -243,6 +289,7 @@ export function TaskCard({
             <Trash2 className="size-3.5" />
           </button>
         )}
+      </div>
       </div>
     </motion.article>
   );

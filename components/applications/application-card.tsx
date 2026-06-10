@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
+  ArrowRight,
   CalendarDays,
   CheckCircle2,
   ChevronDown,
@@ -30,6 +31,16 @@ import {
   COUNTRY_NAMES,
   type ApplicationItem,
 } from "./types";
+
+// The natural next stage per status, surfaced as a one-click button so the
+// most common action (advancing an application) doesn't require opening the
+// Edit panel. Terminal/waiting statuses have no advance.
+const ADVANCE: Partial<
+  Record<ApplicationStatus, { to: ApplicationStatus; label: string }>
+> = {
+  interested: { to: "drafting", label: "Start drafting" },
+  drafting: { to: "submitted", label: "Mark submitted" },
+};
 
 function nextStepFor(status: ApplicationStatus, hasNotes: boolean): string {
   switch (status) {
@@ -84,8 +95,22 @@ export function ApplicationCard({
 }) {
   const [pending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const [notes, setNotes] = useState(item.notes ?? "");
+  const statusMenuRef = useRef<HTMLDivElement | null>(null);
   const u = item.program.university;
+
+  // Close the status menu on any outside click.
+  useEffect(() => {
+    if (!statusMenuOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (!statusMenuRef.current?.contains(e.target as Node)) {
+        setStatusMenuOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [statusMenuOpen]);
   const effectiveDeadline =
     item.deadline_at ?? item.program.application_deadline ?? null;
   const days = daysUntil(effectiveDeadline);
@@ -136,13 +161,14 @@ export function ApplicationCard({
   return (
     <motion.article
       layout
+      id={`application-${item.id}`}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8, scale: 0.98 }}
       transition={{ duration: 0.35, ease: [0.21, 0.6, 0.3, 1] }}
       whileHover={{ y: -2 }}
       className={cn(
-        "group rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-shadow hover:shadow-[0_8px_24px_-12px_rgba(13,148,136,0.25)] sm:p-5",
+        "group scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-shadow hover:shadow-[0_8px_24px_-12px_rgba(13,148,136,0.25)] sm:p-5",
         pending && "opacity-70",
       )}
     >
@@ -169,7 +195,60 @@ export function ApplicationCard({
           </p>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <StatusPill status={item.status} />
+            <div ref={statusMenuRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setStatusMenuOpen((o) => !o)}
+                disabled={pending}
+                aria-haspopup="menu"
+                aria-expanded={statusMenuOpen}
+                title="Change status"
+                className="group/status inline-flex items-center rounded-full outline-none transition-transform focus-visible:ring-2 focus-visible:ring-teal-300 active:scale-95"
+              >
+                <StatusPill status={item.status} />
+                <ChevronDown className="-ml-1 size-3 text-slate-400 transition-transform group-hover/status:text-slate-600" />
+              </button>
+              {statusMenuOpen && (
+                <div
+                  role="menu"
+                  className="absolute left-0 top-full z-20 mt-1.5 w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                >
+                  {ALL_APPLICATION_STATUSES.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setStatusMenuOpen(false);
+                        if (s !== item.status) handleStatus(s);
+                      }}
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-xs font-medium transition-colors",
+                        s === item.status
+                          ? "bg-teal-50 text-teal-800"
+                          : "text-slate-600 hover:bg-slate-50",
+                      )}
+                    >
+                      {APPLICATION_STATUS_LABELS[s]}
+                      {s === item.status ? (
+                        <CheckCircle2 className="size-3.5 text-teal-600" />
+                      ) : null}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {ADVANCE[item.status] ? (
+              <button
+                type="button"
+                onClick={() => handleStatus(ADVANCE[item.status]!.to)}
+                disabled={pending}
+                className="inline-flex items-center gap-1 rounded-full border border-teal-200 bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-700 transition-colors hover:bg-teal-100"
+              >
+                {ADVANCE[item.status]!.label}
+                <ArrowRight className="size-3" />
+              </button>
+            ) : null}
             {taskTotal > 0 && (
               <span
                 className={cn(

@@ -60,7 +60,7 @@ export function AiRecommendationsPanel({
       <header className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-500 text-white shadow-sm">
+            <div className="flex size-10 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
               <Sparkles className="size-5" />
             </div>
             <motion.span
@@ -71,10 +71,10 @@ export function AiRecommendationsPanel({
             />
           </div>
           <div>
-            <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">
               Personalised guidance
             </h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               A few next-best moves based on where you are right now.
             </p>
           </div>
