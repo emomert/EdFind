@@ -13,27 +13,38 @@ Collect enough structured signal about a student's preferences in ≤ 2 minutes 
 3. They see a "Creating your profile…" loading screen while the server stores the profile and runs the matcher.
 4. They land on the results page (`/results/:matchId`) with their best matches.
 
-## Question schema (v4)
+## Question schema (v5)
 
-`answers_version: 4`. Version history: bumped 1→2 in Phase 8 when `academic_focus` and `work_experience` were added; 2→3 when the optional free-text `additional_context` question was added; **3→4 (2026-06-09)** when `current_situation` and `gpa_range` single-selects and the optional free-text `study_background` question were added, and `english_level` was reframed from CEFR bands to exam-readiness wording. Older profiles in the DB still validate at read time because we never destructive-migrate quiz data — the new fields default to `null` for older payloads (and reframed `english_level` values from earlier versions remain stored as-is).
+`answers_version: 5`. Version history: bumped 1→2 in Phase 8 when `academic_focus` and `work_experience` were added; 2→3 when the optional free-text `additional_context` question was added; 3→4 (2026-06-09) when `current_situation` and `gpa_range` single-selects and the optional free-text `study_background` question were added, and `english_level` was reframed to exam-readiness wording; **4→5 (2026-06-10)** — the feedback-round-2 overhaul (see below). Older profiles in the DB still validate at read time because we never destructive-migrate quiz data — new fields default to `null` for older payloads, and superseded enum values (the old `english_level` / `current_situation` / `career_goal` labels) remain stored as-is.
 
-**Data-layer nullability:** `current_situation` and `gpa_range` are **required in the guided quiz UI** but **nullable at the data layer** (`AnswersSchema`). The `/search` free-text path can't reliably infer them, so we store `null` rather than fabricate a situation or GPA. `study_background` and `additional_context` are optional free-text (`null` when skipped). All other selects are required enums.
+**What changed in v5:**
+- `current_situation` split the overlapping recent-grad/gap-year choices, added `graduating_soon`, and gained a writable **"Other"** companion (`current_situation_other`).
+- New **`institution`** question — a searchable Turkish-university picker (`lib/quiz/turkish-universities.ts`) with a first-class free-text fallback. Legend adapts to the situation ("studying at" / "will graduate from" / "graduated from").
+- The structured "field you're drawn to" picker was **dropped**. The free-text **`study_background` is now required** and replaces it; the AI infers the structured `field_of_study` (now **nullable**, AI-inferred, no longer asked) from that text + context.
+- **GPA is now compound:** `gpa_scale` (grading system) + `exact_gpa` (free-text exact value, any scale) + `gpa_range` (rough 4.0 band). Answered once the student gives an exact value **or** a band.
+- `english_level` reframed into professional, CEFR-anchored options: `certified`, `exam_ready`, `advanced`, `upper_intermediate`, `intermediate`, `beginner`.
+- `budget_per_year` gained **`tuition_free`** (tuition-free / fully-funded only).
+- `career_goal` gained options (`industry_expert`, `career_switch`) and a writable **"Other"** (`career_goal_other`).
+
+**Data-layer nullability:** `current_situation`, `institution`, `study_background`, `gpa_scale`, `gpa_range`, `exact_gpa`, and `field_of_study` are **nullable at the data layer** (`AnswersSchema`) — several are required in the guided quiz UI, but the `/search` free-text path can't reliably infer them and we store `null` rather than fabricate. `*_other` companions and `additional_context` are optional free-text. All other selects are required enums.
 
 | # | Question | Field | Type | Notes |
 |---|---|---|---|---|
-| 1 | _"Which destination feels right for your master's journey?"_ | `destinations` | array of country codes | Multi-select. 18 destination countries: IT, NL, DE, GB, ES, FR, CH, SE, DK, IE, AT, BE, CZ, EE, FI, NO, PL, PT, plus "ANY" (No preference). |
-| 2 | _"What best describes your current situation?"_ (added v4) | `current_situation` | enum | Single-select. `undergraduate`, `recent_graduate`, `working_professional`, `gap_year`, `other`. **UI-required but nullable at the data layer** (null when `/search` can't infer it). |
-| 3 | _"What field of study are you drawn to?"_ | `field_of_study` | enum | Single-select. The field they want to study **next** — not necessarily their undergraduate field. Uses the taxonomy in `data-model.md`. |
-| 4 | _"What did you study? (optional)"_ (added v4) | `study_background` | free text | **Optional** — the student's undergraduate background in their own words. Bounded to `maxLength` 200 (`STUDY_BACKGROUND_MAX_LENGTH`). Fed to the matcher to judge fit and eligibility; `null` when skipped (and always `null` on the `/search` path). |
-| 5 | _"What's your approximate GPA range?"_ (added v4) | `gpa_range` | enum | Single-select. `below_2_0`, `2_0_2_5`, `2_5_3_0`, `3_0_3_5`, `3_5_plus` (roughly a 4.0 scale). **UI-required but nullable at the data layer** (null when `/search` can't infer it). |
-| 6 | _"How would you describe your English level?"_ (reframed v4) | `english_level` | enum | Single-select. Reframed from CEFR bands to exam-readiness wording: `exam_ready` ("IELTS/TOEFL ready"), `no_exam_yet` ("Good, but haven't taken an exam yet"), `intermediate` ("Intermediate"), `needs_improvement` ("Need improvement"). |
-| 7 | _"What's your budget per year?"_ | `budget_per_year` | enum bracket | `<10k`, `10-15k`, `15-20k`, `20-25k`, `25k+`, `flexible`. Stored as the bracket label, not a number. |
+| 1 | _"Which destination feels right for your master's journey?"_ | `destinations` | array of country codes | Multi-select. 18 destination countries plus "ANY" (No preference). |
+| 2 | _"What best describes your current situation?"_ | `current_situation` (+ `current_situation_other`) | enum + free-text | `undergraduate`, `graduating_soon`, `recent_graduate`, `gap_year`, `working_professional`, `other`. Selecting "Other" reveals a write-in. **UI-required, nullable at data layer.** |
+| 3 | _"Which university are you studying at / will graduate from / did you graduate from?"_ (added v5) | `institution` | free text (searchable picker) | Searchable list of Turkish universities + free-text fallback. Legend adapts to `current_situation`. **UI-required, nullable at data layer.** |
+| 4 | _"What did you study?"_ (now required v5) | `study_background` | free text **(required)** | The student's undergraduate background in their own words. `maxLength` 200. Replaces the old field-of-study picker; the AI infers `field_of_study` from it. Nullable at the data layer (always `null` on `/search`). |
+| 5 | _"What's your GPA?"_ (compound v5) | `gpa_scale` + `exact_gpa` + `gpa_range` | enum + free-text + enum | Pick the grading scale (`4_point`, `100_point`, `5_point`, `10_point`, `ects_letter`, `uk_class`, `other`), type the exact value, and/or pick a rough 4.0 band. **UI-required, nullable at data layer.** |
+| 6 | _"How would you describe your English?"_ (reframed v5) | `english_level` | enum | `certified`, `exam_ready`, `advanced`, `upper_intermediate`, `intermediate`, `beginner` (strongest → weakest). |
+| 7 | _"What's your budget per year?"_ | `budget_per_year` | enum bracket | `tuition_free`, `<10k`, `10-15k`, `15-20k`, `20-25k`, `25k+`, `flexible`. `tuition_free` is a hard filter in the matcher. |
 | 8 | _"How long do you want your program to be?"_ | `duration_preference` | enum | `12mo`, `18mo`, `24mo`, `flexible`. |
 | 9 | _"Do you need scholarship support?"_ | `scholarship_need` | enum | `required`, `helpful`, `not_needed`. |
-| 10 | _"What's your career goal after graduation?"_ | `career_goal` | enum | `work_in_europe`, `work_internationally`, `return_to_turkey`, `phd_research`, `entrepreneurship`, `unsure`. |
-| 11 | _"What style of master's appeals to you?"_ (added v2) | `academic_focus` | enum | `research`, `applied`, `balanced`. Lets the matcher distinguish PhD-track research masters from job-oriented professional masters. |
-| 12 | _"How much full-time work experience do you have?"_ (added v2) | `work_experience` | enum | `none`, `1-2_years`, `3-5_years`, `5_plus_years`. Some programmes (LBS MiM, MBA-style options) prefer 1-3+ years; helps the matcher avoid recommending experience-required programmes to fresh grads. |
-| 13 | _"Anything else we should know? (optional)"_ (added v3) | `additional_context` | free text | **Optional** — the Next button is always enabled, even with empty text. Bounded to `maxLength` 500 (`ADDITIONAL_CONTEXT_MAX_LENGTH`). Fed to the matcher verbatim and quoted back in the rationale (specific labs, family in a city, a switch of discipline — anything multiple-choice would miss). |
+| 10 | _"What's your goal after the master's?"_ (expanded v5) | `career_goal` (+ `career_goal_other`) | enum + free-text | `work_in_europe`, `return_to_turkey`, `work_internationally`, `phd_research`, `industry_expert`, `career_switch`, `entrepreneurship`, `unsure`, `other`. "Other" reveals a write-in. |
+| 11 | _"What style of master's appeals to you?"_ | `academic_focus` | enum | `research`, `applied`, `balanced`. |
+| 12 | _"How much full-time work experience do you have?"_ | `work_experience` | enum | `none`, `1-2_years`, `3-5_years`, `5_plus_years`. |
+| 13 | _"Anything else we should know? (optional)"_ | `additional_context` | free text | **Optional.** `maxLength` 500. Fed to the matcher verbatim and quoted back in the rationale. |
+
+> `field_of_study` is no longer a direct question. It stays in the answers shape (nullable) and is **inferred by the AI** from `study_background` (quiz) or the query (`/search`). Downstream displays (applications header) fall back gracefully when it's `null`.
 
 The schema is **versioned** (`answers_version`). When we add or change a question, we bump the version and keep old answers as-is — never destructive-migrate quiz data.
 
@@ -55,9 +66,9 @@ The schema is **versioned** (`answers_version`). When we add or change a questio
 ## Server flow on submit
 
 1. Sign-in is required (`/quiz` is auth-gated since Phase 9.4) — unauthenticated visitors are redirected to `/login?next=/quiz`.
-2. Validate answers against the v4 `AnswersSchema` (Zod). Reject if any required key is missing or unknown; `current_situation` and `gpa_range` are nullable at the data layer, and `study_background` / `additional_context` are optional and default to `null`.
+2. Validate answers against the v5 `AnswersSchema` (Zod). Reject if any required key is missing or unknown; `current_situation`, `institution`, `study_background`, `gpa_*`, and `field_of_study` are nullable at the data layer, and the `*_other` / `additional_context` free-text fields default to `null`.
 3. Generate a `client_id` if the browser doesn't already have one (UUIDv4, persisted to localStorage and a signed cookie). The same `client_id` survives sign-in via the auth callback's `attach_anon_rows_to_user` RPC.
-4. Insert into `profiles` with `tier='free'`, `answers_version=4`, the validated `answers` blob, the `client_id`, and the authenticated `user_id`.
+4. Insert into `profiles` with `tier='free'`, `answers_version=5`, the validated `answers` blob, the `client_id`, and the authenticated `user_id`.
 5. Run the real DeepSeek V4 Flash matcher (see `docs/features/ai-matcher.md`) over the full catalog and return the top 3.
 6. Insert one row per match into `matches`, each with its score and rationale.
 7. Return `{ matchId }` for the highest-scoring match.
@@ -81,12 +92,14 @@ The shared backend for `/quiz` and `/search` lives in `lib/server/persist-and-ma
 | Concern | File |
 |---|---|
 | Question definitions, TS types, `ANSWERS_VERSION`, Zod validator, draft storage key | `lib/quiz/schema.ts` |
-| Client state machine, draft persistence, submission timing, error retry | `components/quiz/quiz-client.tsx` |
+| Turkish-university list + diacritic-folded search (institution picker) | `lib/quiz/turkish-universities.ts` |
+| Client state machine, draft persistence, `handlePatch` for compound questions | `components/quiz/quiz-client.tsx` |
 | `getOrCreateClientId()` (UUID in localStorage) + `CLIENT_ID_COOKIE` name | `lib/quiz/client-id.ts` |
-| Sticky progress bar (`role="progressbar"`) | `components/quiz/progress-bar.tsx` |
+| Sticky progress bar (`role="progressbar"`) — note: the quiz sound toggle was removed 2026-06-10 and sound now defaults off | `components/quiz/progress-bar.tsx` |
 | Mascot character + supportive copy | `components/quiz/mascot.tsx` |
 | Single answer card (radio/checkbox) | `components/quiz/answer-card.tsx` |
-| Per-question screen layout (fieldset/legend, back/next) | `components/quiz/question-screen.tsx` |
+| Searchable institution combobox (Turkish unis + free-text) | `components/quiz/institution-combobox.tsx` |
+| Per-question screen — fieldset/legend, GPA picker, "Other" write-ins, institution/free-text rendering | `components/quiz/question-screen.tsx` |
 | Staged "Reading preferences → Searching database → Preparing results" | `components/quiz/loading-screen.tsx` |
 | Route shell (Server Component) | `app/quiz/page.tsx` |
 | `submitProfile(input)` Server Action — Zod validate, insert profile, run placeholder matcher, insert match, set httpOnly client_id cookie | `app/quiz/actions.ts` |

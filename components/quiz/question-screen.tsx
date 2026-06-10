@@ -3,10 +3,20 @@
 import dynamic from "next/dynamic";
 import { ArrowLeft, ArrowRight, Globe2, X } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { AnswerCard } from "@/components/quiz/answer-card";
+import { InstitutionCombobox } from "@/components/quiz/institution-combobox";
 import { MarkerSparkles, MarkerStar } from "@/components/decor/marker";
-import type { Destination, Question } from "@/lib/quiz/schema";
+import type {
+  Answers,
+  CurrentSituation,
+  Destination,
+  GpaQuestion,
+  GpaScale,
+  OtherSpec,
+  Question,
+} from "@/lib/quiz/schema";
 
 // d3-geo + topojson-client + the 90 KB topo file are lazy-loaded so they
 // only ship when the user actually reaches question 1.
@@ -25,8 +35,10 @@ const EuropeGlobe = dynamic(
 
 type Props = {
   question: Question;
+  answers: Answers;
   selected: string[];
   onSelect: (value: string) => void;
+  onPatch: (patch: Partial<Answers>) => void;
   onBack: (() => void) | null;
   onNext: () => void;
   canAdvance: boolean;
@@ -55,21 +67,44 @@ const DESTINATION_NAMES: Record<Destination, string> = {
   ANY: "Anywhere in Europe",
 };
 
+// The institution legend adapts to the student's stated situation so the
+// wording is natural (studying / graduating / graduated).
+function institutionLegend(cs: CurrentSituation | null): string {
+  switch (cs) {
+    case "undergraduate":
+      return "Which university are you studying at?";
+    case "graduating_soon":
+      return "Which university will you graduate from?";
+    case "recent_graduate":
+    case "gap_year":
+    case "working_professional":
+      return "Which university did you graduate from?";
+    default:
+      return "Which university did you study at?";
+  }
+}
+
 export function QuestionScreen({
   question,
+  answers,
   selected,
   onSelect,
+  onPatch,
   onBack,
   onNext,
   canAdvance,
   isLastStep,
 }: Props) {
   const isDestinations = question.field === "destinations";
+  const legend =
+    question.select === "institution"
+      ? institutionLegend(answers.current_situation)
+      : question.legend;
 
   return (
     <fieldset className="border-0 p-0">
       <legend className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-        {question.legend}
+        {legend}
       </legend>
       {question.helper ? (
         <p className="mt-3 text-sm text-muted-foreground sm:text-base">
@@ -79,28 +114,52 @@ export function QuestionScreen({
 
       {isDestinations ? (
         <DestinationGlobe selected={selected} onSelect={onSelect} />
+      ) : question.select === "institution" ? (
+        <InstitutionCombobox
+          value={answers.institution}
+          onChange={(v) => onPatch({ institution: v })}
+        />
+      ) : question.select === "gpa" ? (
+        <GpaPicker question={question} answers={answers} onPatch={onPatch} />
       ) : question.select === "text" ? (
         <FreeTextInput
           value={selected[0] ?? ""}
           placeholder={question.placeholder}
           maxLength={question.maxLength}
+          required={Boolean(question.required)}
+          ariaLabel={legend}
           onChange={onSelect}
         />
       ) : (
-        <div className="mt-8 grid gap-3 sm:grid-cols-2">
-          {question.options.map((option) => (
-            <AnswerCard
-              key={option.value}
-              name={question.field}
-              value={option.value}
-              label={option.label}
-              description={option.description}
-              selected={selected.includes(option.value)}
-              selectMode={question.select}
-              onSelect={onSelect}
+        <>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            {question.options.map((option) => (
+              <AnswerCard
+                key={option.value}
+                name={question.field}
+                value={option.value}
+                label={option.label}
+                description={option.description}
+                selected={selected.includes(option.value)}
+                selectMode={question.select}
+                onSelect={onSelect}
+              />
+            ))}
+          </div>
+          {question.select === "single" &&
+          question.other &&
+          answers[question.field] === question.other.whenValue ? (
+            <OtherTextInput
+              spec={question.other}
+              value={
+                typeof answers[question.other.field] === "string"
+                  ? (answers[question.other.field] as string)
+                  : ""
+              }
+              onPatch={onPatch}
             />
-          ))}
-        </div>
+          ) : null}
+        </>
       )}
 
       <div className="mt-10 flex items-center justify-between gap-3">
@@ -121,15 +180,157 @@ export function QuestionScreen({
   );
 }
 
+function GpaPicker({
+  question,
+  answers,
+  onPatch,
+}: {
+  question: GpaQuestion;
+  answers: Answers;
+  onPatch: (patch: Partial<Answers>) => void;
+}) {
+  // The 4.0-scale quick-pick bands only make sense on a 4.0 scale, so hide them
+  // for other grading systems (the exact-GPA field is scale-agnostic). Switching
+  // to a non-4.0 scale also clears any stale band so the matcher never receives
+  // a band that contradicts the chosen scale.
+  const showRange =
+    answers.gpa_scale === null || answers.gpa_scale === "4_point";
+  const pickScale = (next: GpaScale | null) => {
+    if (next === null || next === "4_point") onPatch({ gpa_scale: next });
+    else onPatch({ gpa_scale: next, gpa_range: null });
+  };
+
+  return (
+    <div className="mt-8 space-y-6">
+      <div>
+        <p className="text-sm font-medium text-foreground">Grading scale</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {question.scaleOptions.map((opt) => {
+            const active = answers.gpa_scale === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                aria-pressed={active}
+                onClick={() => pickScale(active ? null : opt.value)}
+                className={cn(
+                  "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-accent/40",
+                )}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <label
+          htmlFor="exact-gpa"
+          className="text-sm font-medium text-foreground"
+        >
+          Your GPA
+        </label>
+        <input
+          id="exact-gpa"
+          type="text"
+          inputMode="decimal"
+          value={answers.exact_gpa ?? ""}
+          maxLength={24}
+          placeholder={question.exactPlaceholder}
+          onChange={(e) =>
+            onPatch({
+              exact_gpa:
+                e.target.value.trim() === "" ? null : e.target.value,
+            })
+          }
+          className="mt-2 w-full rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:max-w-xs"
+        />
+      </div>
+
+      {showRange ? (
+        <div>
+          <p className="text-sm font-medium text-foreground">
+            …or pick a rough range{" "}
+            <span className="font-normal text-muted-foreground">
+              (4.0 scale)
+            </span>
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {question.rangeOptions.map((opt) => {
+              const active = answers.gpa_range === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() =>
+                    onPatch({ gpa_range: active ? null : opt.value })
+                  }
+                  className={cn(
+                    "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
+                    active
+                      ? "border-primary bg-secondary/60 text-foreground"
+                      : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-accent/40",
+                  )}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function OtherTextInput({
+  spec,
+  value,
+  onPatch,
+}: {
+  spec: OtherSpec;
+  value: string;
+  onPatch: (patch: Partial<Answers>) => void;
+}) {
+  return (
+    <div className="mt-3">
+      <input
+        type="text"
+        value={value}
+        maxLength={spec.maxLength}
+        placeholder={spec.placeholder}
+        autoFocus
+        onChange={(e) =>
+          onPatch({
+            [spec.field]:
+              e.target.value.trim() === "" ? null : e.target.value,
+          } as Partial<Answers>)
+        }
+        className="w-full rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+        aria-label="Please describe"
+      />
+    </div>
+  );
+}
+
 function FreeTextInput({
   value,
   placeholder,
   maxLength,
+  required,
+  ariaLabel,
   onChange,
 }: {
   value: string;
   placeholder: string;
   maxLength: number;
+  required: boolean;
+  ariaLabel: string;
   onChange: (next: string) => void;
 }) {
   const remaining = maxLength - value.length;
@@ -142,11 +343,13 @@ function FreeTextInput({
         rows={5}
         maxLength={maxLength}
         className="w-full resize-y rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-        aria-label="Anything else we should know"
+        aria-label={ariaLabel}
       />
       <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
         <span>
-          You can skip this — the AI will still match using your other answers.
+          {required
+            ? "A sentence or two is plenty — it sharpens your matches."
+            : "You can skip this — the AI will still match using your other answers."}
         </span>
         <span
           aria-live="polite"

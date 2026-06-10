@@ -23,7 +23,6 @@ import { QuizProgressBar } from "@/components/quiz/progress-bar";
 import { QuizMascot } from "@/components/quiz/mascot";
 import { QuestionScreen } from "@/components/quiz/question-screen";
 import { QuizLoadingScreen } from "@/components/quiz/loading-screen";
-import { SoundToggle } from "@/components/quiz/sound-toggle";
 import { SoundProvider, useSound } from "@/lib/sound/sound-context";
 
 type Phase = "questions" | "loading" | "error";
@@ -87,7 +86,7 @@ export function QuizClient() {
 function QuizClientInner() {
   const router = useRouter();
   const reduce = useReducedMotion();
-  const { enabled: soundEnabled, toggle: toggleSound, play } = useSound();
+  const { play } = useSound();
   const [phase, setPhase] = useState<Phase>("questions");
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Answers>(EMPTY_ANSWERS);
@@ -212,6 +211,12 @@ function QuizClientInner() {
     setStepIndex((i) => Math.max(i - 1, 0));
   }, [play]);
 
+  // Patch one or more answer fields at once — used by compound questions
+  // (institution picker, GPA scale/exact/range, the "Other" write-ins).
+  const handlePatch = useCallback((patch: Partial<Answers>) => {
+    setAnswers((prev) => ({ ...prev, ...patch }));
+  }, []);
+
   const handleSequenceComplete = useCallback(() => {
     sequenceResolveRef.current?.();
     sequenceResolveRef.current = null;
@@ -264,15 +269,7 @@ function QuizClientInner() {
   return (
     <div className="mx-auto max-w-3xl px-6 pb-24">
       <div className="sticky top-16 z-10 -mx-6 border-b border-border bg-background/90 px-6 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-        <div className="flex items-center gap-3">
-          <div className="min-w-0 flex-1">
-            <QuizProgressBar
-              currentStep={stepIndex + 1}
-              totalSteps={TOTAL_STEPS}
-            />
-          </div>
-          <SoundToggle enabled={soundEnabled} onToggle={toggleSound} />
-        </div>
+        <QuizProgressBar currentStep={stepIndex + 1} totalSteps={TOTAL_STEPS} />
       </div>
 
       <div
@@ -291,8 +288,10 @@ function QuizClientInner() {
           >
             <QuestionScreen
               question={question}
+              answers={answers}
               selected={selectedValues}
               onSelect={handleSelect}
+              onPatch={handlePatch}
               onBack={stepIndex === 0 ? null : handleBack}
               onNext={handleNext}
               canAdvance={canAdvance}

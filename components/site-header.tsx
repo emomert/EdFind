@@ -7,10 +7,13 @@ import { APPLICATIONS_ENABLED, COMMUNITY_ENABLED } from "@/lib/feature-flags";
 import { getUser } from "@/lib/supabase/auth";
 import { HeaderSearch } from "@/components/header-search";
 
+// Shortlist was merged into the applications tracker (2026-06-09): saving a
+// program creates an application at status 'interested', so a separate
+// "Shortlist" nav entry is redundant — it lives inside Applications now. The
+// /shortlist route stays alive (it's the 'interested' view + drives /compare).
 const baseNavLinks = [
   { href: "/start", label: "Find programs" },
   { href: "/catalog", label: "Catalog" },
-  { href: "/shortlist", label: "Shortlist" },
 ];
 
 const navLinks = [

@@ -46,7 +46,9 @@ const MatcherOutputSchema = z.object({
     .max(5),
 });
 
-const SYSTEM_PROMPT = `You are EdFind's matching engine. EdFind helps Turkish students find master's programs in Europe. Given a student's profile and the full catalog of available programs, return the 3 best-fit programs ranked by overall match.
+// Exported so the public /technical-report page can render the exact
+// instructions we send to the model (single source of truth — no drift).
+export const SYSTEM_PROMPT = `You are EdFind's matching engine. EdFind helps Turkish students find master's programs in Europe. Given a student's profile and the full catalog of available programs, return the 3 best-fit programs ranked by overall match.
 
 Output strict JSON in this exact shape, with no markdown, no commentary, no extra keys:
 
@@ -72,15 +74,15 @@ EXAMPLE OF A WELL-FORMED RATIONALE (this is the floor, not a ceiling):
 Matching rules:
 - Hard filters (a program failing any of these should never be in the top 3 unless nothing else qualifies):
   · Destination: if the student's destinations does NOT include "ANY", restrict to programs whose country is in the destinations list.
-  · Language: if english_level is "needs_improvement" or "intermediate", prefer English-taught programs with milder entry requirements and acknowledge English-test readiness as a step to plan for; never recommend a non-English-taught program when the student's English is weak. "exam_ready" means they can already meet IELTS/TOEFL minimums; "no_exam_yet" means strong English but the test is still pending.
-  · Budget: "<10k" rules out anything above ~10,000 EUR/year (convert non-EUR roughly: 1 GBP ≈ 1.18 EUR, 1 CHF ≈ 1.05 EUR, 1 SEK ≈ 0.09 EUR, 1 DKK ≈ 0.13 EUR, 1 NOK ≈ 0.085 EUR, 1 CZK ≈ 0.04 EUR, 1 PLN ≈ 0.23 EUR, 1 HUF ≈ 0.0026 EUR). "10-15k" tolerates up to ~15,000 EUR/year. "flexible" applies no budget filter.
+  · Language: english_level runs (strongest → weakest) certified → exam_ready → advanced → upper_intermediate → intermediate → beginner. "certified" already holds a valid IELTS/TOEFL/Duolingo score; "exam_ready" is fluent and only needs to sit the test. For "intermediate" or "beginner", prefer English-taught programs with milder entry requirements and flag English-test readiness as a step to plan for; never recommend a non-English-taught program when the student's English is weak.
+  · Budget: "tuition_free" means recommend ONLY programs whose tuition is zero or nominal (≲ ~2,000 EUR/year — typical of public universities in Germany, Norway, Austria, and similar) OR where a full scholarship realistically covers the cost; never put an expensive program at the top for these students. "<10k" rules out anything above ~10,000 EUR/year (convert non-EUR roughly: 1 GBP ≈ 1.18 EUR, 1 CHF ≈ 1.05 EUR, 1 SEK ≈ 0.09 EUR, 1 DKK ≈ 0.13 EUR, 1 NOK ≈ 0.085 EUR, 1 CZK ≈ 0.04 EUR, 1 PLN ≈ 0.23 EUR). "10-15k" tolerates up to ~15,000 EUR/year. "flexible" applies no budget filter.
   · Duration: respect duration_preference unless "flexible".
 - Soft fits:
-  · field_of_study match on the program
+  · field_of_study match on the program. NOTE: field_of_study may be null (the student described their background in their own words instead of picking a category). When it's null, infer the field they're aiming for from study_background + additional_context and match on that.
   · academic_focus: "research" → favour research-led / thesis-heavy / PhD-track programs; "applied" → favour industry-linked / project-based / professional masters; "balanced" → either is fine
   · work_experience: many MiM / MBA-style programmes expect ≥ 1-2 years; "none" students should be steered toward direct-from-undergrad masters where possible. "5_plus_years" students may benefit from MBA-adjacent or executive-style options when available.
-  · gpa_range: a rough academic-strength signal on a 4.0 scale. Selective programmes (top QS ranks, competitive MiM/MBA) realistically expect ≥ 3.0; if gpa_range is "below_2_0" or "2_0_2_5", be honest about reach vs. safety and favour programmes with more accessible entry. null means the student didn't say — do not penalise.
-  · current_situation + study_background: use the student's undergraduate background for fit and eligibility (e.g. a non-quantitative background is a real caveat for a heavy data-science MSc; a working_professional may suit applied/executive formats). null means not provided — don't speculate.
+  · GPA: gpa_exact is the student's stated GPA on gpa_scale (e.g. "85" on a 100_point scale, "3.4" on a 4_point scale, "2.1" as a uk_class). gpa_range is a rough 4.0-scale band. Read them together and convert other scales to a 4.0 sense (≈ 100-point: 85→3.4, 70→2.4; 10-point: 7→2.8; UK 2.1 ≈ 3.3). Selective programmes (top QS ranks, competitive MiM/MBA) realistically expect ≥ 3.0-equivalent; if the GPA is low, be honest about reach vs. safety and favour programmes with more accessible entry. All GPA fields null means the student didn't say — do not penalise.
+  · current_situation + institution + study_background: use the student's undergraduate background and home university for fit and eligibility (e.g. a non-quantitative background is a real caveat for a heavy data-science MSc; a working_professional may suit applied/executive formats; a strong, well-known home university can partly offset a modest GPA). study_background is free text — read it for the actual subject studied and any stated intent to switch fields. null means not provided — don't speculate.
   · career_goal alignment with programme character (e.g. phd_research → research-oriented programmes; entrepreneurship → programmes with venture / innovation tracks; return_to_turkey → ranking & brand recognition matters more than EU placement networks)
   · ranking prestige (lower QS rank number = better)
   · scholarship_need vs tuition affordability
@@ -96,15 +98,28 @@ function buildUserMessage(
   const profile = {
     destinations: answers.destinations,
     current_situation: answers.current_situation,
+    // Free-text detail, only meaningful when current_situation === "other".
+    current_situation_detail:
+      answers.current_situation === "other"
+        ? answers.current_situation_other
+        : null,
+    // The student's home / undergraduate institution (null when skipped).
+    institution: answers.institution,
+    // May be null — when so, infer the target field from study_background.
     field_of_study: answers.field_of_study,
     // Undergraduate background in the student's words (null when skipped).
     study_background: answers.study_background,
+    gpa_scale: answers.gpa_scale,
+    gpa_exact: answers.exact_gpa,
     gpa_range: answers.gpa_range,
     budget_per_year_bracket: answers.budget_per_year,
     duration_preference: answers.duration_preference,
     english_level: answers.english_level,
     scholarship_need: answers.scholarship_need,
     career_goal: answers.career_goal,
+    // Free-text detail, only meaningful when career_goal === "other".
+    career_goal_detail:
+      answers.career_goal === "other" ? answers.career_goal_other : null,
     academic_focus: answers.academic_focus,
     work_experience: answers.work_experience,
     // Verbatim student-typed free text — bounded at 500 chars upstream.

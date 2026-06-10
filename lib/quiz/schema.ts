@@ -1,5 +1,5 @@
 /**
- * Quiz schema (current: v4).
+ * Quiz schema (current: v5).
  *
  * The shape stored in `profiles.answers` (jsonb) and the structured definitions
  * the quiz UI renders from. See docs/features/profile-quiz.md for the spec.
@@ -7,18 +7,33 @@
  * Bump ANSWERS_VERSION (and add a new schema file) when questions or values
  * change. Old answers are kept as-is — never destructive-migrate quiz data.
  *
- * v4 (2026-06-09): added current_situation + gpa_range single-selects and an
- * optional study_background free-text; reframed english_level from CEFR bands
- * to exam-readiness wording.
+ * v5 (2026-06-10):
+ *   - current_situation: split the overlapping recent-grad/gap-year choices,
+ *     added "graduating soon", and a writable "Other" (current_situation_other).
+ *     reframed english_level into CEFR-anchored, professional options.
+ *   - Added an `institution` question (searchable Turkish-university picker with
+ *     free-text fallback), inserted before the academic-background question.
+ *   - Dropped the structured "field you're drawn to" picker. The required
+ *     free-text `study_background` ("What did you study?") replaces it; the AI
+ *     infers the structured field_of_study (now nullable) from that text.
+ *   - GPA is now a compound question: gpa_scale (grading system) + exact_gpa
+ *     (free text) + gpa_range (rough 4.0 band).
+ *   - budget_per_year gained a "tuition_free" option.
+ *   - career_goal gained options + a writable "Other" (career_goal_other).
+ *
+ * UI-required-but-data-nullable fields (current_situation, institution,
+ * study_background, gpa_*): the guided quiz requires them, but the /search
+ * free-text path can't reliably infer them and we'd rather store null than
+ * fabricate. The strict server-required fields stay non-null in AnswersSchema.
  */
 
 import { z } from "zod";
 
-export const ANSWERS_VERSION = 4;
+export const ANSWERS_VERSION = 5;
 
-// Mirrors the set of countries that actually appear in `universities.country`
-// (currently 18). Adding values here is forward-compatible — old answers that
-// reference a subset stay valid, so no ANSWERS_VERSION bump is required.
+// Mirrors the set of countries that actually appear in `universities.country`.
+// Adding values here is forward-compatible — old answers that reference a
+// subset stay valid, so no ANSWERS_VERSION bump is required.
 export const DESTINATIONS = [
   "IT",
   "NL",
@@ -55,6 +70,7 @@ export const FIELDS_OF_STUDY = [
 export type FieldOfStudy = (typeof FIELDS_OF_STUDY)[number];
 
 export const BUDGET_BRACKETS = [
+  "tuition_free",
   "<10k",
   "10-15k",
   "15-20k",
@@ -68,21 +84,37 @@ export const DURATIONS = ["12mo", "18mo", "24mo", "flexible"] as const;
 export type Duration = (typeof DURATIONS)[number];
 
 export const ENGLISH_LEVELS = [
+  "certified",
   "exam_ready",
-  "no_exam_yet",
+  "advanced",
+  "upper_intermediate",
   "intermediate",
-  "needs_improvement",
+  "beginner",
 ] as const;
 export type EnglishLevel = (typeof ENGLISH_LEVELS)[number];
 
 export const CURRENT_SITUATIONS = [
   "undergraduate",
+  "graduating_soon",
   "recent_graduate",
-  "working_professional",
   "gap_year",
+  "working_professional",
   "other",
 ] as const;
 export type CurrentSituation = (typeof CURRENT_SITUATIONS)[number];
+
+// Grading system the student's GPA is expressed on. Asked first so the exact
+// value + rough band are interpreted on the right scale.
+export const GPA_SCALES = [
+  "4_point",
+  "100_point",
+  "5_point",
+  "10_point",
+  "ects_letter",
+  "uk_class",
+  "other",
+] as const;
+export type GpaScale = (typeof GPA_SCALES)[number];
 
 export const GPA_RANGES = [
   "below_2_0",
@@ -98,11 +130,14 @@ export type ScholarshipNeed = (typeof SCHOLARSHIP_NEEDS)[number];
 
 export const CAREER_GOALS = [
   "work_in_europe",
-  "work_internationally",
   "return_to_turkey",
+  "work_internationally",
   "phd_research",
+  "industry_expert",
+  "career_switch",
   "entrepreneurship",
   "unsure",
+  "other",
 ] as const;
 export type CareerGoal = (typeof CAREER_GOALS)[number];
 
@@ -117,18 +152,37 @@ export const WORK_EXPERIENCES = [
 ] as const;
 export type WorkExperience = (typeof WORK_EXPERIENCES)[number];
 
+export const ADDITIONAL_CONTEXT_MAX_LENGTH = 500;
+export const STUDY_BACKGROUND_MAX_LENGTH = 200;
+export const INSTITUTION_MAX_LENGTH = 120;
+export const SITUATION_OTHER_MAX_LENGTH = 120;
+export const CAREER_OTHER_MAX_LENGTH = 200;
+export const EXACT_GPA_MAX_LENGTH = 24;
+
 export type Answers = {
   destinations: Destination[];
   current_situation: CurrentSituation | null;
+  // Free-text companion shown when current_situation === "other".
+  current_situation_other: string | null;
+  // The student's home/undergraduate institution (Turkish university name or a
+  // free-typed value). UI-required, nullable at the data layer.
+  institution: string | null;
+  // AI-inferred from study_background (no longer a direct question). Nullable.
   field_of_study: FieldOfStudy | null;
-  // Optional free-text: the student's undergraduate background in their words.
+  // Required free-text undergraduate background, in the student's words. The
+  // matcher reads it and the AI infers field_of_study from it.
   study_background: string | null;
+  gpa_scale: GpaScale | null;
   gpa_range: GpaRange | null;
+  // Free-text exact GPA in whatever scale the student picked ("3.42", "85").
+  exact_gpa: string | null;
   budget_per_year: BudgetBracket | null;
   duration_preference: Duration | null;
   english_level: EnglishLevel | null;
   scholarship_need: ScholarshipNeed | null;
   career_goal: CareerGoal | null;
+  // Free-text companion shown when career_goal === "other".
+  career_goal_other: string | null;
   academic_focus: AcademicFocus | null;
   work_experience: WorkExperience | null;
   // Optional free-text. Lets the student volunteer anything that doesn't fit a
@@ -140,21 +194,23 @@ export type Answers = {
 export const EMPTY_ANSWERS: Answers = {
   destinations: [],
   current_situation: null,
+  current_situation_other: null,
+  institution: null,
   field_of_study: null,
   study_background: null,
+  gpa_scale: null,
   gpa_range: null,
+  exact_gpa: null,
   budget_per_year: null,
   duration_preference: null,
   english_level: null,
   scholarship_need: null,
   career_goal: null,
+  career_goal_other: null,
   academic_focus: null,
   work_experience: null,
   additional_context: null,
 };
-
-export const ADDITIONAL_CONTEXT_MAX_LENGTH = 500;
-export const STUDY_BACKGROUND_MAX_LENGTH = 200;
 
 export type Option<T extends string> = {
   value: T;
@@ -168,10 +224,20 @@ type QuestionBase = {
   helper?: string;
 };
 
+// When a single-select option is the designated "other" value, reveal a
+// free-text companion that writes into `field`.
+export type OtherSpec = {
+  whenValue: string;
+  field: keyof Answers;
+  placeholder: string;
+  maxLength: number;
+};
+
 export type SingleQuestion<K extends keyof Answers, V extends string> = QuestionBase & {
   field: K;
   select: "single";
   options: ReadonlyArray<Option<V>>;
+  other?: OtherSpec;
 };
 
 export type MultiQuestion<K extends keyof Answers, V extends string> = QuestionBase & {
@@ -180,24 +246,40 @@ export type MultiQuestion<K extends keyof Answers, V extends string> = QuestionB
   options: ReadonlyArray<Option<V>>;
 };
 
-// Free-text question. The Next button is enabled even with empty text — the
-// field is genuinely optional.
+// Free-text question. When `required` is false/absent the Next button stays
+// enabled even with empty text — the field is genuinely optional.
 export type FreeTextQuestion<K extends keyof Answers> = QuestionBase & {
   field: K;
   select: "text";
   placeholder: string;
   maxLength: number;
+  required?: boolean;
+};
+
+// Searchable institution picker (Turkish universities + free-text fallback).
+export type InstitutionQuestion = QuestionBase & {
+  field: "institution";
+  select: "institution";
+};
+
+// Compound GPA question: grading scale + exact value + rough 4.0 band.
+export type GpaQuestion = QuestionBase & {
+  field: "gpa_range";
+  select: "gpa";
+  scaleOptions: ReadonlyArray<Option<GpaScale>>;
+  rangeOptions: ReadonlyArray<Option<GpaRange>>;
+  exactPlaceholder: string;
 };
 
 export type Question =
   | MultiQuestion<"destinations", Destination>
   | SingleQuestion<"current_situation", CurrentSituation>
-  | SingleQuestion<"field_of_study", FieldOfStudy>
+  | InstitutionQuestion
   | FreeTextQuestion<"study_background">
-  | SingleQuestion<"gpa_range", GpaRange>
+  | GpaQuestion
+  | SingleQuestion<"english_level", EnglishLevel>
   | SingleQuestion<"budget_per_year", BudgetBracket>
   | SingleQuestion<"duration_preference", Duration>
-  | SingleQuestion<"english_level", EnglishLevel>
   | SingleQuestion<"scholarship_need", ScholarshipNeed>
   | SingleQuestion<"career_goal", CareerGoal>
   | SingleQuestion<"academic_focus", AcademicFocus>
@@ -239,66 +321,105 @@ export const QUESTIONS: readonly Question[] = [
     select: "single",
     legend: "What best describes your current situation?",
     options: [
-      { value: "undergraduate", label: "Undergraduate student" },
-      { value: "recent_graduate", label: "Recent graduate" },
+      { value: "undergraduate", label: "Current undergraduate student" },
+      { value: "graduating_soon", label: "Graduating soon (final year)" },
+      {
+        value: "recent_graduate",
+        label: "Recent graduate",
+        description: "Finished within the last couple of years",
+      },
+      {
+        value: "gap_year",
+        label: "On a gap year / break",
+        description: "Graduated and currently taking time before the next step",
+      },
       { value: "working_professional", label: "Working professional" },
-      { value: "gap_year", label: "Gap year" },
       { value: "other", label: "Other" },
     ],
+    other: {
+      whenValue: "other",
+      field: "current_situation_other",
+      placeholder: "Tell us in a few words…",
+      maxLength: SITUATION_OTHER_MAX_LENGTH,
+    },
   },
   {
     step: 3,
-    field: "field_of_study",
-    select: "single",
-    legend: "What field of study are you drawn to?",
-    helper: "The field you want to study next — not necessarily what you studied before.",
-    options: [
-      { value: "business_management", label: "Business & Management" },
-      { value: "engineering", label: "Engineering" },
-      { value: "computer_science_ai", label: "Computer Science & AI" },
-      { value: "design", label: "Design" },
-      { value: "architecture_built_environment", label: "Architecture & Built Environment" },
-      { value: "economics_finance", label: "Economics & Finance" },
-      { value: "data_science", label: "Data Science" },
-      { value: "social_sciences", label: "Social Sciences" },
-    ],
+    field: "institution",
+    select: "institution",
+    // The legend is overridden at render time to match the student's situation
+    // (studying at / will graduate from / graduated from).
+    legend: "Which university did you study at?",
+    helper:
+      "Start typing to search Turkish universities — or type any institution if yours isn't listed.",
   },
   {
     step: 4,
     field: "study_background",
     select: "text",
-    legend: "What did you study? (optional)",
+    required: true,
+    legend: "What did you study?",
     helper:
-      "Your undergraduate field, in your own words — it helps us judge fit and eligibility. The AI reads this alongside your answers.",
+      "Your undergraduate field, in your own words. The AI reads this to judge fit and eligibility — and to work out which master's field suits you.",
     placeholder:
-      "e.g. BSc Civil Engineering at METU, or Business Administration, or switching in from Biology…",
+      "e.g. BSc Civil Engineering — but I'm aiming to move into data science…",
     maxLength: STUDY_BACKGROUND_MAX_LENGTH,
   },
   {
     step: 5,
     field: "gpa_range",
-    select: "single",
-    legend: "What's your approximate GPA range?",
-    helper: "On a 4.0 scale (roughly). A ballpark is fine — it helps gauge eligibility.",
-    options: [
+    select: "gpa",
+    legend: "What's your GPA?",
+    helper:
+      "Pick the grading scale your school uses, then type your exact GPA. Not every school grades the same way — a ballpark is fine.",
+    scaleOptions: [
+      { value: "4_point", label: "4.0 scale" },
+      { value: "100_point", label: "Out of 100" },
+      { value: "5_point", label: "5.0 scale" },
+      { value: "10_point", label: "Out of 10" },
+      { value: "ects_letter", label: "ECTS / letter grades" },
+      { value: "uk_class", label: "UK classification" },
+      { value: "other", label: "Other" },
+    ],
+    rangeOptions: [
       { value: "below_2_0", label: "Below 2.0" },
       { value: "2_0_2_5", label: "2.0 – 2.5" },
       { value: "2_5_3_0", label: "2.5 – 3.0" },
       { value: "3_0_3_5", label: "3.0 – 3.5" },
       { value: "3_5_plus", label: "3.5+" },
     ],
+    exactPlaceholder: "e.g. 3.42, 85/100, or 2.1 (Upper Second)",
   },
   {
     step: 6,
     field: "english_level",
     select: "single",
-    legend: "How would you describe your English level?",
-    helper: "Self-assessment is fine. We'll match against each program's actual requirement.",
+    legend: "How would you describe your English?",
+    helper:
+      "We'll match against each program's actual entry requirement. Self-assessment is fine.",
     options: [
-      { value: "exam_ready", label: "IELTS/TOEFL ready" },
-      { value: "no_exam_yet", label: "Good, but haven't taken an exam yet" },
-      { value: "intermediate", label: "Intermediate" },
-      { value: "needs_improvement", label: "Need improvement" },
+      {
+        value: "certified",
+        label: "I have a valid IELTS / TOEFL / Duolingo score",
+        description: "Test already passed and in date",
+      },
+      {
+        value: "exam_ready",
+        label: "Fluent — ready to sit IELTS/TOEFL",
+        description: "Could pass the test, just haven't booked it yet",
+      },
+      {
+        value: "advanced",
+        label: "Advanced (C1)",
+        description: "Comfortable with academic English",
+      },
+      { value: "upper_intermediate", label: "Upper-intermediate (B2)" },
+      {
+        value: "intermediate",
+        label: "Intermediate (B1)",
+        description: "Solid everyday English, still improving",
+      },
+      { value: "beginner", label: "Beginner / basic (A2 or below)" },
     ],
   },
   {
@@ -308,6 +429,11 @@ export const QUESTIONS: readonly Question[] = [
     legend: "What's your budget per year?",
     helper: "Tuition only — not living costs. We'll show scholarships separately.",
     options: [
+      {
+        value: "tuition_free",
+        label: "Tuition-free / fully-funded only",
+        description: "Public universities with no or nominal tuition, or full scholarships",
+      },
       { value: "<10k", label: "Under €10,000" },
       { value: "10-15k", label: "€10,000 – €15,000" },
       { value: "15-20k", label: "€15,000 – €20,000" },
@@ -343,15 +469,31 @@ export const QUESTIONS: readonly Question[] = [
     step: 10,
     field: "career_goal",
     select: "single",
-    legend: "What's your career goal after graduation?",
+    legend: "What's your goal after the master's?",
+    helper: "We use this to weigh program character, location, and brand differently.",
     options: [
-      { value: "work_in_europe", label: "Work in Europe" },
-      { value: "work_internationally", label: "Work internationally" },
-      { value: "return_to_turkey", label: "Return to Turkey" },
-      { value: "phd_research", label: "PhD or research" },
-      { value: "entrepreneurship", label: "Start my own thing" },
-      { value: "unsure", label: "Not sure yet" },
+      { value: "work_in_europe", label: "Work in Europe after graduating" },
+      {
+        value: "return_to_turkey",
+        label: "Return to Turkey with an international degree",
+      },
+      { value: "work_internationally", label: "Work internationally / global mobility" },
+      { value: "phd_research", label: "Pursue a PhD or research career" },
+      {
+        value: "industry_expert",
+        label: "Grow into a senior / specialist role in my field",
+      },
+      { value: "career_switch", label: "Switch into a new field or industry" },
+      { value: "entrepreneurship", label: "Start my own company / venture" },
+      { value: "unsure", label: "Still figuring it out" },
+      { value: "other", label: "Other" },
     ],
+    other: {
+      whenValue: "other",
+      field: "career_goal_other",
+      placeholder: "Describe your goal in a few words…",
+      maxLength: CAREER_OTHER_MAX_LENGTH,
+    },
   },
   {
     step: 11,
@@ -398,7 +540,7 @@ export const QUESTIONS: readonly Question[] = [
     helper:
       "Specific labs you want to work with, family in a city you'd join, why this field really, anything we'd miss from multiple choice. The AI reads this and quotes it in your rationale.",
     placeholder:
-      "e.g. I'm switching from civil engineering to data science, or I want to be near my partner in Berlin, or I'm aiming for Prof. Smith's robotics lab at TU Delft…",
+      "e.g. I want to be near my partner in Berlin, or I'm aiming for Prof. Smith's robotics lab at TU Delft…",
     maxLength: ADDITIONAL_CONTEXT_MAX_LENGTH,
   },
 ];
@@ -409,8 +551,25 @@ export function isQuestionAnswered(answers: Answers, question: Question): boolea
   if (question.field === "destinations") {
     return answers.destinations.length > 0;
   }
-  // Free-text is optional — Next is always enabled, even with empty input.
+  // Institution: UI-required — needs a non-empty value (picked or typed).
+  if (question.select === "institution") {
+    return (
+      typeof answers.institution === "string" &&
+      answers.institution.trim().length > 0
+    );
+  }
+  // GPA: answered once the student gives either an exact value or a rough band.
+  if (question.select === "gpa") {
+    const hasExact =
+      typeof answers.exact_gpa === "string" && answers.exact_gpa.trim().length > 0;
+    return hasExact || answers.gpa_range !== null;
+  }
+  // Free-text: optional unless flagged required (study_background).
   if (question.select === "text") {
+    if (question.required) {
+      const v = answers[question.field];
+      return typeof v === "string" && v.trim().length > 0;
+    }
     return true;
   }
   return answers[question.field] !== null;
@@ -422,27 +581,54 @@ export const QUIZ_DRAFT_STORAGE_KEY = "edfind:quiz_draft:v1";
  * Server-side validator for the answers blob. The Server Action runs this
  * before any DB write — every required key must be present and every value
  * must be in its enum/array. Tightened to mirror `Answers` exactly.
+ *
+ * Fields that are UI-required but `.nullable()` here (current_situation,
+ * institution, study_background, gpa_*, field_of_study) are intentionally
+ * nullable so the /search free-text path can submit a partial profile without
+ * fabricating values.
  */
 export const AnswersSchema = z.object({
   destinations: z.array(z.enum(DESTINATIONS)).min(1),
-  // current_situation + gpa_range are required in the guided quiz UI but
-  // nullable at the data layer: the /search free-text path can't reliably
-  // infer them, and we'd rather store null than fabricate a GPA.
   current_situation: z.enum(CURRENT_SITUATIONS).nullable().optional().default(null),
-  field_of_study: z.enum(FIELDS_OF_STUDY),
-  // Optional free-text undergraduate background (null when skipped).
+  current_situation_other: z
+    .string()
+    .max(SITUATION_OTHER_MAX_LENGTH)
+    .nullable()
+    .optional()
+    .default(null),
+  institution: z
+    .string()
+    .max(INSTITUTION_MAX_LENGTH)
+    .nullable()
+    .optional()
+    .default(null),
+  // AI-inferred from study_background (no longer asked directly) — nullable.
+  field_of_study: z.enum(FIELDS_OF_STUDY).nullable().optional().default(null),
   study_background: z
     .string()
     .max(STUDY_BACKGROUND_MAX_LENGTH)
     .nullable()
     .optional()
     .default(null),
+  gpa_scale: z.enum(GPA_SCALES).nullable().optional().default(null),
   gpa_range: z.enum(GPA_RANGES).nullable().optional().default(null),
+  exact_gpa: z
+    .string()
+    .max(EXACT_GPA_MAX_LENGTH)
+    .nullable()
+    .optional()
+    .default(null),
   budget_per_year: z.enum(BUDGET_BRACKETS),
   duration_preference: z.enum(DURATIONS),
   english_level: z.enum(ENGLISH_LEVELS),
   scholarship_need: z.enum(SCHOLARSHIP_NEEDS),
   career_goal: z.enum(CAREER_GOALS),
+  career_goal_other: z
+    .string()
+    .max(CAREER_OTHER_MAX_LENGTH)
+    .nullable()
+    .optional()
+    .default(null),
   academic_focus: z.enum(ACADEMIC_FOCUS),
   work_experience: z.enum(WORK_EXPERIENCES),
   // Optional and bounded — null or empty string when the student skipped it.
@@ -458,14 +644,19 @@ export const AnswersSchema = z.object({
   // (with non-null fields where validation rejects null at submit time).
   destinations: Destination[];
   current_situation: CurrentSituation | null;
-  field_of_study: FieldOfStudy;
+  current_situation_other: string | null;
+  institution: string | null;
+  field_of_study: FieldOfStudy | null;
   study_background: string | null;
+  gpa_scale: GpaScale | null;
   gpa_range: GpaRange | null;
+  exact_gpa: string | null;
   budget_per_year: BudgetBracket;
   duration_preference: Duration;
   english_level: EnglishLevel;
   scholarship_need: ScholarshipNeed;
   career_goal: CareerGoal;
+  career_goal_other: string | null;
   academic_focus: AcademicFocus;
   work_experience: WorkExperience;
   additional_context: string | null;
