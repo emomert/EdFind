@@ -209,7 +209,7 @@ export function HeaderSearch() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
-            className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/30 px-4 pt-[14vh] backdrop-blur-sm sm:pt-[18vh]"
+            className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/40 px-4 pt-[6vh] sm:pt-[8vh]"
             onClick={closeModal}
           >
             <motion.div
