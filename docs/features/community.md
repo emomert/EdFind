@@ -13,35 +13,41 @@ Stripe is wired.
   Supabase as soon as we want real persistence.
 - **Subscription state** is a cookie (`edfind_community_subscribed`). A
   floating dev-toggle on the page flips it.
-- **Auth required** — matches the pattern for `/applications`, `/quiz`, etc.
-  Free vs paid is a within-page gate, not a route gate.
+- **Public read** (since 2026-06-11) — `/community` no longer requires an
+  account; it's the only signed-out-accessible product surface besides the
+  catalog/detail pages. Writing still needs a signed-in, university-verified
+  account, and DMing campus responsibles needs Premium (see
+  `docs/features/premium.md`).
 - **Feature flag:** `NEXT_PUBLIC_ENABLE_COMMUNITY` (default on; set to
   `false` to hide the route + header nav link).
 
 ## Layout
 
-Redesigned 2026-06-11 on user feedback: the sidebar is gone (the feed gets
-full width), the "what can I do here" cards moved to the top, and two widgets
-were removed outright (`CommunityStatsCard` "Community at a glance",
-`TopUniversitiesWidget` "Top universities discussed" — see git history).
+Redesigned 2026-06-11 on user feedback (two rounds): the sidebar is gone
+(the feed gets full width), the "what can I do here" cards moved to the top,
+two widgets were removed outright (`CommunityStatsCard` "Community at a
+glance", `TopUniversitiesWidget` "Top universities discussed"), the top
+upgrade strip was removed again in round two (the Premium pitch now appears
+ONLY on the campus-responsible message buttons — the place the perk applies),
+mock first names (Emre, Arda, …) no longer render inside group boxes or the
+chat-modal header (avatars + "Campus responsible" label instead; the
+Responsibles tab keeps full profiles since it's a directory), and every group
+card / chat modal links to its university or program detail page
+(`groupDetailHref()` in `community-group-card.tsx`).
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│  CommunityHero                                                     │
-│   · "Verified Student Insights" eyebrow + headline + trust chips   │
-│   · campus-life video (public/videos/community-hero.mp4 —          │
-│     Pexels #7683350 by RDNE Stock project, free license,           │
-│     self-hosted; hidden < lg, removed on load error)               │
+│  CommunityHero — full-bleed video background                       │
+│   · busy-campus clip as the section background (public/videos/     │
+│     community-hero.mp4 — Pexels #30614645 by Media Hopper Studio,  │
+│     free license, trimmed to 12s/720p with ffmpeg, ~1.3 MB)        │
+│   · left→right white gradient overlay; copy sits on the left       │
+│   · static gradient + decor fallback if the video fails to load    │
 └────────────────────────────────────────────────────────────────────┘
 ┌─────────────────────┬─────────────────────┬────────────────────────┐
 │  AskCommunityCard   │ ShareExperienceCard │ VerifyUniversityEmail- │
 │  (what you can do)  │ (what you can do)   │ Card (write access)    │
 └─────────────────────┴─────────────────────┴────────────────────────┘
-┌────────────────────────────────────────────────────────────────────┐
-│  UpgradeCommunityAccessCard variant="input" (free users only)      │
-│   · slim strip, honest copy: the ONE paid perk is DMing campus     │
-│     responsibles — no benefit-list sales panel                     │
-└────────────────────────────────────────────────────────────────────┘
 ┌────────────────────────────────────────────────────────────────────┐
 │  CommunityFilters                                                  │
 │   · search · country · university · field · verified-only toggle   │
@@ -114,12 +120,14 @@ group coverage scales with the real catalog. 58 unis + 196 programs →
 
 ## Subscription model
 
-Currently a cookie (`edfind_community_subscribed`) read on the server in
-`page.tsx`, passed to `SubscriptionProvider`, and consumed via `useSubscription()`.
+The community subscription **is** the Premium tier (unified 2026-06-11 —
+see `docs/features/premium.md`). `lib/community/subscription.ts` is a thin
+delegate over `lib/premium/premium.ts` (`edfind_premium` cookie); the page
+reads it server-side, passes it to `SubscriptionProvider`, and components
+consume it via `useSubscription()`.
 
 **Why a cookie:** Stripe isn't wired yet (Phase 10). When billing arrives,
-the cookie becomes irrelevant — entitlement comes from `profiles.tier IN
-('partner', 'full')` (or whatever the eventual entitlement shape is). The
+the cookie becomes irrelevant — entitlement comes from `profiles.tier`. The
 `SubscriberOnly` component and `useSubscription` hook don't change; only
 the value source does.
 
@@ -157,13 +165,12 @@ subscription.
 
 | Element | Unverified | Verified | Note |
 |---|---|---|---|
-| Hero, filters, tabs, group cards, review reading, helpful button | ✓ | ✓ | open to all signed-in users |
+| Hero, filters, tabs, group cards, review reading, helpful button | ✓ | ✓ | public — no account needed to read |
 | Group chat modal — read | ✓ | ✓ | |
 | Group chat modal — input | `VerifyUniversityEmailCard variant="input"` | textarea + send (local-only state) | subscription gate removed 2026-06-11 |
-| Popular questions reply / "Ask a question" / "Write a review" CTAs | verify note | active buttons (stubs) | |
-| "Message X" button on responsible cards | — | — | subscription-gated (the one paid perk) |
-| Top `UpgradeCommunityAccessCard` strip | shown to non-subscribers | shown to non-subscribers | hidden for subscribers |
-| Subscription dev toggle | shown | shown | non-production only |
+| Popular questions reply / "Ask a question" / "Write a review" CTAs | verify note | active buttons (stubs) | verifying requires signing in first |
+| "Message X" button on responsible cards | — | — | Premium-gated: renders as a "Go Premium" link when not premium |
+| Premium dev toggle | shown | shown | non-production only |
 
 Nothing actually persists for write actions yet — the chat input writes to
 local React state only. This is intentional for the mock-first scope. When

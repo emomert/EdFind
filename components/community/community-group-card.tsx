@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
+  ArrowUpRight,
   BadgeCheck,
   Building2,
   GraduationCap,
@@ -16,6 +18,13 @@ import type { CommunityGroup, CommunityUser } from "@/lib/community/types";
 import { UniversityLogo } from "@/components/university/university-logo";
 import { useSubscription } from "./subscription-context";
 import { UserAvatar } from "./user-avatar";
+
+/** Detail page the group belongs to — program page when we have both slugs. */
+export function groupDetailHref(group: CommunityGroup): string {
+  return group.type === "program" && group.programSlug
+    ? `/programs/${group.universitySlug}/${group.programSlug}`
+    : `/universities/${group.universitySlug}`;
+}
 
 const ACTIVITY_DOT: Record<CommunityGroup["activityLevel"], string> = {
   low: "bg-slate-300",
@@ -97,15 +106,23 @@ export function CommunityGroupCard({
             {isProgram ? "Program" : "University"}
           </span>
           <h3 className="line-clamp-1 text-sm font-semibold text-slate-900">
-            {displayName}
+            <Link
+              href={groupDetailHref(group)}
+              className="transition-colors hover:text-teal-700 hover:underline"
+            >
+              {displayName}
+            </Link>
           </h3>
           <p className="mt-0.5 text-[11px] text-slate-500">
             {isProgram && parentUniversityName ? (
               <span className="inline-flex items-center gap-1">
                 <span className="text-slate-400">↳</span>
-                <span className="font-medium text-slate-600">
+                <Link
+                  href={`/universities/${group.universitySlug}`}
+                  className="font-medium text-slate-600 transition-colors hover:text-teal-700 hover:underline"
+                >
                   {parentUniversityName}
-                </span>
+                </Link>
                 <span>·</span>
                 <span>{countryName}</span>
               </span>
@@ -148,6 +165,7 @@ export function CommunityGroupCard({
       )}
 
       <footer className="mt-auto flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
+        {/* Avatars only — mock first names removed on user feedback. */}
         {responsibles.length > 0 ? (
           <div className="flex items-center gap-2">
             <div className="flex -space-x-1.5">
@@ -156,8 +174,7 @@ export function CommunityGroupCard({
               ))}
             </div>
             <span className="truncate text-[11px] text-slate-500">
-              {responsibles[0].name.split(" ")[0]}
-              {responsibles.length > 1 && ` +${responsibles.length - 1}`}
+              Campus responsible{responsibles.length > 1 ? "s" : ""}
             </span>
           </div>
         ) : (
@@ -166,28 +183,37 @@ export function CommunityGroupCard({
           </span>
         )}
 
-        <button
-          type="button"
-          onClick={() => onOpenChat(group)}
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition",
-            isSubscribed
-              ? "bg-teal-600 text-white shadow-sm hover:bg-teal-700"
-              : "border border-slate-200 bg-white text-slate-600 hover:border-teal-300 hover:text-teal-700",
-          )}
-        >
-          {isSubscribed ? (
-            <>
-              <MessagesSquare className="size-3.5" />
-              Join chat
-            </>
-          ) : (
-            <>
-              <Lock className="size-3" />
-              Preview
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-1.5">
+          <Link
+            href={groupDetailHref(group)}
+            className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:border-teal-300 hover:text-teal-700"
+          >
+            {isProgram ? "Program page" : "University page"}
+            <ArrowUpRight className="size-3" />
+          </Link>
+          <button
+            type="button"
+            onClick={() => onOpenChat(group)}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition",
+              isSubscribed
+                ? "bg-teal-600 text-white shadow-sm hover:bg-teal-700"
+                : "border border-slate-200 bg-white text-slate-600 hover:border-teal-300 hover:text-teal-700",
+            )}
+          >
+            {isSubscribed ? (
+              <>
+                <MessagesSquare className="size-3.5" />
+                Join chat
+              </>
+            ) : (
+              <>
+                <Lock className="size-3" />
+                Preview
+              </>
+            )}
+          </button>
+        </div>
       </footer>
     </motion.article>
   );

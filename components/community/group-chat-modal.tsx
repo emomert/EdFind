@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Crown, Lock, Send, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Crown, Lock, Send, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type {
@@ -11,6 +12,7 @@ import type {
   CommunityUser,
 } from "@/lib/community/types";
 import { UniversityLogo } from "@/components/university/university-logo";
+import { groupDetailHref } from "./community-group-card";
 import { VerifiedBadge } from "./verified-badge";
 import { UserAvatar } from "./user-avatar";
 import { RoleBadge } from "./role-badge";
@@ -83,20 +85,28 @@ export function GroupChatModal({
                     {group.verifiedStudentCount} verified
                   </span>
                 </p>
-                {responsibles.length > 0 && (
-                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                    {responsibles.slice(0, 2).map((r) => (
-                      <span
-                        key={r.id}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-white px-2 py-1 text-[11px] font-medium text-slate-700 ring-1 ring-slate-200"
-                      >
-                        <UserAvatar user={r} size="xs" />
-                        <Crown className="size-3 text-amber-500" />
-                        {r.name.split(" ")[0]}
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  {/* Avatars only — mock first names removed on user feedback. */}
+                  {responsibles.length > 0 && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-2 py-1 text-[11px] font-medium text-slate-700 ring-1 ring-slate-200">
+                      <span className="flex -space-x-1">
+                        {responsibles.slice(0, 2).map((r) => (
+                          <UserAvatar key={r.id} user={r} size="xs" />
+                        ))}
                       </span>
-                    ))}
-                  </div>
-                )}
+                      <Crown className="size-3 text-amber-500" />
+                      Campus responsible{responsibles.length > 1 ? "s" : ""}
+                    </span>
+                  )}
+                  <Link
+                    href={groupDetailHref(group)}
+                    onClick={onClose}
+                    className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-1 text-[11px] font-medium text-teal-700 ring-1 ring-teal-200 transition hover:bg-teal-50"
+                  >
+                    {group.type === "program" ? "Program page" : "University page"}
+                    <ArrowUpRight className="size-3" />
+                  </Link>
+                </div>
               </div>
               <button
                 type="button"

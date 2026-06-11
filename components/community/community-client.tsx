@@ -36,7 +36,6 @@ import {
   AskCommunityCard,
   ShareExperienceCard,
 } from "./community-action-cards";
-import { UpgradeCommunityAccessCard } from "./upgrade-community-access-card";
 
 export type CommunityClientProps = {
   isSubscribed: boolean;
@@ -282,16 +281,6 @@ export function CommunityClient(props: CommunityClientProps) {
           <ShareExperienceCard />
           <VerifyUniversityEmailCard />
         </div>
-
-        {/* The one paid perk, stated honestly — a slim strip, not a sales
-            panel (the old bottom box oversold it; 2026-06-11 feedback). */}
-        {!props.isSubscribed && (
-          <UpgradeCommunityAccessCard
-            variant="input"
-            className="mt-4"
-            message="One subscriber perk here: message campus responsibles directly. Reading and verified writing stay free."
-          />
-        )}
 
         <div className="mt-6 space-y-5">
           <CommunityFilters
