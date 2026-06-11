@@ -28,8 +28,14 @@ highest-leverage AI assist we can offer after matching itself.
     it isn't required).
 - **Saved documents** list below: one collapsed row per document (kind icon,
   title, linked university, updated date). Opening reveals a monospace
-  textarea editor with Save / Copy / Download .md / Delete, plus a fixed
-  "review before sending" disclaimer.
+  textarea editor with Save / Copy / Download PDF / Download .md / Delete,
+  plus a fixed "review before sending" disclaimer.
+- **PDF export** (2026-06-11) — dependency-free print-to-PDF: the markdown is
+  rendered to clean A4-styled HTML in a popup (`lib/documents/export.ts`,
+  constrained renderer matching only what the prompts emit) and the browser's
+  print dialog does the rest. If the draft still contains `[placeholders]`,
+  a fill-in panel opens first — values apply **to the PDF only** (the saved
+  draft keeps its placeholders; blank fields stay as-is).
 
 New draft rows are prepended client-side from the action's return value — no
 refetch round-trip.
@@ -104,8 +110,8 @@ Shared types/constants (`DocumentItem`, `DOCUMENT_KIND_LABELS`,
 
 ## What's intentionally not done
 
-- **No PDF export.** `.md` download + copy covers the MVP; PDF needs a layout
-  engine decision (ADR) and real templates.
+- **No PDF layout engine.** PDF export rides the browser print dialog (zero
+  dependencies); pixel-perfect templates would need a layout-engine ADR.
 - **No regenerate button.** `user_notes` is stored per row precisely so a
   future "regenerate with same notes" is trivial; for now, generate again.
 - **No rich-text/markdown preview.** Editing happens in a monospace textarea;

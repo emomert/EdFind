@@ -7,6 +7,7 @@ import {
   Copy,
   Download,
   FileText,
+  FileType2,
   Loader2,
   Mail,
   Sparkles,
@@ -14,6 +15,11 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import {
+  applyPlaceholders,
+  extractPlaceholders,
+  printDocumentAsPdf,
+} from "@/lib/documents/export";
 import {
   generateApplicationDocument,
   updateApplicationDocument,
@@ -251,6 +257,12 @@ function DocumentCard({
   const [draft, setDraft] = useState(doc.content);
   const [copied, setCopied] = useState(false);
   const [saving, startSaving] = useTransition();
+  // PDF flow: when the draft still contains [placeholders], offer to fill
+  // them right before exporting (export-only — the saved text keeps them).
+  const [pdfPanelOpen, setPdfPanelOpen] = useState(false);
+  const [placeholderValues, setPlaceholderValues] = useState<
+    Record<string, string>
+  >({});
   const dirty = draft !== doc.content;
 
   const linkedApp = doc.application_id
@@ -300,6 +312,27 @@ function DocumentCard({
     a.download = `${doc.title.replace(/[^\w\- ]+/g, "").trim() || "document"}.md`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const placeholders = extractPlaceholders(draft);
+
+  const exportPdf = (values: Record<string, string>) => {
+    const ok = printDocumentAsPdf(doc.title, applyPlaceholders(draft, values));
+    if (!ok) {
+      window.alert(
+        "Your browser blocked the print window — allow pop-ups for this site and try again.",
+      );
+      return;
+    }
+    setPdfPanelOpen(false);
+  };
+
+  const handlePdfClick = () => {
+    if (placeholders.length === 0) {
+      exportPdf({});
+      return;
+    }
+    setPdfPanelOpen((open) => !open);
   };
 
   const Icon = doc.kind === "cv" ? FileText : Mail;
@@ -376,6 +409,10 @@ function DocumentCard({
               )}
               {copied ? "Copied" : "Copy"}
             </StudioButton>
+            <StudioButton onClick={handlePdfClick}>
+              <FileType2 className="size-3.5" />
+              Download PDF
+            </StudioButton>
             <StudioButton onClick={handleDownload}>
               <Download className="size-3.5" />
               Download .md
@@ -386,6 +423,49 @@ function DocumentCard({
               Delete
             </StudioButton>
           </div>
+
+          {pdfPanelOpen && placeholders.length > 0 && (
+            <div className="mt-3 rounded-xl border border-teal-100 bg-teal-50/40 p-3.5">
+              <p className="text-xs font-medium text-slate-800">
+                Fill in the placeholders before exporting
+              </p>
+              <p className="mt-0.5 text-[11px] text-slate-500">
+                Only the PDF gets these values — the saved draft keeps its
+                placeholders. Leave a field blank to keep it as-is.
+              </p>
+              <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+                {placeholders.map((token) => (
+                  <label key={token} className="block">
+                    <span className="block truncate text-[11px] font-medium text-slate-600">
+                      {token}
+                    </span>
+                    <input
+                      type="text"
+                      value={placeholderValues[token] ?? ""}
+                      onChange={(e) =>
+                        setPlaceholderValues((prev) => ({
+                          ...prev,
+                          [token]: e.target.value,
+                        }))
+                      }
+                      placeholder={`[${token}]`}
+                      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs shadow-sm transition focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
+                    />
+                  </label>
+                ))}
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <StudioButton onClick={() => exportPdf(placeholderValues)} primary>
+                  <FileType2 className="size-3.5" />
+                  Save as PDF
+                </StudioButton>
+                <StudioButton onClick={() => setPdfPanelOpen(false)}>
+                  Cancel
+                </StudioButton>
+              </div>
+            </div>
+          )}
+
           <p className="mt-2 text-xs text-muted-foreground">
             Always review before sending — fill every [placeholder] and check
             facts. AI drafts are a starting point, not a finished application.
