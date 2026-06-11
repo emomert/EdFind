@@ -34,10 +34,8 @@ import { GroupChatModal } from "./group-chat-modal";
 import { GroupTypeSelector } from "./group-type-selector";
 import {
   AskCommunityCard,
-  CommunityStatsCard,
   ShareExperienceCard,
-  TopUniversitiesWidget,
-} from "./sidebar-widgets";
+} from "./community-action-cards";
 import { UpgradeCommunityAccessCard } from "./upgrade-community-access-card";
 
 export type CommunityClientProps = {
@@ -56,7 +54,6 @@ export type CommunityClientProps = {
   fields: { value: string; label: string }[];
   catalogUniversities: { slug: string; name: string; country: string }[];
   catalogCountries: { code: string; name: string }[];
-  stats: React.ComponentProps<typeof CommunityStatsCard>["stats"];
   /**
    * Whether to show the mock subscription dev toggle. Evaluated server-side
    * (non-production only) so it never ships to the live site. See audit
@@ -277,6 +274,25 @@ export function CommunityClient(props: CommunityClientProps) {
         >
           <CommunityHero />
 
+        {/* What you can do here — surfaced before the feed so first-time
+            visitors understand the page: ask, share, and (since writing
+            needs a verified university email) how to get write access. */}
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <AskCommunityCard />
+          <ShareExperienceCard />
+          <VerifyUniversityEmailCard />
+        </div>
+
+        {/* The one paid perk, stated honestly — a slim strip, not a sales
+            panel (the old bottom box oversold it; 2026-06-11 feedback). */}
+        {!props.isSubscribed && (
+          <UpgradeCommunityAccessCard
+            variant="input"
+            className="mt-4"
+            message="One subscriber perk here: message campus responsibles directly. Reading and verified writing stay free."
+          />
+        )}
+
         <div className="mt-6 space-y-5">
           <CommunityFilters
             values={filters}
@@ -289,69 +305,49 @@ export function CommunityClient(props: CommunityClientProps) {
             fields={props.fields}
           />
 
-          <div className="grid gap-6 lg:grid-cols-[1fr,320px]">
-            <div className="min-w-0 space-y-5">
-              <CommunityTabs
-                value={activeTab}
-                onChange={setActiveTab}
-                counts={tabCounts}
+          <CommunityTabs
+            value={activeTab}
+            onChange={setActiveTab}
+            counts={tabCounts}
+          />
+
+          <div>
+            {activeTab === "reviews" && (
+              <ReviewsTab
+                reviews={filteredReviews}
+                usersById={usersById}
+                universityNames={props.universityNames}
+                programNames={props.programNames}
               />
-
-              <div>
-                {activeTab === "reviews" && (
-                  <ReviewsTab
-                    reviews={filteredReviews}
-                    usersById={usersById}
-                    universityNames={props.universityNames}
-                    programNames={props.programNames}
-                  />
-                )}
-                {activeTab === "groups" && (
-                  <GroupsTab
-                    groups={filteredGroups}
-                    usersById={usersById}
-                    countryNames={props.countryNames}
-                    universityNames={props.universityNames}
-                    universityLogos={props.universityLogos}
-                    typeFilter={filters.groupType}
-                    typeCounts={groupTypeCounts}
-                    onChangeType={(t) =>
-                      setFilters({ ...filters, groupType: t })
-                    }
-                    onOpen={setOpenGroup}
-                  />
-                )}
-                {activeTab === "questions" && (
-                  <QuestionsTab
-                    questions={filteredQuestions}
-                    usersById={usersById}
-                    universityNames={props.universityNames}
-                  />
-                )}
-                {activeTab === "responsibles" && (
-                  <ResponsiblesTab
-                    responsibles={responsibles}
-                    universityNames={props.universityNames}
-                  />
-                )}
-              </div>
-            </div>
-
-            <aside className="space-y-4">
-              <VerifyUniversityEmailCard />
-              <CommunityStatsCard stats={props.stats} />
-              <TopUniversitiesWidget
-                groups={props.groups
-                  .filter((g) => g.type === "university")
-                  .sort((a, b) => b.memberCount - a.memberCount)}
+            )}
+            {activeTab === "groups" && (
+              <GroupsTab
+                groups={filteredGroups}
+                usersById={usersById}
                 countryNames={props.countryNames}
+                universityNames={props.universityNames}
                 universityLogos={props.universityLogos}
-                onSelect={setOpenGroup}
+                typeFilter={filters.groupType}
+                typeCounts={groupTypeCounts}
+                onChangeType={(t) =>
+                  setFilters({ ...filters, groupType: t })
+                }
+                onOpen={setOpenGroup}
               />
-              {!props.isSubscribed && <UpgradeCommunityAccessCard />}
-              <AskCommunityCard />
-              <ShareExperienceCard />
-            </aside>
+            )}
+            {activeTab === "questions" && (
+              <QuestionsTab
+                questions={filteredQuestions}
+                usersById={usersById}
+                universityNames={props.universityNames}
+              />
+            )}
+            {activeTab === "responsibles" && (
+              <ResponsiblesTab
+                responsibles={responsibles}
+                universityNames={props.universityNames}
+              />
+            )}
           </div>
         </div>
 
@@ -396,7 +392,7 @@ function ReviewsTab({
   if (reviews.length === 0)
     return <EmptyState message="No reviews match your filters yet." />;
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-3 lg:grid-cols-2">
       {reviews.map((r) => {
         const user = usersById[r.userId];
         if (!user) return null;
@@ -459,7 +455,7 @@ function GroupsTab({
         <EmptyState message="No groups match your filters yet." />
       ) : (
         <>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {initial.map((g) => (
               <CommunityGroupCard
                 key={g.id}
@@ -525,7 +521,7 @@ function ResponsiblesTab({
       />
     );
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {responsibles.map((r) => (
         <CampusResponsibleCard
           key={r.id}

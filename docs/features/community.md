@@ -20,27 +20,39 @@ Stripe is wired.
 
 ## Layout
 
+Redesigned 2026-06-11 on user feedback: the sidebar is gone (the feed gets
+full width), the "what can I do here" cards moved to the top, and two widgets
+were removed outright (`CommunityStatsCard` "Community at a glance",
+`TopUniversitiesWidget` "Top universities discussed" — see git history).
+
 ```
 ┌────────────────────────────────────────────────────────────────────┐
 │  CommunityHero                                                     │
 │   · "Verified Student Insights" eyebrow + headline + trust chips   │
-│   · animated layered profile illustration                          │
+│   · campus-life video (public/videos/community-hero.mp4 —          │
+│     Pexels #7683350 by RDNE Stock project, free license,           │
+│     self-hosted; hidden < lg, removed on load error)               │
+└────────────────────────────────────────────────────────────────────┘
+┌─────────────────────┬─────────────────────┬────────────────────────┐
+│  AskCommunityCard   │ ShareExperienceCard │ VerifyUniversityEmail- │
+│  (what you can do)  │ (what you can do)   │ Card (write access)    │
+└─────────────────────┴─────────────────────┴────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│  UpgradeCommunityAccessCard variant="input" (free users only)      │
+│   · slim strip, honest copy: the ONE paid perk is DMing campus     │
+│     responsibles — no benefit-list sales panel                     │
 └────────────────────────────────────────────────────────────────────┘
 ┌────────────────────────────────────────────────────────────────────┐
 │  CommunityFilters                                                  │
 │   · search · country · university · field · verified-only toggle   │
 │   · sort: most helpful / active / recent / members / highest rated │
 └────────────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────┬──────────────────────────────────┐
-│  CommunityTabs                  │  Sidebar (sticky-feel column)    │
-│   · Reviews                     │   · CommunityStatsCard           │
-│   · Groups                      │   · TopUniversitiesWidget        │
-│   · Questions                   │   · UpgradeCommunityAccessCard   │
-│   · Campus Responsibles         │     (free users only)            │
-│                                 │   · AskCommunityCard             │
-│  ─── ActiveTab content ───      │   · ShareExperienceCard          │
-│                                 │                                  │
-└─────────────────────────────────┴──────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│  CommunityTabs (full width)                                        │
+│   · Reviews (lg: 2-col) · Groups (xl: 3-col) · Questions           │
+│   · Campus Responsibles (xl: 3-col)                                │
+│  ─── ActiveTab content ───                                         │
+└────────────────────────────────────────────────────────────────────┘
 ```
 
 `GroupChatModal` opens as an overlay when a group card's CTA is clicked.
@@ -50,7 +62,7 @@ Stripe is wired.
 | Component | File | Concern |
 |---|---|---|
 | `CommunityClient` | `components/community/community-client.tsx` | Top-level client, owns filter + tab state, wraps everything in `SubscriptionProvider` |
-| `CommunityHero` | `components/community/community-hero.tsx` | Eyebrow + headline + trust chips + animated illustration |
+| `CommunityHero` | `components/community/community-hero.tsx` | Eyebrow + headline + trust chips + self-hosted campus video |
 | `CommunityFilters` | `components/community/community-filters.tsx` | Search + country + uni + field + verified toggle + sort |
 | `CommunityTabs` | `components/community/community-tabs.tsx` | Tab navigation with active-underline layout animation |
 | `ReviewCard` | `components/community/review-card.tsx` | One review — user, badge, rating stars, tags, helpful + reply |
@@ -58,8 +70,8 @@ Stripe is wired.
 | `GroupChatModal` | `components/community/group-chat-modal.tsx` | Bottom-sheet modal with messages + locked or active input |
 | `CampusResponsibleCard` | `components/community/campus-responsible-card.tsx` | Responsible card with response time, expertise tags, message CTA |
 | `PopularQuestionsList` | `components/community/popular-questions-card.tsx` | Grid of questions with reply counts |
-| `sidebar-widgets.tsx` | (same file) | `CommunityStatsCard`, `TopUniversitiesWidget`, `AskCommunityCard`, `ShareExperienceCard` |
-| `UpgradeCommunityAccessCard` | `components/community/upgrade-community-access-card.tsx` | Three variants: `panel` (sidebar), `inline` (compact), `input` (message-input replacement) |
+| `community-action-cards.tsx` | (same file) | `AskCommunityCard`, `ShareExperienceCard` — the top "what you can do" cards (was `sidebar-widgets.tsx`; the stats + top-unis widgets were deleted 2026-06-11) |
+| `UpgradeCommunityAccessCard` | `components/community/upgrade-community-access-card.tsx` | Three variants: `panel` (unused since 2026-06-11), `inline` (compact), `input` (slim strip — used at top of page + as composer replacement pattern) |
 | `SubscriberOnly` + context | `components/community/subscriber-only.tsx`, `subscription-context.tsx` | `<SubscriberOnly fallback={...}>{...}</SubscriberOnly>` reads from React context |
 | `SubscriptionDevToggle` | `components/community/subscription-dev-toggle.tsx` | Floating bottom-right button to flip the cookie via Server Action |
 | `VerifiedBadge` + `RoleBadge` + `UserAvatar` | `verified-badge.tsx` / `role-badge.tsx` / `user-avatar.tsx` | Small primitives |
@@ -131,27 +143,27 @@ for the full flow, table, and domain rules). Reading never requires it.
   `VerificationProvider` (nested inside `SubscriptionProvider`).
 - Client: `useVerification()` → `{ verification, canWrite }`;
   `<VerifiedWriterOnly fallback={…}>` mirrors `SubscriberOnly`.
-- The sidebar leads with `VerifyUniversityEmailCard` (request form / pending
-  notice / verified badge). The chat composer shows its compact
-  `variant="input"` for unverified subscribers.
+- `VerifyUniversityEmailCard` sits in the top "what you can do" row (request
+  form / pending notice / verified badge) — moved up from the old sidebar
+  because writing anywhere on the page requires it. The chat composer shows
+  its compact `variant="input"` for unverified users.
 
 ## Gating mechanics today
 
-Two axes: subscription (access tier) × verification (write permission).
+Two axes, narrowed 2026-06-11: **verification** is the write gate everywhere
+(chat, reviews, questions), and **subscription**'s only perk is direct
+messaging campus responsibles. Group-chat writing no longer requires a
+subscription.
 
-| Element | Free | Subscribed, unverified | Subscribed + verified |
+| Element | Unverified | Verified | Note |
 |---|---|---|---|
-| Hero, filters, tabs, group cards (preview) | ✓ | ✓ | ✓ |
-| Review reading | ✓ | ✓ | ✓ |
-| Helpful button | ✓ | ✓ | ✓ |
-| "Message X" buttons on review/responsible cards | locked CTA chip | active button (cosmetic) | active button (cosmetic) |
-| Group chat modal — read | ✓ | ✓ | ✓ |
-| Group chat modal — input | `UpgradeCommunityAccessCard variant="input"` | `VerifyUniversityEmailCard variant="input"` | textarea + send (local-only state) |
-| Popular questions reply button | "Preview" | "Verify to reply" | "Reply" |
-| Sidebar "Ask a question" / "Write a review" CTAs | verify note | verify note | active buttons (stubs) |
-| Sidebar `UpgradeCommunityAccessCard` panel | shown | hidden | hidden |
-| Sidebar `VerifyUniversityEmailCard` | form | form / pending notice | verified badge |
-| Subscription dev toggle | shown | shown | shown |
+| Hero, filters, tabs, group cards, review reading, helpful button | ✓ | ✓ | open to all signed-in users |
+| Group chat modal — read | ✓ | ✓ | |
+| Group chat modal — input | `VerifyUniversityEmailCard variant="input"` | textarea + send (local-only state) | subscription gate removed 2026-06-11 |
+| Popular questions reply / "Ask a question" / "Write a review" CTAs | verify note | active buttons (stubs) | |
+| "Message X" button on responsible cards | — | — | subscription-gated (the one paid perk) |
+| Top `UpgradeCommunityAccessCard` strip | shown to non-subscribers | shown to non-subscribers | hidden for subscribers |
+| Subscription dev toggle | shown | shown | non-production only |
 
 Nothing actually persists for write actions yet — the chat input writes to
 local React state only. This is intentional for the mock-first scope. When
@@ -170,14 +182,13 @@ mock data we'll likely move these into a shared `lib/reference/` module.
 
 - **Page entrance:** `motion.div` fade-up on mount (alongside the global
   `app/template.tsx` route fade).
-- **Hero:** staggered headline / chips reveal, layered illustration with
-  floating verification chip.
+- **Hero:** staggered headline / chips reveal; the video column scale-fades
+  in (autoplay · muted · loop · playsInline).
 - **Tabs:** `layoutId` underline that animates between active tabs.
 - **Cards:** `motion.article layout` with hover lift; `AnimatePresence` not
   used at this scale (would re-trigger entrance on filter changes).
 - **Modal:** bottom-sheet on mobile, centered on desktop. Backdrop fade +
   scale-in motion preset.
-- **Stats card:** `whileInView` reveal so it animates as the user scrolls.
 
 ## What's intentionally not done
 

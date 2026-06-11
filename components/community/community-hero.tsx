@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { BadgeCheck, Globe, MessagesSquare, Crown, GraduationCap } from "lucide-react";
 
@@ -78,61 +79,47 @@ export function CommunityHero() {
           </motion.div>
         </div>
 
-        <CampusIllustration />
+        <CampusVideo />
       </div>
     </motion.section>
   );
 }
 
-function CampusIllustration() {
+/**
+ * Campus-life clip in the hero's right column. The file is a freely-licensed
+ * Pexels video ("Group of College Students Talking while on the Side of the
+ * Bridge" by RDNE Stock project — Pexels license, no attribution required),
+ * self-hosted at public/videos/community-hero.mp4 so we don't hotlink.
+ * Swap the file to change the clip. Hidden below lg (autoplay video isn't
+ * worth the data cost on phones) and removed entirely if it fails to load.
+ */
+function CampusVideo() {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
+      initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.35, duration: 0.6 }}
-      className="relative mx-auto hidden aspect-[4/3] w-full max-w-sm lg:block"
+      transition={{ delay: 0.3, duration: 0.6 }}
+      className="relative mx-auto hidden w-full max-w-md lg:block"
       aria-hidden
     >
-      {/* Layered card mockup suggesting verified profiles */}
-      <div className="absolute inset-0 rotate-[-4deg] rounded-3xl border border-teal-100 bg-white/80 shadow-xl backdrop-blur" />
-      <div className="absolute inset-3 rotate-[2deg] rounded-3xl border border-emerald-100 bg-gradient-to-br from-white to-emerald-50 shadow-lg">
-        <div className="flex items-center gap-3 p-4">
-          <div className="size-12 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500" />
-          <div className="flex-1 space-y-1.5">
-            <div className="h-2.5 w-3/5 rounded-full bg-slate-200" />
-            <div className="h-2 w-2/5 rounded-full bg-slate-100" />
-          </div>
-          <BadgeCheck className="size-5 text-teal-600" />
-        </div>
-        <div className="space-y-2 px-4 pb-4">
-          <div className="h-2 rounded-full bg-slate-100" />
-          <div className="h-2 w-4/5 rounded-full bg-slate-100" />
-          <div className="h-2 w-3/5 rounded-full bg-slate-100" />
-          <div className="mt-3 flex items-center gap-2">
-            <span className="rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-semibold text-teal-700">
-              Verified
-            </span>
-            <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold text-violet-700">
-              Alumni
-            </span>
-          </div>
-        </div>
+      <div className="overflow-hidden rounded-3xl shadow-xl ring-1 ring-teal-100">
+        <video
+          src="/videos/community-hero.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          onError={() => setFailed(true)}
+          className="aspect-[16/10] w-full object-cover"
+        />
       </div>
-      <motion.div
-        animate={{ y: [0, -6, 0] }}
-        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -right-3 top-6 rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-teal-700 shadow-lg ring-1 ring-teal-100"
-      >
-        <BadgeCheck className="mr-1 inline size-3.5 text-teal-600" />
-        184 verified students
-      </motion.div>
-      <motion.div
-        animate={{ y: [0, 5, 0] }}
-        transition={{ duration: 3.6, delay: 0.3, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -left-4 bottom-4 rounded-2xl bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-lg ring-1 ring-slate-200"
-      >
-        💬 “Polimi housing tips →”
-      </motion.div>
+      <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-teal-700 shadow-lg ring-1 ring-teal-100 backdrop-blur">
+        <BadgeCheck className="size-3.5 text-teal-600" />
+        Campus life, for real
+      </div>
     </motion.div>
   );
 }

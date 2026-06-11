@@ -115,12 +115,12 @@ inboxes. A partial unique index keeps at most one `pending` row per user.
 | `app/verify-university-email/page.tsx` | Public confirmation landing page |
 | `components/community/verification-context.tsx` | `VerificationProvider` + `useVerification()` |
 | `components/community/verified-writer-only.tsx` | `<VerifiedWriterOnly>` gate wrapper |
-| `components/community/verify-university-email-card.tsx` | Sidebar card + chat-composer variant |
+| `components/community/verify-university-email-card.tsx` | Top-of-page card + chat-composer variant |
 | `app/community/page.tsx` | Reads verification server-side, passes to client |
 
 Gated surfaces: chat composer (`group-chat-modal.tsx`), question Reply button
 (`popular-questions-card.tsx`), "Ask a question" / "Write a review" CTAs
-(`sidebar-widgets.tsx`).
+(`community-action-cards.tsx`).
 
 ## Env vars
 

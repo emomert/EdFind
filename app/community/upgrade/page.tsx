@@ -13,11 +13,12 @@ export const metadata: Metadata = {
     "Full access to EdFind's verified student community is coming soon.",
 };
 
+// Honest scope (2026-06-11 feedback): the subscription's one real perk today
+// is direct messaging with campus responsibles. Reading the community is open
+// to everyone, and writing (chat, reviews, questions) is unlocked by verifying
+// a university email — not by paying.
 const PERKS = [
-  "Message verified students and campus responsibles",
-  "Join university and program group chats",
-  "Reply to questions and discussions",
-  "Detailed, program-specific verified-student insights",
+  "Message campus responsibles directly — get first-hand answers about the university you're targeting",
 ];
 
 /**
@@ -57,7 +58,7 @@ export default async function CommunityUpgradePage() {
             cancellable any time.
           </p>
 
-          <ul className="mt-6 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
+          <ul className="mt-6 grid gap-2 text-sm text-slate-700">
             {PERKS.map((perk) => (
               <li key={perk} className="flex items-start gap-2">
                 <Check className="mt-0.5 size-4 shrink-0 text-teal-600" />
@@ -65,6 +66,11 @@ export default async function CommunityUpgradePage() {
               </li>
             ))}
           </ul>
+          <p className="mt-3 max-w-xl text-xs text-slate-500">
+            Everything else is already free: anyone can read the community, and
+            verifying a university email unlocks writing — chat, reviews, and
+            questions.
+          </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button asChild>

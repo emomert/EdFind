@@ -107,29 +107,6 @@ export default async function CommunityPage() {
     .map((value) => ({ value, label: FIELD_LABELS[value] || value }))
     .sort((a, b) => a.label.localeCompare(b.label));
 
-  // ─── Realistic-looking aggregate stats ─────────────────────────────
-  const verifiedStudentsCount = FAKE_USERS.filter((u) => u.verified).length;
-  const campusResponsiblesCount = FAKE_USERS.filter(
-    (u) => u.isCampusResponsible,
-  ).length;
-  // We seed plausible numbers based on group totals (each uni group counts
-  // toward verified-students total, etc.). These are for the "Community at a
-  // glance" widget — they're aspirational, not literal mock-user counts.
-  const totalVerifiedFromGroups = groups
-    .filter((g) => g.type === "university")
-    .reduce((sum, g) => sum + g.verifiedStudentCount, 0);
-  const totalMembers = groups.reduce((sum, g) => sum + g.memberCount, 0);
-  const programGroupsCount = groups.filter((g) => g.type === "program").length;
-
-  const stats = {
-    verifiedReviews: FAKE_REVIEWS.length + 12_800,
-    verifiedStudents: totalVerifiedFromGroups + verifiedStudentsCount,
-    universities: universities.length,
-    programGroups: programGroupsCount,
-    campusResponsibles: campusResponsiblesCount + 314,
-    activeDiscussions: Math.round(totalMembers * 0.08),
-  };
-
   return (
     <CommunityClient
       isSubscribed={subscription.isSubscribed}
@@ -147,7 +124,6 @@ export default async function CommunityPage() {
       fields={fields}
       catalogUniversities={universities}
       catalogCountries={catalogCountries}
-      stats={stats}
       showDevToggle={process.env.VERCEL_ENV !== "production"}
     />
   );
