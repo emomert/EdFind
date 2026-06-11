@@ -207,16 +207,18 @@ export default async function HomePage() {
               </p>
               <ol className="mt-4 space-y-3 text-sm text-foreground">
                 <Step n={1}>
-                  Answer {TOTAL_STEPS} quick questions — where you&apos;re headed,
-                  what you studied, budget, goals — plus an optional note about
-                  anything we&apos;d miss.
+                  Tell us about yourself — {TOTAL_STEPS} quick questions, or
+                  just describe what you&apos;re looking for in your own words.
                 </Step>
                 <Step n={2}>
-                  Our matcher (DeepSeek V4) ranks programs across all{" "}
-                  {totals.countries} countries we cover.
+                  We compare your profile against every program in our catalog
+                  — {totals.countries} countries, real tuition, deadlines, and
+                  rankings — and pick your top 3, each with a personal
+                  explanation of why it fits (and where the trade-offs are).
                 </Step>
                 <Step n={3}>
-                  See your top 3 matches with a personal rationale for each.
+                  Go deeper: compare options, check housing costs and verified
+                  student insights, then track your applications in one place.
                 </Step>
               </ol>
             </div>

@@ -16,6 +16,7 @@ import {
 } from "@/components/decor/marker";
 import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
 import { Lift, Reveal, Stagger, StaggerItem } from "@/components/motion";
+import { TOTAL_STEPS } from "@/lib/quiz/schema";
 
 export const metadata: Metadata = {
   title: "Find programs — EdFind",
@@ -39,12 +40,11 @@ const PATHS: Path[] = [
   {
     href: "/quiz",
     eyebrow: "Structured",
-    title: "Take the 13-question quiz",
-    description:
-      "Walk through 13 quick questions covering your situation, university, background, GPA, budget, and goals — mostly single taps, plus a couple of short text answers. Best if you're still figuring out what you want.",
+    title: `Take the ${TOTAL_STEPS}-question quiz`,
+    description: `Walk through ${TOTAL_STEPS} quick questions covering your situation, university, background, what you want to study, GPA, budget, and goals — mostly single taps, plus a few short text answers. Best if you're still figuring out what you want.`,
     icon: <ListChecks className="size-5" />,
     bullets: [
-      "Mostly taps — a school search and two short text boxes",
+      "Mostly taps — a school search and a few short text boxes",
       "Drafts saved automatically",
       "Same AI matcher under the hood",
     ],
@@ -102,7 +102,7 @@ export default function StartPage() {
               ?
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
-              Both paths feed the same DeepSeek V4 matcher and the same 196-program
+              Both paths lead to the same matches from the same program
               catalog — pick whichever feels easier. You can always switch.
             </p>
           </div>
