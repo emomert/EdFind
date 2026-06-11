@@ -16,7 +16,7 @@ button — Save *is* track. See `docs/data-model.md` (`saved_programs` deprecate
 
 | Route | Auth | Renders |
 |---|---|---|
-| `/applications` | Required | Header card + deadline strip + applications list + task kanban |
+| `/applications` | Required | Header card + deadline strip + applications list + task kanban + document studio |
 | Program detail pages | n/a | `<SaveButton>` that toggles a program into/out of the tracker (status `'interested'`) |
 | `/shortlist` | Required | The `'interested'` view of the tracker; drives `/compare` |
 
@@ -50,6 +50,10 @@ for the stack so each section gets the full width.
 │     · linked program chip (with unlink button)                     │
 │     · click-to-move (arrow buttons)                                │
 │   · Suggestion strip for first-time users                          │
+└────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│  DocumentStudio — AI CV & cover-letter drafting (2026-06-11)       │
+│   · see docs/features/application-documents.md                     │
 └────────────────────────────────────────────────────────────────────┘
 ```
 

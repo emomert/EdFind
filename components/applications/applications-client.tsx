@@ -12,8 +12,10 @@ import { StudentProgressCard } from "./student-progress-card";
 import { DeadlineStrip } from "./deadline-strip";
 import { ApplicationsOverview } from "./applications-overview";
 import { KanbanBoard } from "./kanban-board";
+import { DocumentStudio } from "./document-studio";
 import type {
   ApplicationItem,
+  DocumentItem,
   ProfileSummary,
   TaskItem,
 } from "./types";
@@ -25,16 +27,19 @@ export function ApplicationsClient({
   displayName,
   items: initialApps,
   tasks: initialTasks,
+  documents: initialDocuments,
   profile,
 }: {
   email: string | null | undefined;
   displayName: string | null | undefined;
   items: ApplicationItem[];
   tasks: TaskItem[];
+  documents: DocumentItem[];
   profile: ProfileSummary;
 }) {
   const [items, setItems] = useState<ApplicationItem[]>(initialApps);
   const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
+  const [documents, setDocuments] = useState<DocumentItem[]>(initialDocuments);
 
   return (
     <motion.div
@@ -68,6 +73,20 @@ export function ApplicationsClient({
         className="mt-8"
       >
         <KanbanBoard tasks={tasks} setTasks={setTasks} applications={items} />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.45 }}
+        className="mt-8"
+      >
+        <DocumentStudio
+          documents={documents}
+          applications={items}
+          setDocuments={setDocuments}
+          hasProfile={profile.hasProfile}
+        />
       </motion.div>
 
       <details className="mt-10 flex justify-end text-right">

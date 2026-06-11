@@ -42,6 +42,32 @@ export type ProfileSummary = {
   hasProfile: boolean;
 };
 
+export type DocumentKind = "cv" | "cover_letter";
+
+/** One AI-drafted document row, as the document studio sees it. */
+export type DocumentItem = {
+  id: string;
+  kind: DocumentKind;
+  title: string;
+  content: string;
+  user_notes: string | null;
+  application_id: string | null;
+  updated_at: string;
+};
+
+export const DOCUMENT_KIND_LABELS: Record<DocumentKind, string> = {
+  cv: "CV",
+  cover_letter: "Cover letter",
+};
+
+export const HIGHLIGHTS_MAX_LENGTH = 2000;
+/**
+ * A CV drafted from nothing would be pure fabrication, so the studio requires
+ * a minimum of real background text for CVs. Cover letters can lean on the
+ * quiz profile + program facts, so notes stay optional there.
+ */
+export const CV_HIGHLIGHTS_MIN_LENGTH = 30;
+
 export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   interested: "Interested",
   drafting: "Drafting",

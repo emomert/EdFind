@@ -179,6 +179,26 @@ A user owns a set of tasks; each may optionally link to a tracked application. U
 
 **RLS:** owner-scoped (authenticated, `user_id = auth.uid()`). INSERT/UPDATE additionally verify that any linked `application_id` is owned by the same user (`20260609120000`) — so a foreign application UUID can't be attached via direct PostgREST.
 
+### `application_documents` (document studio, 2026-06-11)
+
+AI-drafted CVs and cover letters — see `docs/features/application-documents.md`.
+Uninstall: `supabase/uninstall/drop_application_documents.sql` (kept outside
+`migrations/` so it doesn't auto-run).
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | uuid PK | |
+| `user_id` | uuid FK → `auth.users.id` **not null**, `on delete cascade` | indexed with `updated_at desc` |
+| `application_id` | uuid FK → `applications.id`, nullable, **`on delete set null`** | a drafted document survives untracking its program |
+| `kind` | `document_kind` enum not null | `cv`, `cover_letter` |
+| `title` | text not null | |
+| `content` | text not null | Markdown; user-editable after generation |
+| `user_notes` | text | the free-text "highlights" supplied at generation time |
+| `created_at` / `updated_at` | timestamptz | trigger-maintained |
+
+**RLS:** enabled, **no client policies** — service-role only via the Server
+Actions in `app/applications/document-actions.ts` (which filter by `user_id`).
+
 ## Verification (community write-gating)
 
 ### `university_email_verifications` (2026-06-05)
@@ -318,6 +338,7 @@ Every schema change ships as a new file under `supabase/migrations/` named `YYYY
 | `20260609130000_shortlist_into_applications.sql` | Backfill `saved_programs` rows into `applications` at status `'interested'` (shortlist merged into the tracker; `saved_programs` deprecated, not yet dropped) |
 | `20260609140000_housing.sql` | `housing_cities` + `housing_universities` (AI-researched, draft/published, public-read on published only) |
 | `20260610120000_university_hero_images.sql` | `universities.hero_image_credit` + `hero_image_source_url` (attribution for real licensed hero photos) |
+| `20260611120000_add_application_documents.sql` | `document_kind` enum, `application_documents` (AI document studio) |
 
 The `schema_migrations` ledger table itself is created by `db-migrate.mjs` (not a migration file).
 

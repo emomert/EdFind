@@ -4,6 +4,10 @@ import type { ReactNode } from "react";
 import { LegalPage } from "@/components/legal/legal-page";
 import { SYSTEM_PROMPT as MATCHER_PROMPT } from "@/lib/ai";
 import { SYSTEM_PROMPT as PARSER_PROMPT } from "@/lib/ai/parse-query";
+import {
+  CV_SYSTEM_PROMPT,
+  COVER_LETTER_SYSTEM_PROMPT,
+} from "@/lib/ai/generate-document";
 import { ANSWERS_VERSION, TOTAL_STEPS } from "@/lib/quiz/schema";
 
 export const metadata: Metadata = {
@@ -30,7 +34,7 @@ export default function TechnicalReportPage() {
     <LegalPage
       eyebrow="Transparency"
       title="How EdFind works"
-      updated="10 June 2026"
+      updated="11 June 2026"
       intro="We think a tool that recommends life decisions should be honest about how it does it. This page explains, in plain terms, what happens under the hood — the stack, the matching pipeline, our neutrality rules, and the actual AI prompts we send to the model."
     >
       <h2>What EdFind is doing</h2>
@@ -111,6 +115,16 @@ export default function TechnicalReportPage() {
         wording is also passed through so the rationale can quote you.
       </p>
 
+      <h2>AI document drafting</h2>
+      <p>
+        The application tracker can draft a CV or a program-specific cover
+        letter. These prompts are deliberately strict about fabrication: the
+        model may only use facts you typed and verified catalog data about the
+        program, and anything missing becomes a bracketed placeholder for you to
+        fill in. A draft is a starting point you edit — never something to send
+        as-is.
+      </p>
+
       <h2>Neutrality</h2>
       <p>
         Partner universities are content-tagged and surfaced as their own tier.
@@ -143,6 +157,14 @@ export default function TechnicalReportPage() {
 
       <PromptBlock label="Free-text query parser prompt (/search)">
         {PARSER_PROMPT}
+      </PromptBlock>
+
+      <PromptBlock label="CV drafting prompt (document studio on /applications)">
+        {CV_SYSTEM_PROMPT}
+      </PromptBlock>
+
+      <PromptBlock label="Cover-letter drafting prompt (document studio on /applications)">
+        {COVER_LETTER_SYSTEM_PROMPT}
       </PromptBlock>
 
       <h2>Privacy &amp; security in brief</h2>

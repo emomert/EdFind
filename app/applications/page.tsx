@@ -7,6 +7,7 @@ import { APPLICATIONS_ENABLED } from "@/lib/feature-flags";
 import { ApplicationsClient } from "@/components/applications/applications-client";
 import type {
   ApplicationItem,
+  DocumentItem,
   ProfileSummary,
   TaskItem,
 } from "@/components/applications/types";
@@ -26,7 +27,7 @@ export default async function ApplicationsPage() {
   const user = await requireUser("/applications");
   const supabase = createServiceClient();
 
-  const [appsRes, tasksRes, profileRes] = await Promise.all([
+  const [appsRes, tasksRes, profileRes, docsRes] = await Promise.all([
     supabase
       .from("applications")
       .select(
@@ -50,12 +51,18 @@ export default async function ApplicationsPage() {
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
+    supabase
+      .from("application_documents")
+      .select("id, kind, title, content, user_notes, application_id, updated_at")
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false }),
   ]);
 
   const items = ((appsRes.data ?? []) as unknown as ApplicationItem[]).filter(
     (r) => r.program !== null,
   );
   const tasks = (tasksRes.data ?? []) as TaskItem[];
+  const documents = (docsRes.data ?? []) as DocumentItem[];
 
   const profileRow = (profileRes.data as ProfileRow | null) ?? null;
   const answers = (profileRow?.answers ?? {}) as {
@@ -86,6 +93,7 @@ export default async function ApplicationsPage() {
       displayName={displayName}
       items={items}
       tasks={tasks}
+      documents={documents}
       profile={profile}
     />
   );
