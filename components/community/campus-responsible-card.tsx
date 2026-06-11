@@ -1,9 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Clock, Crown, Languages, MessageCircle } from "lucide-react";
-
-import { cn } from "@/lib/utils";
 import type { CommunityUser } from "@/lib/community/types";
 import { VerifiedBadge } from "./verified-badge";
 import { UserAvatar } from "./user-avatar";
@@ -75,20 +74,25 @@ export function CampusResponsibleCard({
         </div>
       )}
 
-      <button
-        type="button"
-        className={cn(
-          "mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium transition",
-          isSubscribed
-            ? "bg-teal-600 text-white shadow-sm hover:bg-teal-700"
-            : "border border-slate-200 bg-white text-slate-600 hover:border-teal-300 hover:text-teal-700",
-        )}
-      >
-        <MessageCircle className="size-3.5" />
-        {isSubscribed
-          ? `Message ${user.name.split(" ")[0]}`
-          : `Subscribe to message ${user.name.split(" ")[0]}`}
-      </button>
+      {isSubscribed ? (
+        <button
+          type="button"
+          className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-teal-600 px-3 py-2 text-xs font-medium text-white shadow-sm transition hover:bg-teal-700"
+        >
+          <MessageCircle className="size-3.5" />
+          {`Message ${user.name.split(" ")[0]}`}
+        </button>
+      ) : (
+        // Direct messages are THE Premium perk — this is where the paywall
+        // is allowed to show itself (2026-06-11 feedback).
+        <Link
+          href="/premium?next=/community"
+          className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-teal-300 hover:text-teal-700"
+        >
+          <MessageCircle className="size-3.5" />
+          {`Go Premium to message ${user.name.split(" ")[0]}`}
+        </Link>
+      )}
     </motion.article>
   );
 }

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/auth";
+import { requirePremium } from "@/lib/premium/premium";
 import { APPLICATIONS_ENABLED } from "@/lib/feature-flags";
 import { ApplicationsClient } from "@/components/applications/applications-client";
 import type {
@@ -25,6 +26,7 @@ export default async function ApplicationsPage() {
   if (!APPLICATIONS_ENABLED) notFound();
 
   const user = await requireUser("/applications");
+  await requirePremium("/applications");
   const supabase = createServiceClient();
 
   const [appsRes, tasksRes, profileRes, docsRes] = await Promise.all([

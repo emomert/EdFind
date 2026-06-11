@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { requireUser } from "@/lib/supabase/auth";
+import { requirePremium } from "@/lib/premium/premium";
 import { SearchClient } from "@/components/search/search-client";
 
 export const metadata: Metadata = {
@@ -11,5 +12,6 @@ export const metadata: Metadata = {
 
 export default async function SearchPage() {
   await requireUser("/search");
+  await requirePremium("/search");
   return <SearchClient />;
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { requireUser } from "@/lib/supabase/auth";
+import { requirePremium } from "@/lib/premium/premium";
 import { QuizClient } from "@/components/quiz/quiz-client";
 
 export const metadata: Metadata = {
@@ -11,5 +12,6 @@ export const metadata: Metadata = {
 
 export default async function QuizPage() {
   await requireUser("/quiz");
+  await requirePremium("/quiz");
   return <QuizClient />;
 }

@@ -17,7 +17,8 @@ const ToggleSchema = z.boolean();
 export async function toggleSubscriptionAction(next: unknown): Promise<void> {
   // Fail closed in production regardless of any client call.
   if (process.env.VERCEL_ENV === "production") return;
-  // Only a signed-in user (the community page already requires auth).
+  // Only a signed-in user (community reading is public since 2026-06-11,
+  // so the toggle silently no-ops for signed-out visitors).
   const user = await getUser();
   if (!user) return;
   const parsed = ToggleSchema.parse(next);

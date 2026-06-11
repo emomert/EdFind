@@ -44,7 +44,7 @@ export function SubscriptionDevToggle() {
                   Demo mode
                 </p>
                 <p className="mt-1 text-xs text-slate-600">
-                  Stripe isn&apos;t wired yet. Flip between free and subscribed
+                  Stripe isn&apos;t wired yet. Flip between Free and Premium
                   to preview both states. Saves to a cookie.
                 </p>
               </div>
@@ -80,7 +80,7 @@ export function SubscriptionDevToggle() {
               >
                 <span className="flex items-center gap-1 font-semibold">
                   {isSubscribed && <Check className="size-3" />}
-                  Subscribed
+                  Premium
                 </span>
                 <span className="text-slate-500">Full access</span>
               </button>
@@ -100,7 +100,7 @@ export function SubscriptionDevToggle() {
         )}
       >
         <Beaker className="size-3.5" />
-        Demo: {isSubscribed ? "subscribed" : "free"}
+        Demo: {isSubscribed ? "Premium" : "Free"}
         {expanded ? <X className="size-3.5" /> : null}
       </button>
     </div>

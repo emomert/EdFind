@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/auth";
+import { requirePremium } from "@/lib/premium/premium";
 import { UniversityLogo } from "@/components/university/university-logo";
 import { formatTuition as formatTuitionWithEur } from "@/lib/format/currency";
 
@@ -115,6 +116,7 @@ export default async function ComparePage({
   await requireUser(
     idsParam ? `/compare?ids=${encodeURIComponent(idsParam)}` : "/compare",
   );
+  await requirePremium("/compare");
   const rawIds = (idsParam ?? "")
     .split(",")
     .map((s) => s.trim())

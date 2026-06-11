@@ -30,11 +30,11 @@ export function UpgradeCommunityAccessCard({
           {message ?? "Subscribe to send messages in this community."}
         </p>
         <Link
-          href="/community/upgrade"
+          href="/premium"
           className="inline-flex items-center gap-1.5 rounded-full bg-teal-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-teal-700"
         >
           <Sparkles className="size-3" />
-          Upgrade
+          Go Premium
         </Link>
       </div>
     );
@@ -98,13 +98,13 @@ export function UpgradeCommunityAccessCard({
           </ul>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Link
-              href="/community/upgrade"
+              href="/premium"
               className="inline-flex items-center gap-1.5 rounded-full bg-teal-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-teal-700"
             >
               {ctaLabel}
             </Link>
             <p className="text-[11px] text-slate-500">
-              From €1.99/month · cancel any time
+              €5/month · cancel any time
             </p>
           </div>
         </div>

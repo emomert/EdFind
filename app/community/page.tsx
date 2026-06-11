@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { requireUser } from "@/lib/supabase/auth";
+import { getUser } from "@/lib/supabase/auth";
 import { createServiceClient } from "@/lib/supabase/server";
 import { COMMUNITY_ENABLED } from "@/lib/feature-flags";
 import { getSubscriptionState } from "@/lib/community/subscription";
@@ -39,8 +39,10 @@ type ProgRow = {
 export default async function CommunityPage() {
   if (!COMMUNITY_ENABLED) notFound();
 
-  // Match other gated pages — require auth.
-  const user = await requireUser("/community");
+  // Public since 2026-06-11 — reading the community needs no account.
+  // Writing (chat, reviews, questions) still requires a signed-in user with
+  // a verified university email; signed-out visitors just see the verify CTA.
+  const user = await getUser();
 
   const supabase = createServiceClient();
   const [unisRes, progsRes, subscription, verification] = await Promise.all([
@@ -56,7 +58,9 @@ export default async function CommunityPage() {
       )
       .order("name"),
     getSubscriptionState(),
-    getUniversityVerification(user.id),
+    user
+      ? getUniversityVerification(user.id)
+      : Promise.resolve({ status: "none" as const }),
   ]);
 
   const universities = (unisRes.data ?? []) as UniRow[];

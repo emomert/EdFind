@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/auth";
+import { requirePremium } from "@/lib/premium/premium";
 import {
   ShortlistClient,
   type ShortlistItem,
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 // started — and still drives the compare flow.
 export default async function ShortlistPage() {
   const user = await requireUser("/shortlist");
+  await requirePremium("/shortlist");
 
   const supabase = createServiceClient();
   const res = await supabase
