@@ -9,12 +9,12 @@ import {
   GraduationCap,
   MapPin,
   Search,
-  SlidersHorizontal,
   Sparkles,
   Star,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { SelectPill } from "@/components/ui/select-pill";
 import {
   COUNTRY_NAMES,
   FIELD_LABELS,
@@ -309,57 +309,48 @@ export function CatalogClient({
             />
           </label>
 
-          <select
+          <SelectPill
+            ariaLabel="Filter by country"
             value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-          >
-            <option value="">All countries</option>
-            {countries.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+            onChange={setCountry}
+            options={[
+              { value: "", label: "All countries" },
+              ...countries.map((c) => ({ value: c.code, label: c.name })),
+            ]}
+          />
 
           {showProgramFilters && (
             <>
-              <select
+              <SelectPill
+                ariaLabel="Filter by field"
                 value={field}
-                onChange={(e) => setField(e.target.value)}
-                className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-              >
-                <option value="">All fields</option>
-                {fields.map((f) => (
-                  <option key={f.value} value={f.value}>
-                    {f.label}
-                  </option>
-                ))}
-              </select>
-              <select
+                onChange={setField}
+                options={[
+                  { value: "", label: "All fields" },
+                  ...fields.map((f) => ({ value: f.value, label: f.label })),
+                ]}
+              />
+              <SelectPill
+                ariaLabel="Filter by language"
                 value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-              >
-                <option value="">All languages</option>
-                {languages.map((l) => (
-                  <option key={l.value} value={l.value}>
-                    {l.label}
-                  </option>
-                ))}
-              </select>
-              <select
+                onChange={setLanguage}
+                options={[
+                  { value: "", label: "All languages" },
+                  ...languages.map((l) => ({ value: l.value, label: l.label })),
+                ]}
+              />
+              <SelectPill
+                ariaLabel="Filter by duration"
                 value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-              >
-                <option value="">Any duration</option>
-                {durations.map((d) => (
-                  <option key={d} value={String(d)}>
-                    {d} months
-                  </option>
-                ))}
-              </select>
+                onChange={setDuration}
+                options={[
+                  { value: "", label: "Any duration" },
+                  ...durations.map((d) => ({
+                    value: String(d),
+                    label: `${d} months`,
+                  })),
+                ]}
+              />
             </>
           )}
 
@@ -385,31 +376,32 @@ export function CatalogClient({
             </button>
           )}
 
-          <div className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-1 py-1 text-xs text-slate-600">
-            <SlidersHorizontal className="ml-1 size-3 text-slate-400" />
-            {tab === "universities" ? (
-              <select
-                value={uniSort}
-                onChange={(e) => setUniSort(e.target.value as UniSort)}
-                className="rounded-full bg-transparent px-2 py-1 text-xs focus:outline-none"
-              >
-                <option value="rank">Sort: QS rank</option>
-                <option value="name">Sort: Name (A→Z)</option>
-                <option value="country">Sort: Country</option>
-              </select>
-            ) : (
-              <select
-                value={progSort}
-                onChange={(e) => setProgSort(e.target.value as ProgSort)}
-                className="rounded-full bg-transparent px-2 py-1 text-xs focus:outline-none"
-              >
-                <option value="name">Sort: Name (A→Z)</option>
-                <option value="tuition_asc">Sort: Tuition (low→high)</option>
-                <option value="tuition_desc">Sort: Tuition (high→low)</option>
-                <option value="duration">Sort: Duration</option>
-              </select>
-            )}
-          </div>
+          {tab === "universities" ? (
+            <SelectPill
+              ariaLabel="Sort universities"
+              prefix="Sort:"
+              value={uniSort}
+              onChange={(v) => setUniSort(v as UniSort)}
+              options={[
+                { value: "rank", label: "QS rank" },
+                { value: "name", label: "Name (A→Z)" },
+                { value: "country", label: "Country" },
+              ]}
+            />
+          ) : (
+            <SelectPill
+              ariaLabel="Sort programs"
+              prefix="Sort:"
+              value={progSort}
+              onChange={(v) => setProgSort(v as ProgSort)}
+              options={[
+                { value: "name", label: "Name (A→Z)" },
+                { value: "tuition_asc", label: "Tuition (low→high)" },
+                { value: "tuition_desc", label: "Tuition (high→low)" },
+                { value: "duration", label: "Duration" },
+              ]}
+            />
+          )}
         </div>
       </section>
 

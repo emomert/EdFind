@@ -1,8 +1,9 @@
 "use client";
 
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { SelectPill } from "@/components/ui/select-pill";
 
 export type CommunityFilterValues = {
   query: string;
@@ -49,44 +50,37 @@ export function CommunityFilters({
           />
         </label>
 
-        <select
+        <SelectPill
+          ariaLabel="Filter by country"
           value={values.country}
-          onChange={(e) => onChange({ ...values, country: e.target.value })}
-          className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm transition focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-        >
-          <option value="">All countries</option>
-          {countries.map((c) => (
-            <option key={c.code} value={c.code}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+          onChange={(country) => onChange({ ...values, country })}
+          options={[
+            { value: "", label: "All countries" },
+            ...countries.map((c) => ({ value: c.code, label: c.name })),
+          ]}
+        />
 
-        <select
+        <SelectPill
+          ariaLabel="Filter by university"
+          className="max-w-[260px]"
+          panelClassName="w-[300px]"
           value={values.universitySlug}
-          onChange={(e) => onChange({ ...values, universitySlug: e.target.value })}
-          className="max-w-[260px] rounded-full border border-slate-200 bg-white px-3 py-2 text-sm transition focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-        >
-          <option value="">All universities</option>
-          {universities.map((u) => (
-            <option key={u.slug} value={u.slug}>
-              {u.name}
-            </option>
-          ))}
-        </select>
+          onChange={(universitySlug) => onChange({ ...values, universitySlug })}
+          options={[
+            { value: "", label: "All universities" },
+            ...universities.map((u) => ({ value: u.slug, label: u.name })),
+          ]}
+        />
 
-        <select
+        <SelectPill
+          ariaLabel="Filter by field"
           value={values.field}
-          onChange={(e) => onChange({ ...values, field: e.target.value })}
-          className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm transition focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-        >
-          <option value="">All fields</option>
-          {fields.map((f) => (
-            <option key={f.value} value={f.value}>
-              {f.label}
-            </option>
-          ))}
-        </select>
+          onChange={(field) => onChange({ ...values, field })}
+          options={[
+            { value: "", label: "All fields" },
+            ...fields.map((f) => ({ value: f.value, label: f.label })),
+          ]}
+        />
 
         <button
           type="button"
@@ -108,27 +102,17 @@ export function CommunityFilters({
           Verified only
         </button>
 
-        <div className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-1 py-1 text-xs text-slate-600">
-          <SlidersHorizontal className="ml-1 size-3 text-slate-400" />
-          <select
-            value={values.sort}
-            onChange={(e) =>
-              onChange({
-                ...values,
-                sort: e.target.value as CommunityFilterValues["sort"],
-              })
-            }
-            className="rounded-full bg-transparent px-2 py-1 text-xs focus:outline-none"
-          >
-            {(Object.keys(SORT_LABELS) as Array<keyof typeof SORT_LABELS>).map(
-              (k) => (
-                <option key={k} value={k}>
-                  Sort: {SORT_LABELS[k]}
-                </option>
-              ),
-            )}
-          </select>
-        </div>
+        <SelectPill
+          ariaLabel="Sort results"
+          prefix="Sort:"
+          value={values.sort}
+          onChange={(sort) =>
+            onChange({ ...values, sort: sort as CommunityFilterValues["sort"] })
+          }
+          options={(
+            Object.keys(SORT_LABELS) as Array<keyof typeof SORT_LABELS>
+          ).map((k) => ({ value: k, label: SORT_LABELS[k] }))}
+        />
       </div>
     </section>
   );
