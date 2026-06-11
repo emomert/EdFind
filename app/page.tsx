@@ -27,6 +27,7 @@ import {
   WelcomeTour,
   WelcomeTourReplayLink,
 } from "@/components/welcome/welcome-tour";
+import { QuizDemo, QuizDemoLink } from "@/components/welcome/quiz-demo";
 
 type FeaturedUniversity = {
   slug: string;
@@ -170,7 +171,10 @@ export default async function HomePage() {
                 ? "Signed in — your matches travel with you across devices."
                 : "Sign in with Google · Takes about 2 minutes · We never silently boost partner universities"}
             </p>
-            <WelcomeTourReplayLink className="mt-3" />
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+              <WelcomeTourReplayLink />
+              <QuizDemoLink />
+            </div>
           </div>
 
           <aside className="relative">
@@ -261,6 +265,7 @@ export default async function HomePage() {
       </section>
 
       <WelcomeTour totals={totals} isAuthed={isAuthed} />
+      <QuizDemo />
     </div>
   );
 }

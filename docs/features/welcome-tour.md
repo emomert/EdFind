@@ -18,7 +18,7 @@ SEO unaffected, and the gate is purely client-side.
 | # | Key | Shown | Content |
 |---|-----|-------|---------|
 | 1 | `welcome` | always | Brand mark, one-line pitch, live catalog stat chips (universities / programs / countries, passed from the homepage's Supabase totals) |
-| 2 | `quiz` | always | 13-question AI matching quiz (v6: selects + institution search + required background free-text + compound GPA) → ranked top 3 with rationale |
+| 2 | `quiz` | always | 14-question AI matching quiz (v7: selects + institution search + background & desired-study free-texts + compound GPA) → ranked top 3 with rationale |
 | 3 | `search` | always | Free-text AI search in your own words |
 | 4 | `catalog` | always | Full catalog browse + Ctrl+K header search |
 | 5 | `shortlist` | always | Save + side-by-side compare (saved programs land in the applications tracker) |
@@ -28,6 +28,18 @@ SEO unaffected, and the gate is purely client-side.
 
 Steps are data (`TourStep[]`) inside the component — copy lives in plain
 strings, template-friendly for future Turkish localization.
+
+## Sibling: auto-playing quiz preview (2026-06-11)
+
+`components/welcome/quiz-demo.tsx` — a second, larger homepage modal opened
+by the hero's "Watch the quiz in action" link (same window-event pattern as
+the tour's replay link; no auto-open, no localStorage gate). It plays a
+shortened 5-step quiz by itself, faithful to the real quiz UI: answer cards
+get "clicked" on a timed script, and the two free-text steps type themselves
+out with a blinking caret (~32 ms/char; instant under `prefers-reduced-motion`).
+Ends in a finale beat ("…and that's when the matching happens") with a
+"Take the real quiz" CTA and a Replay button. The demo's step script
+(`DEMO_STEPS`) is data — update it when quiz questions change materially.
 
 ## Behavior
 
