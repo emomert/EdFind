@@ -27,6 +27,13 @@
  * (pick the grading scale, then enter the value) — a pure UI change in
  * question-screen.tsx, no new field.
  *
+ * v7 (2026-06-11): split the study question in two. `study_background` now
+ * asks ONLY what the student studied (undergrad background); a new required
+ * free-text `desired_study` asks what they WANT to study next — deliberately
+ * open-ended (a word like "politics", a precise topic like "political economy
+ * of East Asia", or something vague like "I like politics" are all valid).
+ * The AI infers `field_of_study` primarily from `desired_study` now.
+ *
  * UI-required-but-data-nullable fields (current_situation, institution,
  * study_background, gpa_*): the guided quiz requires them, but the /search
  * free-text path can't reliably infer them and we'd rather store null than
@@ -35,7 +42,7 @@
 
 import { z } from "zod";
 
-export const ANSWERS_VERSION = 6;
+export const ANSWERS_VERSION = 7;
 
 // Mirrors the set of countries that actually appear in `universities.country`.
 // Adding values here is forward-compatible — old answers that reference a
@@ -160,6 +167,7 @@ export type WorkExperience = (typeof WORK_EXPERIENCES)[number];
 
 export const ADDITIONAL_CONTEXT_MAX_LENGTH = 500;
 export const STUDY_BACKGROUND_MAX_LENGTH = 200;
+export const DESIRED_STUDY_MAX_LENGTH = 300;
 export const INSTITUTION_MAX_LENGTH = 120;
 export const SITUATION_OTHER_MAX_LENGTH = 120;
 export const CAREER_OTHER_MAX_LENGTH = 200;
@@ -176,9 +184,13 @@ export type Answers = {
   institution: string | null;
   // AI-inferred from study_background (no longer a direct question). Nullable.
   field_of_study: FieldOfStudy | null;
-  // Required free-text undergraduate background, in the student's words. The
-  // matcher reads it and the AI infers field_of_study from it.
+  // Required free-text undergraduate background, in the student's words.
+  // Asks ONLY what they studied — the target field lives in desired_study.
   study_background: string | null;
+  // Required free-text: what they WANT to study next, as open-ended as they
+  // like ("economics", "political economy of East Asia", "I like politics").
+  // The AI infers field_of_study primarily from this.
+  desired_study: string | null;
   gpa_scale: GpaScale | null;
   gpa_range: GpaRange | null;
   // Free-text exact GPA in whatever scale the student picked ("3.42", "85").
@@ -207,6 +219,7 @@ export const EMPTY_ANSWERS: Answers = {
   institution: null,
   field_of_study: null,
   study_background: null,
+  desired_study: null,
   gpa_scale: null,
   gpa_range: null,
   exact_gpa: null,
@@ -288,6 +301,7 @@ export type Question =
   | SingleQuestion<"current_situation", CurrentSituation>
   | InstitutionQuestion
   | FreeTextQuestion<"study_background">
+  | FreeTextQuestion<"desired_study">
   | GpaQuestion
   | SingleQuestion<"english_level", EnglishLevel>
   | SingleQuestion<"budget_per_year", BudgetBracket>
@@ -372,13 +386,24 @@ export const QUESTIONS: readonly Question[] = [
     required: true,
     legend: "What did you study?",
     helper:
-      "Your undergraduate field, in your own words. The AI reads this to judge fit and eligibility — and to work out which master's field suits you.",
-    placeholder:
-      "e.g. BSc Civil Engineering — but I'm aiming to move into data science…",
+      "Your undergraduate field, in your own words — just what you studied. The AI reads this to judge fit and eligibility. (What you want to study next is the following question.)",
+    placeholder: "e.g. BSc Civil Engineering, or BA Sociology with an econ minor…",
     maxLength: STUDY_BACKGROUND_MAX_LENGTH,
   },
   {
     step: 5,
+    field: "desired_study",
+    select: "text",
+    required: true,
+    legend: "What do you want to study?",
+    helper:
+      "Be as free as you like. A field works (\"economics\"), so does something very specific (\"political economy of East Asia\") — and even a vague \"I like politics\" is enough. We'll work out the right programs either way.",
+    placeholder:
+      "e.g. data science, sustainable architecture, or just 'something with politics'…",
+    maxLength: DESIRED_STUDY_MAX_LENGTH,
+  },
+  {
+    step: 6,
     field: "gpa_range",
     select: "gpa",
     legend: "What's your GPA?",
@@ -403,7 +428,7 @@ export const QUESTIONS: readonly Question[] = [
     exactPlaceholder: "e.g. 3.42, 85/100, or 2.1 (Upper Second)",
   },
   {
-    step: 6,
+    step: 7,
     field: "english_level",
     select: "single",
     legend: "How would you describe your English?",
@@ -443,7 +468,7 @@ export const QUESTIONS: readonly Question[] = [
     },
   },
   {
-    step: 7,
+    step: 8,
     field: "budget_per_year",
     select: "single",
     legend: "What's your budget per year?",
@@ -463,7 +488,7 @@ export const QUESTIONS: readonly Question[] = [
     ],
   },
   {
-    step: 8,
+    step: 9,
     field: "duration_preference",
     select: "single",
     legend: "How long do you want your program to be?",
@@ -475,7 +500,7 @@ export const QUESTIONS: readonly Question[] = [
     ],
   },
   {
-    step: 9,
+    step: 10,
     field: "scholarship_need",
     select: "single",
     legend: "Do you need scholarship support?",
@@ -486,7 +511,7 @@ export const QUESTIONS: readonly Question[] = [
     ],
   },
   {
-    step: 10,
+    step: 11,
     field: "career_goal",
     select: "single",
     legend: "What's your goal after the master's?",
@@ -516,7 +541,7 @@ export const QUESTIONS: readonly Question[] = [
     },
   },
   {
-    step: 11,
+    step: 12,
     field: "academic_focus",
     select: "single",
     legend: "What style of master's appeals to you?",
@@ -540,7 +565,7 @@ export const QUESTIONS: readonly Question[] = [
     ],
   },
   {
-    step: 12,
+    step: 13,
     field: "work_experience",
     select: "single",
     legend: "How much full-time work experience do you have?",
@@ -553,7 +578,7 @@ export const QUESTIONS: readonly Question[] = [
     ],
   },
   {
-    step: 13,
+    step: 14,
     field: "additional_context",
     select: "text",
     legend: "Anything else we should know? (optional)",
@@ -632,6 +657,12 @@ export const AnswersSchema = z.object({
     .nullable()
     .optional()
     .default(null),
+  desired_study: z
+    .string()
+    .max(DESIRED_STUDY_MAX_LENGTH)
+    .nullable()
+    .optional()
+    .default(null),
   gpa_scale: z.enum(GPA_SCALES).nullable().optional().default(null),
   gpa_range: z.enum(GPA_RANGES).nullable().optional().default(null),
   exact_gpa: z
@@ -676,6 +707,7 @@ export const AnswersSchema = z.object({
   institution: string | null;
   field_of_study: FieldOfStudy | null;
   study_background: string | null;
+  desired_study: string | null;
   gpa_scale: GpaScale | null;
   gpa_range: GpaRange | null;
   exact_gpa: string | null;

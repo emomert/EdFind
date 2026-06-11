@@ -78,11 +78,11 @@ Matching rules:
   · Budget: "tuition_free" means recommend ONLY programs whose tuition is zero or nominal (≲ ~2,000 EUR/year — typical of public universities in Germany, Norway, Austria, and similar) OR where a full scholarship realistically covers the cost; never put an expensive program at the top for these students. "<10k" rules out anything above ~10,000 EUR/year (convert non-EUR roughly: 1 GBP ≈ 1.18 EUR, 1 CHF ≈ 1.05 EUR, 1 SEK ≈ 0.09 EUR, 1 DKK ≈ 0.13 EUR, 1 NOK ≈ 0.085 EUR, 1 CZK ≈ 0.04 EUR, 1 PLN ≈ 0.23 EUR). "10-15k" tolerates up to ~15,000 EUR/year. "flexible" applies no budget filter.
   · Duration: respect duration_preference unless "flexible".
 - Soft fits:
-  · field_of_study match on the program. NOTE: field_of_study may be null (the student described their background in their own words instead of picking a category). When it's null, infer the field they're aiming for from study_background + additional_context and match on that.
+  · field_of_study match on the program. NOTE: field_of_study may be null (there is no category picker). When it's null, infer the field they're aiming for from desired_study first — that is the student's own words about what they WANT to study next. It may be a broad field ("economics"), a precise topic ("political economy of East Asia"), or deliberately vague ("I like politics"); read the intent generously and map it to the closest program fields, using study_background + additional_context as supporting signal. A specific topic should bias toward programs that plausibly cover it; a vague interest widens the net within that general area.
   · academic_focus: "research" → favour research-led / thesis-heavy / PhD-track programs; "applied" → favour industry-linked / project-based / professional masters; "balanced" → either is fine
   · work_experience: many MiM / MBA-style programmes expect ≥ 1-2 years; "none" students should be steered toward direct-from-undergrad masters where possible. "5_plus_years" students may benefit from MBA-adjacent or executive-style options when available.
   · GPA: gpa_exact is the student's stated GPA on gpa_scale (e.g. "85" on a 100_point scale, "3.4" on a 4_point scale, "2.1" as a uk_class). gpa_range is a rough 4.0-scale band. Read them together and convert other scales to a 4.0 sense (≈ 100-point: 85→3.4, 70→2.4; 10-point: 7→2.8; UK 2.1 ≈ 3.3). Selective programmes (top QS ranks, competitive MiM/MBA) realistically expect ≥ 3.0-equivalent; if the GPA is low, be honest about reach vs. safety and favour programmes with more accessible entry. All GPA fields null means the student didn't say — do not penalise.
-  · current_situation + institution + study_background: use the student's undergraduate background and home university for fit and eligibility (e.g. a non-quantitative background is a real caveat for a heavy data-science MSc; a working_professional may suit applied/executive formats; a strong, well-known home university can partly offset a modest GPA). study_background is free text — read it for the actual subject studied and any stated intent to switch fields. null means not provided — don't speculate.
+  · current_situation + institution + study_background: use the student's undergraduate background and home university for fit and eligibility (e.g. a non-quantitative background is a real caveat for a heavy data-science MSc; a working_professional may suit applied/executive formats; a strong, well-known home university can partly offset a modest GPA). study_background is free text describing ONLY what they studied; compare it against desired_study to spot a field switch and weigh eligibility honestly. null means not provided — don't speculate.
   · career_goal alignment with programme character (e.g. phd_research → research-oriented programmes; entrepreneurship → programmes with venture / innovation tracks; return_to_turkey → ranking & brand recognition matters more than EU placement networks)
   · ranking prestige (lower QS rank number = better)
   · scholarship_need vs tuition affordability
@@ -105,10 +105,12 @@ function buildUserMessage(
         : null,
     // The student's home / undergraduate institution (null when skipped).
     institution: answers.institution,
-    // May be null — when so, infer the target field from study_background.
+    // May be null — when so, infer the target field from desired_study.
     field_of_study: answers.field_of_study,
     // Undergraduate background in the student's words (null when skipped).
     study_background: answers.study_background,
+    // What they WANT to study next, verbatim — broad, precise, or vague.
+    desired_study: answers.desired_study,
     gpa_scale: answers.gpa_scale,
     gpa_exact: answers.exact_gpa,
     gpa_range: answers.gpa_range,

@@ -77,12 +77,13 @@ Rules:
 - Never invent a value not in the allowed lists.
 - Output JSON only.`;
 
-// Note: additional_context and study_background are intentionally NOT in the
-// parser output. additional_context is set below to the student's original
-// free-text query; study_background, institution, gpa_scale/exact_gpa and the
-// "_other" companions aren't inferred for /search (they stay null). field_of_
-// study defaults to null when unstated — the matcher leans on additional_context
-// (the verbatim query) instead of a fabricated field.
+// Note: additional_context, study_background, and desired_study are
+// intentionally NOT in the parser output. additional_context is set below to
+// the student's original free-text query (which already carries what they
+// want to study, verbatim); study_background, desired_study, institution,
+// gpa_scale/exact_gpa and the "_other" companions aren't inferred for /search
+// (they stay null). field_of_study defaults to null when unstated — the
+// matcher leans on additional_context instead of a fabricated field.
 const FALLBACKS = {
   destinations: ["ANY"] as const,
   current_situation: null,
@@ -90,6 +91,7 @@ const FALLBACKS = {
   institution: null,
   field_of_study: null,
   study_background: null,
+  desired_study: null,
   gpa_scale: null,
   gpa_range: null,
   exact_gpa: null,
