@@ -207,8 +207,9 @@ export default async function HomePage() {
               </p>
               <ol className="mt-4 space-y-3 text-sm text-foreground">
                 <Step n={1}>
-                  Tell us about yourself — {TOTAL_STEPS} quick questions, or
-                  just describe what you&apos;re looking for in your own words.
+                  {/* Single template literal — the JSX transform dropped the
+                      space after the expression here ("14quick" in prod). */}
+                  {`Tell us about yourself — ${TOTAL_STEPS} quick questions, or just describe what you're looking for in your own words.`}
                 </Step>
                 <Step n={2}>
                   We compare your profile against every program in our catalog
