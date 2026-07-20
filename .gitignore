@@ -45,6 +45,10 @@ supabase/.temp
 Thumbs.db
 desktop.ini
 
+# Demo recordings — binary presentation artifacts produced by
+# scripts/record-demo.mjs, not source.
+recordings/
+
 # Logs
 *.log
 npm-debug.log*
