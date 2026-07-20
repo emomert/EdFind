@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { getLocale } from "next-intl/server";
 
 import { UniversityLogo } from "@/components/university/university-logo";
 import { COUNTRY_NAMES } from "@/components/applications/types";
+import { localizeCountry, localizeCity } from "@/lib/i18n/data-labels";
+import type { Locale } from "@/lib/i18n/config";
 
 export type MarqueeUniversity = {
   slug: string;
@@ -15,9 +18,11 @@ export type MarqueeUniversity = {
 function MarqueeRow({
   items,
   reverse = false,
+  locale,
 }: {
   items: MarqueeUniversity[];
   reverse?: boolean;
+  locale: Locale;
 }) {
   // Two copies so the -50% slide loops seamlessly. The second copy is a visual
   // clone — hidden from assistive tech and removed from the tab order.
@@ -31,6 +36,11 @@ function MarqueeRow({
       >
         {loop.map((u, i) => {
           const isClone = i >= items.length;
+          const countryName = localizeCountry(
+            COUNTRY_NAMES[u.country] || u.country,
+            locale,
+          );
+          const cityName = localizeCity(u.city, locale);
           return (
             <li key={`${u.slug}-${i}`} aria-hidden={isClone || undefined}>
               <Link
@@ -49,7 +59,7 @@ function MarqueeRow({
                     {u.name}
                   </p>
                   <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                    {u.city}, {COUNTRY_NAMES[u.country] || u.country}
+                    {cityName}, {countryName}
                     {u.qs_world_rank ? ` · QS #${u.qs_world_rank}` : ""}
                   </p>
                 </div>
@@ -66,19 +76,20 @@ function MarqueeRow({
  * Two rows of university cards that continuously flow in opposite directions.
  * Pure-CSS (no JS), pauses on hover, and respects prefers-reduced-motion.
  */
-export function UniversityMarquee({
+export async function UniversityMarquee({
   universities,
 }: {
   universities: MarqueeUniversity[];
 }) {
   if (universities.length === 0) return null;
+  const locale = await getLocale();
   const mid = Math.ceil(universities.length / 2);
   const rowA = universities.slice(0, mid);
   const rowB = universities.length >= 8 ? universities.slice(mid) : universities;
   return (
     <div className="space-y-3">
-      <MarqueeRow items={rowA} />
-      <MarqueeRow items={rowB} reverse />
+      <MarqueeRow items={rowA} locale={locale as Locale} />
+      <MarqueeRow items={rowB} reverse locale={locale as Locale} />
     </div>
   );
 }

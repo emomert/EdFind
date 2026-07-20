@@ -1,0 +1,87 @@
+{
+  "breadcrumbs": {
+    "home": "Home",
+    "catalog": "Catalog"
+  },
+  "duration": {
+    "months": "{months, plural, one {# month} other {# months}}"
+  },
+  "institutionType": {
+    "public": "Public",
+    "private": "Private"
+  },
+  "universityPage": {
+    "meta": {
+      "notFound": "University not found",
+      "title": "{name} — EdFind",
+      "descriptionFallback": "Master's programs at {name}, {city}, {country}."
+    },
+    "partnerBadge": "Partner university",
+    "qsWorldRank": "QS World University Rankings: #{rank}",
+    "visitOfficialSite": "Visit official site",
+    "takeQuizToMatch": "Take the quiz to match",
+    "atAGlance": "At a glance",
+    "founded": "Founded",
+    "students": "Students",
+    "programsOnEdFind": "Programs on EdFind",
+    "programsHeading": "Master's programs at {name}",
+    "noProgramsYet": "We haven't catalogued programs from this university yet — check back soon.",
+    "programsCount": "{count, plural, one {# program} other {# programs}} in our catalog. Click through for details and application info."
+  },
+  "programPage": {
+    "meta": {
+      "notFound": "Program not found",
+      "title": "{program} — {university}",
+      "descriptionFallback": "{program} at {university}."
+    },
+    "partnerBadge": "Partner",
+    "qsSubjectRank": "QS #{rank} in {area}",
+    "stats": {
+      "tuition": "Tuition",
+      "duration": "Duration",
+      "language": "Language",
+      "deadline": "Deadline",
+      "starts": "Starts",
+      "universityRank": "University rank"
+    },
+    "universityRankWorldwide": "QS #{rank} worldwide",
+    "deadlineNotPosted": "Rolling / not posted",
+    "aboutHeading": "About this program",
+    "requirements": {
+      "heading": "Admission requirements",
+      "gpaLabel": "GPA / academic background",
+      "englishTestsLabel": "Accepted English tests",
+      "documentsHeading": "Documents to prepare"
+    },
+    "applyOnSite": "Apply on {university}'s site",
+    "seeAllPrograms": "See all programs at {university}",
+    "otherProgramsHeading": "Other programs at {university}"
+  },
+  "logo": {
+    "altLabel": "{name} logo"
+  },
+  "housing": {
+    "heading": "Housing & cost of living",
+    "researched": "Researched {date} · estimates, not quotes",
+    "rentingIn": "Renting in {city}",
+    "localPricesNote": "(local prices, with euro estimates)",
+    "perMonth": "per month",
+    "room": "Room (shared flat)",
+    "studio": "Studio",
+    "studentHousing": "Student housing",
+    "livingExRent": "Living (ex-rent)",
+    "seeFullBreakdown": "See the full housing breakdown for {city}",
+    "whereStudentsLive": "Where students live",
+    "universityAccommodation": "University accommodation",
+    "offersHousing": "Offers university housing",
+    "noHousing": "No university housing",
+    "onCampus": "On-campus / managed:",
+    "nearCampus": "Private near campus:",
+    "perMonthSuffix": "/mo",
+    "housingOfficeLink": "University housing office",
+    "deposits": "Deposits:",
+    "whereToLook": "Where to look",
+    "sourcesLabel": "Sources:",
+    "disclaimer": "AI-researched estimates, converted to euros at approximate rates — actual prices vary by year, timing, and luck. Always verify current figures before budgeting."
+  }
+}

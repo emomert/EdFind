@@ -3,6 +3,7 @@ import "server-only";
 import { z } from "zod";
 
 import type { ValidatedAnswers } from "@/lib/quiz/schema";
+import type { Locale } from "@/lib/i18n/config";
 import { callDeepSeek } from "@/lib/ai/client";
 
 const DEEPSEEK_MODEL = "deepseek-v4-flash";
@@ -60,6 +61,7 @@ Output strict JSON in this exact shape, with no markdown, no commentary, no extr
 }
 
 Rationale style — REQUIRED:
+- Language: write every rationale in the student's interface language, given as ui_language in the profile ("tr" → Turkish, "en" → English). In Turkish use the informal "sen" register, keep university, program, and degree names in English, and keep numbers, currencies, and dates as digits. The student's free-text answers (desired_study, study_background, additional_context, "_other" details) may themselves be written in Turkish or English — read both, and quote them in the language the student wrote.
 - Length: 70-130 words PER rationale (so the JSON output for 3 matches is ~250-400 words total). Do NOT compress. A one-sentence rationale is a failure of the format.
 - Address the student directly in second person ("You picked..." / "Your budget..." / "Since you have 1-2 years of experience..."). Quote at least two of their actual quiz answers.
 - If the student provided "additional_context" (free-text), QUOTE or paraphrase at least one specific detail from it in the rationale of the matches it actually informs. This is what makes the recommendation feel personal rather than generic.
@@ -94,8 +96,11 @@ Be decisive. Always return exactly 3 matches when the catalog allows it.`;
 function buildUserMessage(
   answers: ValidatedAnswers,
   programs: ProgramForMatching[],
+  locale: Locale,
 ): string {
   const profile = {
+    // Interface language — the system prompt requires rationales in it.
+    ui_language: locale,
     destinations: answers.destinations,
     current_situation: answers.current_situation,
     // Free-text detail, only meaningful when current_situation === "other".
@@ -164,6 +169,7 @@ function buildUserMessage(
 export async function matchProgramsToProfile(
   answers: ValidatedAnswers,
   programs: ProgramForMatching[],
+  locale: Locale = "en",
 ): Promise<MatchSuggestion[]> {
   if (programs.length === 0) {
     throw new Error("No programs in catalog to match against");
@@ -173,7 +179,7 @@ export async function matchProgramsToProfile(
     model: DEEPSEEK_MODEL,
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: buildUserMessage(answers, programs) },
+      { role: "user", content: buildUserMessage(answers, programs, locale) },
     ],
     response_format: { type: "json_object" },
     temperature: 0.55,

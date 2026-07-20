@@ -1,6 +1,7 @@
+import { useTranslations } from "next-intl";
+
 import { cn } from "@/lib/utils";
 import type { ApplicationStatus } from "@/app/applications/actions";
-import { APPLICATION_STATUS_LABELS } from "./types";
 
 const TONE: Record<ApplicationStatus, string> = {
   interested: "bg-slate-100 text-slate-700 ring-slate-200",
@@ -19,6 +20,7 @@ export function StatusPill({
   status: ApplicationStatus;
   className?: string;
 }) {
+  const t = useTranslations("applications.status");
   return (
     <span
       className={cn(
@@ -40,7 +42,7 @@ export function StatusPill({
         )}
         aria-hidden
       />
-      {APPLICATION_STATUS_LABELS[status]}
+      {t(status)}
     </span>
   );
 }

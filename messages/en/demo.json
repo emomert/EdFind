@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "title": "Live demo",
+    "description": "Watch the EdFind quiz and AI matching play out end to end — the real 14-question flow and a ranked top-3 with personalised rationale."
+  },
+  "home": {
+    "badge": "AI-curated, neutral guidance",
+    "title": "Find the right <highlight>master's in Europe</highlight> for you.",
+    "intro": "EdFind matches Turkish students to vetted European master's programs using a short quiz, your priorities, and an AI that explains <em>why</em> each program fits — not just which ones rank highest.",
+    "ctaQuiz": "Take the {count}-question quiz",
+    "ctaSearch": "Search with AI",
+    "signInNote": "Sign in with Google · Takes about 2 minutes · We never silently boost partner universities",
+    "statUniversities": "universities",
+    "statPrograms": "programs",
+    "statCountries": "countries",
+    "howItWorksTitle": "How it works",
+    "step1": "Tell us about yourself — {count} quick questions, or just describe what you're looking for in your own words.",
+    "step2": "We compare your profile against every program in our catalog — {countries} countries, real tuition, deadlines, and rankings — and pick your top 3, each with a personal explanation of why it fits (and where the trade-offs are).",
+    "step3": "Go deeper: compare options, check housing costs and verified student insights, then track your applications in one place.",
+    "universitiesHeading": "Universities from across Europe",
+    "universitiesSubtitle": "{universities} institutions across {countries} countries — and growing"
+  },
+  "results": {
+    "matchCount": "{count, plural, one {# match} other {# matches}} from a catalog of European master's programs",
+    "replay": "Replay demo",
+    "savedBanner": "Saved to your applications",
+    "viewApplications": "View applications",
+    "otherMatchesTitle": "Other strong matches",
+    "otherMatchesSubtitle": "Ranked by overall fit to your profile. Click through for full program details.",
+    "replayFromStart": "Replay from the start",
+    "save": "Save",
+    "saved": "Saved"
+  },
+  "chrome": {
+    "badge": "Demo — plays automatically",
+    "replay": "Replay"
+  }
+}

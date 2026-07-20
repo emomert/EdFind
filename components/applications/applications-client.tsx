@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import { getOrCreateClientId } from "@/lib/quiz/client-id";
@@ -40,6 +41,7 @@ export function ApplicationsClient({
   const [items, setItems] = useState<ApplicationItem[]>(initialApps);
   const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
   const [documents, setDocuments] = useState<DocumentItem[]>(initialDocuments);
+  const t = useTranslations("applications.testingTools");
 
   return (
     <motion.div
@@ -91,7 +93,7 @@ export function ApplicationsClient({
 
       <details className="mt-10 flex justify-end text-right">
         <summary className="inline-flex cursor-pointer list-none items-center text-xs text-muted-foreground/70 transition-colors hover:text-muted-foreground [&::-webkit-details-marker]:hidden">
-          Testing tools
+          {t("summary")}
         </summary>
         <div className="mt-2">
           <ResetButton />
@@ -102,13 +104,12 @@ export function ApplicationsClient({
 }
 
 function ResetButton() {
+  const t = useTranslations("applications.testingTools");
   const [pending, startTransition] = useTransition();
   const [done, setDone] = useState(false);
 
   const handleClick = () => {
-    const confirmed = window.confirm(
-      "Reset all progress?\n\nThis wipes your quiz answers, matches, shortlist, AND every tracked application and task for this account. It cannot be undone.",
-    );
+    const confirmed = window.confirm(t("confirmReset"));
     if (!confirmed) return;
 
     const clientId = getOrCreateClientId();
@@ -134,10 +135,10 @@ function ResetButton() {
         "inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50/60 px-3 py-1.5 text-xs font-medium text-rose-700 transition-colors hover:bg-rose-100",
         (pending || done) && "opacity-70",
       )}
-      title="Wipe quiz answers, matches, shortlist, applications, and tasks"
+      title={t("buttonTitle")}
     >
       <AlertTriangle className="size-3.5" />
-      {done ? "Reset" : "Reset all progress (testing)"}
+      {done ? t("buttonDone") : t("buttonReset")}
     </button>
   );
 }

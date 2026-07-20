@@ -1,0 +1,61 @@
+{
+  "meta": {
+    "title": "Katalog — Üniversiteler ve Programlar",
+    "description": "EdFind kataloğundaki doğrulanmış her Avrupa yüksek lisans programına göz at. Ülkeye, alana, dile, öğrenim ücretine ve daha fazlasına göre filtrele."
+  },
+  "hero": {
+    "badge": "EdFind Kataloğu",
+    "title": "<highlight>Doğruladığımız</highlight> her üniversiteyi ve yüksek lisans programını keşfet.",
+    "subtitle": "Ülkeye, alana, dile veya öğrenim ücretine göre filtrele — ya da aklındaki üniversiteye doğrudan atla. Her kayıt, ayrıntılı bir program sayfasına bağlanır."
+  },
+  "entities": {
+    "universities": "Üniversiteler",
+    "programs": "Programlar",
+    "countries": "Ülkeler"
+  },
+  "filters": {
+    "searchUniversitiesPlaceholder": "Üniversite veya şehir ara…",
+    "searchProgramsPlaceholder": "Program adına göre ara…",
+    "countryAriaLabel": "Ülkeye göre filtrele",
+    "allCountries": "Tüm ülkeler",
+    "fieldAriaLabel": "Alana göre filtrele",
+    "allFields": "Tüm alanlar",
+    "languageAriaLabel": "Dile göre filtrele",
+    "allLanguages": "Tüm diller",
+    "durationAriaLabel": "Süreye göre filtrele",
+    "anyDuration": "Herhangi bir süre",
+    "durationOption": "{months, plural, one {# ay} other {# ay}}",
+    "partnerOnly": "Sadece partnerler",
+    "sortUniversitiesAriaLabel": "Üniversiteleri sırala",
+    "sortProgramsAriaLabel": "Programları sırala",
+    "sortPrefix": "Sırala:",
+    "sortRank": "QS sıralaması",
+    "sortNameAZ": "İsim (A→Z)",
+    "sortCountry": "Ülke",
+    "sortTuitionAsc": "Öğrenim ücreti (düşükten yükseğe)",
+    "sortTuitionDesc": "Öğrenim ücreti (yüksekten düşüğe)",
+    "sortDuration": "Süre"
+  },
+  "empty": {
+    "noUniversities": "Bu filtrelere uyan üniversite yok.",
+    "noPrograms": "Bu filtrelere uyan program yok."
+  },
+  "institutionType": {
+    "public": "Devlet",
+    "private": "Özel"
+  },
+  "universityCard": {
+    "partner": "Partner",
+    "established": "Kuruluş: {year}",
+    "qsRank": "QS #{rank}",
+    "programCount": "{count, plural, one {# program} other {# program}}",
+    "viewUniversity": "Üniversiteyi görüntüle"
+  },
+  "programCard": {
+    "durationMonths": "{months} ay",
+    "applyBy": "Son başvuru: {date}",
+    "startsMonth": "Başlangıç: {month}",
+    "yearRoundIntake": "Yıl boyunca alım",
+    "viewProgram": "Programı görüntüle"
+  }
+}

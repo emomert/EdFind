@@ -7,6 +7,7 @@ import {
   MapPin,
   Sparkles,
 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
@@ -98,9 +99,10 @@ async function loadFeatured(): Promise<{
 }
 
 export default async function HomePage() {
-  const [{ universities, totals }, user] = await Promise.all([
+  const [{ universities, totals }, user, t] = await Promise.all([
     loadFeatured(),
     getUser(),
+    getTranslations("home"),
   ]);
   const isAuthed = Boolean(user);
 
@@ -115,24 +117,22 @@ export default async function HomePage() {
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-primary">
               <Sparkles className="size-3.5" />
-              AI-curated, neutral guidance
+              {t("hero.badge")}
             </span>
             <h1 className="mt-5 text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              Find the right{" "}
-              <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/75 bg-clip-text text-transparent">
-                  master&apos;s in Europe
-                </span>
-                <MarkerSquiggle
-                  className="absolute -bottom-2 left-0 h-2.5 w-full text-primary/70 sm:-bottom-3 sm:h-3"
-                />
-              </span>{" "}
-              for you.
+              {t.rich("hero.title", {
+                highlight: (chunks) => (
+                  <span className="relative inline-block">
+                    <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/75 bg-clip-text text-transparent">
+                      {chunks}
+                    </span>
+                    <MarkerSquiggle className="absolute -bottom-2 left-0 h-2.5 w-full text-primary/70 sm:-bottom-3 sm:h-3" />
+                  </span>
+                ),
+              })}
             </h1>
             <p className="mt-6 max-w-xl text-pretty text-lg text-muted-foreground">
-              EdFind matches Turkish students to vetted European master&apos;s programs
-              using a short quiz, your priorities, and an AI that explains{" "}
-              <em>why</em> each program fits — not just which ones rank highest.
+              {t.rich("hero.subtitle", { em: (chunks) => <em>{chunks}</em> })}
             </p>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -140,14 +140,14 @@ export default async function HomePage() {
                 <>
                   <Button asChild size="lg">
                     <Link href="/quiz">
-                      Take the {TOTAL_STEPS}-question quiz
+                      {t("hero.takeQuiz", { totalSteps: TOTAL_STEPS })}
                       <ArrowRight />
                     </Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
                     <Link href="/search">
                       <Sparkles />
-                      Search with AI
+                      {t("hero.searchWithAi")}
                     </Link>
                   </Button>
                 </>
@@ -155,21 +155,19 @@ export default async function HomePage() {
                 <>
                   <Button asChild size="lg">
                     <Link href="/login?next=/quiz">
-                      Sign in to get started
+                      {t("hero.signInCta")}
                       <ArrowRight />
                     </Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
-                    <Link href="/catalog">Browse universities</Link>
+                    <Link href="/catalog">{t("hero.browseUniversities")}</Link>
                   </Button>
                 </>
               )}
             </div>
 
             <p className="mt-6 text-xs text-muted-foreground">
-              {isAuthed
-                ? "Signed in — your matches travel with you across devices."
-                : "Sign in with Google · Takes about 2 minutes · We never silently boost partner universities"}
+              {isAuthed ? t("hero.signedInNote") : t("hero.signedOutNote")}
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
               <WelcomeTourReplayLink />
@@ -186,17 +184,17 @@ export default async function HomePage() {
               <Stat
                 icon={<GraduationCap className="size-4" />}
                 value={totals.universities}
-                label="universities"
+                label={t("stats.universities")}
               />
               <Stat
                 icon={<Award className="size-4" />}
                 value={totals.programs}
-                label="programs"
+                label={t("stats.programs")}
               />
               <Stat
                 icon={<MapPin className="size-4" />}
                 value={totals.countries}
-                label="countries"
+                label={t("stats.countries")}
               />
             </div>
 
@@ -207,24 +205,14 @@ export default async function HomePage() {
               />
               <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Compass className="size-4 text-primary" />
-                How it works
+                {t("hero.howItWorks")}
               </p>
               <ol className="mt-4 space-y-3 text-sm text-foreground">
-                <Step n={1}>
-                  {/* Single template literal — the JSX transform dropped the
-                      space after the expression here ("14quick" in prod). */}
-                  {`Tell us about yourself — ${TOTAL_STEPS} quick questions, or just describe what you're looking for in your own words.`}
-                </Step>
+                <Step n={1}>{t("hero.step1", { totalSteps: TOTAL_STEPS })}</Step>
                 <Step n={2}>
-                  We compare your profile against every program in our catalog
-                  — {totals.countries} countries, real tuition, deadlines, and
-                  rankings — and pick your top 3, each with a personal
-                  explanation of why it fits (and where the trade-offs are).
+                  {t("hero.step2", { countries: totals.countries })}
                 </Step>
-                <Step n={3}>
-                  Go deeper: compare options, check housing costs and verified
-                  student insights, then track your applications in one place.
-                </Step>
+                <Step n={3}>{t("hero.step3")}</Step>
               </ol>
             </div>
           </aside>
@@ -236,15 +224,17 @@ export default async function HomePage() {
           <div className="mx-auto max-w-6xl px-6">
             <div className="flex items-baseline justify-between">
               <h2 className="relative text-2xl font-semibold tracking-tight sm:text-3xl">
-                Universities from across Europe
+                {t("featured.heading")}
                 <MarkerStar
                   aria-hidden
                   className="absolute -right-7 -top-3 size-5 text-primary/40 sm:-right-9 sm:-top-4 sm:size-6"
                 />
               </h2>
               <p className="hidden text-sm text-muted-foreground sm:block">
-                {totals.universities} institutions across {totals.countries}{" "}
-                countries — and growing
+                {t("featured.subheading", {
+                  universities: totals.universities,
+                  countries: totals.countries,
+                })}
               </p>
             </div>
           </div>
@@ -257,7 +247,7 @@ export default async function HomePage() {
         <div className="mt-8 text-center">
           <Button asChild variant="outline">
             <Link href="/catalog">
-              Browse the full catalog
+              {t("featured.browseCatalog")}
               <ArrowRight />
             </Link>
           </Button>

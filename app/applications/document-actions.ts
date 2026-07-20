@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/supabase/auth";
@@ -106,8 +107,10 @@ async function loadApplicationWithProgram(
 export async function generateApplicationDocument(
   rawInput: unknown,
 ): Promise<GenerateDocumentResult> {
+  const t = await getTranslations("applications.errors");
+  const tTitle = await getTranslations("applications.documentTitle");
   const parsed = GenerateInputSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
   const { kind, applicationId } = parsed.data;
   const highlights = parsed.data.highlights || null;
 
@@ -115,13 +118,13 @@ export async function generateApplicationDocument(
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to generate documents.",
+      error: t("signInToGenerateDocuments"),
       needsAuth: true,
     };
   }
 
   if (kind === "cover_letter" && !applicationId) {
-    return { ok: false, error: "Pick a tracked program for the cover letter." };
+    return { ok: false, error: t("coverLetterNeedsApplication") };
   }
   if (
     kind === "cv" &&
@@ -129,8 +132,7 @@ export async function generateApplicationDocument(
   ) {
     return {
       ok: false,
-      error:
-        "Tell us a bit about your background first — a CV drafted from nothing would just be placeholders.",
+      error: t("cvNeedsHighlights"),
     };
   }
 
@@ -143,7 +145,7 @@ export async function generateApplicationDocument(
   if ((countRes.count ?? 0) >= MAX_DOCUMENTS_PER_USER) {
     return {
       ok: false,
-      error: `You've reached the limit of ${MAX_DOCUMENTS_PER_USER} documents — delete some old drafts first.`,
+      error: t("documentLimitReached", { limit: MAX_DOCUMENTS_PER_USER }),
     };
   }
 
@@ -152,7 +154,7 @@ export async function generateApplicationDocument(
   if (applicationId) {
     const app = await loadApplicationWithProgram(applicationId, user.id);
     if (!app || !app.program) {
-      return { ok: false, error: "Not authorized." };
+      return { ok: false, error: t("notAuthorized") };
     }
     programName = app.program.name;
     program = {
@@ -196,21 +198,21 @@ export async function generateApplicationDocument(
     });
   } catch (err) {
     if (err instanceof AiDisabledError) {
-      return { ok: false, error: "AI drafting is temporarily disabled." };
+      return { ok: false, error: t("aiDisabled") };
     }
     if (err instanceof AiTimeoutError) {
-      return { ok: false, error: "The AI took too long — please try again." };
+      return { ok: false, error: t("aiTimeout") };
     }
     console.error("[generateApplicationDocument] AI call failed", err);
-    return { ok: false, error: "Couldn't generate the draft. Try again." };
+    return { ok: false, error: t("generateFailed") };
   }
 
   const title =
     kind === "cv"
       ? programName
-        ? `CV — tailored for ${programName}`
-        : "CV"
-      : `Cover letter — ${programName}`;
+        ? tTitle("cvTailored", { program: programName })
+        : tTitle("cv")
+      : tTitle("coverLetter", { program: programName ?? "" });
 
   const ins = await supabase
     .from("application_documents")
@@ -226,7 +228,7 @@ export async function generateApplicationDocument(
     .single();
   if (ins.error || !ins.data) {
     console.error("[generateApplicationDocument] insert failed", ins.error);
-    return { ok: false, error: "Couldn't save the draft." };
+    return { ok: false, error: t("saveFailed") };
   }
 
   revalidatePath("/applications");
@@ -236,14 +238,15 @@ export async function generateApplicationDocument(
 export async function updateApplicationDocument(
   rawInput: unknown,
 ): Promise<DocumentActionResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = UpdateInputSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to edit documents.",
+      error: t("signInToEditDocuments"),
       needsAuth: true,
     };
   }
@@ -263,9 +266,9 @@ export async function updateApplicationDocument(
     .maybeSingle();
   if (upd.error) {
     console.error("[updateApplicationDocument] update failed", upd.error);
-    return { ok: false, error: "Couldn't save your changes." };
+    return { ok: false, error: t("saveChangesFailed") };
   }
-  if (!upd.data) return { ok: false, error: "Not authorized." };
+  if (!upd.data) return { ok: false, error: t("notAuthorized") };
 
   revalidatePath("/applications");
   return { ok: true };
@@ -274,14 +277,15 @@ export async function updateApplicationDocument(
 export async function deleteApplicationDocument(
   rawInput: unknown,
 ): Promise<DocumentActionResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = DeleteInputSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to delete documents.",
+      error: t("signInToDeleteDocuments"),
       needsAuth: true,
     };
   }
@@ -294,7 +298,7 @@ export async function deleteApplicationDocument(
     .eq("user_id", user.id);
   if (del.error) {
     console.error("[deleteApplicationDocument] delete failed", del.error);
-    return { ok: false, error: "Couldn't delete the document." };
+    return { ok: false, error: t("deleteDocumentFailed") };
   }
 
   revalidatePath("/applications");

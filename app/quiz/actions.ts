@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 
 import { AnswersSchema } from "@/lib/quiz/schema";
 import { persistAndMatch } from "@/lib/server/persist-and-match";
@@ -25,9 +26,10 @@ export type SubmitResult =
 export async function submitProfile(rawInput: unknown): Promise<SubmitResult> {
   const parsed = SubmitInputSchema.safeParse(rawInput);
   if (!parsed.success) {
+    const t = await getTranslations("quiz.error");
     return {
       ok: false,
-      error: "Some answers were missing or unrecognized. Please try again.",
+      error: t("validation"),
     };
   }
 

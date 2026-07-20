@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, RotateCw } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/auth";
@@ -12,10 +13,13 @@ import {
   type MatchCardData,
 } from "@/components/results/match-card";
 
-export const metadata: Metadata = {
-  title: "Your matches",
-  description: "Master's programs matched to your profile.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("results.meta.matches");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 type Params = { matchId: string };
 
@@ -26,6 +30,7 @@ export default async function ResultsPage({
 }) {
   const { matchId } = await params;
   const user = await requireUser(`/results/${matchId}`);
+  const t = await getTranslations("results.matches");
 
   const supabase = createServiceClient();
 
@@ -124,13 +129,12 @@ export default async function ResultsPage({
     <div className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
       <div className="flex items-center justify-between">
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {valid.length} match{valid.length === 1 ? "" : "es"} from a catalog of
-          European master&apos;s programs
+          {t("count", { count: valid.length })}
         </p>
         <Button asChild variant="ghost" size="sm">
           <Link href="/quiz">
             <RotateCw className="size-3.5" />
-            Re-take quiz
+            {t("retakeQuiz")}
           </Link>
         </Button>
       </div>
@@ -142,11 +146,10 @@ export default async function ResultsPage({
       {others.length > 0 ? (
         <section className="mt-16 border-t border-border pt-10">
           <h2 className="text-xl font-semibold tracking-tight">
-            Other strong matches
+            {t("otherMatches.heading")}
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Ranked by overall fit to your profile. Click through for full
-            program details.
+            {t("otherMatches.intro")}
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {others.map((m, i) => (
@@ -160,7 +163,7 @@ export default async function ResultsPage({
         <Button asChild variant="outline">
           <Link href="/">
             <ArrowLeft />
-            Back to home
+            {t("backToHome")}
           </Link>
         </Button>
       </div>

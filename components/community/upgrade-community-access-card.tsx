@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Sparkles, Lock } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 
 export function UpgradeCommunityAccessCard({
   variant = "panel",
   message,
-  ctaLabel = "Upgrade to join the conversation",
+  ctaLabel,
   className,
 }: {
   variant?: "panel" | "inline" | "input";
@@ -17,6 +18,8 @@ export function UpgradeCommunityAccessCard({
   ctaLabel?: string;
   className?: string;
 }) {
+  const t = useTranslations("community.upgrade");
+
   if (variant === "input") {
     return (
       <div
@@ -27,14 +30,14 @@ export function UpgradeCommunityAccessCard({
       >
         <Lock className="size-4 shrink-0 text-teal-600" />
         <p className="flex-1 text-slate-600">
-          {message ?? "Subscribe to send messages in this community."}
+          {message ?? t("inputMessageDefault")}
         </p>
         <Link
           href="/premium"
           className="inline-flex items-center gap-1.5 rounded-full bg-teal-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-teal-700"
         >
           <Sparkles className="size-3" />
-          Go Premium
+          {t("goPremium")}
         </Link>
       </div>
     );
@@ -49,7 +52,7 @@ export function UpgradeCommunityAccessCard({
         )}
       >
         <Lock className="size-3" />
-        {message ?? "Subscribe to unlock"}
+        {message ?? t("inlineMessageDefault")}
       </div>
     );
   }
@@ -72,28 +75,27 @@ export function UpgradeCommunityAccessCard({
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="text-base font-semibold tracking-tight text-slate-900">
-            Unlock the full Community
+            {t("panelHeading")}
           </h3>
           <p className="mt-1 text-sm text-slate-600">
-            {message ??
-              "Subscribe to message verified students and EdFind campus responsibles, join group chats, and access detailed program-specific insights."}
+            {message ?? t("panelMessageDefault")}
           </p>
           <ul className="mt-3 grid gap-1 text-xs text-slate-600 sm:grid-cols-2">
             <li className="flex items-center gap-1.5">
               <span aria-hidden className="text-teal-600">✓</span>
-              Message campus responsibles
+              {t("bullets.messageResponsibles")}
             </li>
             <li className="flex items-center gap-1.5">
               <span aria-hidden className="text-teal-600">✓</span>
-              Join group chats
+              {t("bullets.joinGroupChats")}
             </li>
             <li className="flex items-center gap-1.5">
               <span aria-hidden className="text-teal-600">✓</span>
-              Reply to discussions
+              {t("bullets.replyDiscussions")}
             </li>
             <li className="flex items-center gap-1.5">
               <span aria-hidden className="text-teal-600">✓</span>
-              Detailed verified-student insights
+              {t("bullets.detailedInsights")}
             </li>
           </ul>
           <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -101,10 +103,10 @@ export function UpgradeCommunityAccessCard({
               href="/premium"
               className="inline-flex items-center gap-1.5 rounded-full bg-teal-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-teal-700"
             >
-              {ctaLabel}
+              {ctaLabel ?? t("ctaDefault")}
             </Link>
             <p className="text-[11px] text-slate-500">
-              €5/month · cancel any time
+              {t("priceLine")}
             </p>
           </div>
         </div>

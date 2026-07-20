@@ -1,0 +1,87 @@
+{
+  "breadcrumbs": {
+    "home": "Ana sayfa",
+    "catalog": "Katalog"
+  },
+  "duration": {
+    "months": "{months, plural, one {# ay} other {# ay}}"
+  },
+  "institutionType": {
+    "public": "Devlet",
+    "private": "Özel"
+  },
+  "universityPage": {
+    "meta": {
+      "notFound": "Üniversite bulunamadı",
+      "title": "{name} — EdFind",
+      "descriptionFallback": "{name} yüksek lisans programları — {city}, {country}."
+    },
+    "partnerBadge": "Partner üniversite",
+    "qsWorldRank": "QS Dünya Üniversite Sıralaması: #{rank}",
+    "visitOfficialSite": "Resmi siteyi ziyaret et",
+    "takeQuizToMatch": "Eşleşmek için testi çöz",
+    "atAGlance": "Kısaca",
+    "founded": "Kuruluş",
+    "students": "Öğrenci sayısı",
+    "programsOnEdFind": "EdFind'daki program sayısı",
+    "programsHeading": "{name} üniversitesindeki yüksek lisans programları",
+    "noProgramsYet": "Bu üniversitenin programlarını henüz kataloğa eklemedik — yakında tekrar bak.",
+    "programsCount": "Kataloğumuzda {count, plural, one {# program} other {# program}} var. Ayrıntılar ve başvuru bilgisi için tıkla."
+  },
+  "programPage": {
+    "meta": {
+      "notFound": "Program bulunamadı",
+      "title": "{program} — {university}",
+      "descriptionFallback": "{university} — {program}."
+    },
+    "partnerBadge": "Partner",
+    "qsSubjectRank": "{area} alanında QS #{rank}",
+    "stats": {
+      "tuition": "Öğrenim ücreti",
+      "duration": "Süre",
+      "language": "Dil",
+      "deadline": "Son başvuru tarihi",
+      "starts": "Başlangıç",
+      "universityRank": "Üniversite sıralaması"
+    },
+    "universityRankWorldwide": "Dünya genelinde QS #{rank}",
+    "deadlineNotPosted": "Sürekli kabul / henüz açıklanmadı",
+    "aboutHeading": "Program hakkında",
+    "requirements": {
+      "heading": "Başvuru koşulları",
+      "gpaLabel": "Not ortalaması / akademik geçmiş",
+      "englishTestsLabel": "Kabul edilen İngilizce sınavları",
+      "documentsHeading": "Hazırlanması gereken belgeler"
+    },
+    "applyOnSite": "{university} sitesinden başvur",
+    "seeAllPrograms": "{university} üniversitesindeki tüm programları gör",
+    "otherProgramsHeading": "{university} üniversitesindeki diğer programlar"
+  },
+  "logo": {
+    "altLabel": "{name} logosu"
+  },
+  "housing": {
+    "heading": "Barınma ve yaşam maliyeti",
+    "researched": "{date} tarihinde araştırıldı · tahmini rakamlardır, kesin fiyat değildir",
+    "rentingIn": "{city} şehrinde kiralama",
+    "localPricesNote": "(yerel fiyatlar, euro karşılıklarıyla)",
+    "perMonth": "aylık",
+    "room": "Oda (paylaşımlı ev)",
+    "studio": "Stüdyo",
+    "studentHousing": "Öğrenci yurdu",
+    "livingExRent": "Yaşam gideri (kira hariç)",
+    "seeFullBreakdown": "{city} için barınma detaylarının tamamını gör",
+    "whereStudentsLive": "Öğrenciler nerede yaşıyor",
+    "universityAccommodation": "Üniversite konaklaması",
+    "offersHousing": "Üniversite yurdu var",
+    "noHousing": "Üniversite yurdu yok",
+    "onCampus": "Kampüste / üniversite yönetiminde:",
+    "nearCampus": "Kampüs yakınında özel konaklama:",
+    "perMonthSuffix": "/ay",
+    "housingOfficeLink": "Üniversite barınma ofisi",
+    "deposits": "Depozito:",
+    "whereToLook": "Nereden bakılır",
+    "sourcesLabel": "Kaynaklar:",
+    "disclaimer": "Yapay zekâ ile araştırılmış, yaklaşık kurlarla euroya çevrilmiş tahminlerdir — gerçek fiyatlar yıla, zamanlamaya ve şansa göre değişir. Bütçe yapmadan önce güncel rakamları mutlaka doğrula."
+  }
+}

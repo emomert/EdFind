@@ -7,6 +7,8 @@ import {
   Sparkles,
   Wand2,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,11 +20,13 @@ import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graph
 import { Lift, Reveal, Stagger, StaggerItem } from "@/components/motion";
 import { TOTAL_STEPS } from "@/lib/quiz/schema";
 
-export const metadata: Metadata = {
-  title: "Find programs — EdFind",
-  description:
-    "Pick how you want EdFind to surface your master's program matches: structured quiz, or describe what you want in your own words.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("home.start.meta");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 type Path = {
   href: string;
@@ -36,41 +40,34 @@ type Path = {
   recommended: boolean;
 };
 
-const PATHS: Path[] = [
-  {
-    href: "/quiz",
-    eyebrow: "Structured",
-    title: `Take the ${TOTAL_STEPS}-question quiz`,
-    description: `Walk through ${TOTAL_STEPS} quick questions covering your situation, university, background, what you want to study, GPA, budget, and goals — mostly single taps, plus a few short text answers. Best if you're still figuring out what you want.`,
-    icon: <ListChecks className="size-5" />,
-    bullets: [
-      "Mostly taps — a school search and a few short text boxes",
-      "Drafts saved automatically",
-      "Same AI matcher under the hood",
-    ],
-    durationLabel: "≈ 2 minutes",
-    cta: "Start the quiz",
-    recommended: true,
-  },
-  {
-    href: "/search",
-    eyebrow: "Free-form",
-    title: "Describe what you want",
-    description:
-      "Type a few sentences in your own words — \"MSc in data science in Northern Europe, under 15k, English-taught\" — and we'll extract the structured profile and match against it.",
-    icon: <Wand2 className="size-5" />,
-    bullets: [
-      "Natural language input",
-      "Best for clear preferences",
-      "Skips the question-by-question flow",
-    ],
-    durationLabel: "≈ 30 seconds",
-    cta: "Search with AI",
-    recommended: false,
-  },
-];
-
 export default function StartPage() {
+  const t = useTranslations("home.start");
+
+  const PATHS: Path[] = [
+    {
+      href: "/quiz",
+      eyebrow: t("paths.quiz.eyebrow"),
+      title: t("paths.quiz.title", { totalSteps: TOTAL_STEPS }),
+      description: t("paths.quiz.description", { totalSteps: TOTAL_STEPS }),
+      icon: <ListChecks className="size-5" />,
+      bullets: t.raw("paths.quiz.bullets") as string[],
+      durationLabel: t("paths.quiz.duration"),
+      cta: t("paths.quiz.cta"),
+      recommended: true,
+    },
+    {
+      href: "/search",
+      eyebrow: t("paths.search.eyebrow"),
+      title: t("paths.search.title"),
+      description: t("paths.search.description"),
+      icon: <Wand2 className="size-5" />,
+      bullets: t.raw("paths.search.bullets") as string[],
+      durationLabel: t("paths.search.duration"),
+      cta: t("paths.search.cta"),
+      recommended: false,
+    },
+  ];
+
   return (
     <div className="relative">
       <div
@@ -87,23 +84,22 @@ export default function StartPage() {
           <div className="text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-primary">
               <Sparkles className="size-3.5" />
-              Two paths to the same matcher
+              {t("badge")}
             </span>
             <h1 className="mt-5 text-balance text-4xl font-bold tracking-tight sm:text-5xl">
-              How would you like to{" "}
-              <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/75 bg-clip-text text-transparent">
-                  find your matches
-                </span>
-                <MarkerSquiggle
-                  className="absolute -bottom-2 left-0 h-2.5 w-full text-primary/70 sm:-bottom-3 sm:h-3"
-                />
-              </span>
-              ?
+              {t.rich("title", {
+                highlight: (chunks) => (
+                  <span className="relative inline-block">
+                    <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/75 bg-clip-text text-transparent">
+                      {chunks}
+                    </span>
+                    <MarkerSquiggle className="absolute -bottom-2 left-0 h-2.5 w-full text-primary/70 sm:-bottom-3 sm:h-3" />
+                  </span>
+                ),
+              })}
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
-              Both paths lead to the same matches from the same program
-              catalog — pick whichever feels easier. You can always switch.
+              {t("subtitle")}
             </p>
           </div>
         </Reveal>
@@ -119,7 +115,7 @@ export default function StartPage() {
                   {path.recommended ? (
                     <span className="absolute right-5 top-5 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
                       <Sparkles className="size-3" />
-                      Recommended
+                      {t("recommended")}
                     </span>
                   ) : null}
 
@@ -184,17 +180,14 @@ export default function StartPage() {
               </div>
               <div>
                 <p className="text-base font-semibold tracking-tight text-foreground">
-                  Both paths produce the same kind of result.
+                  {t("footer.title")}
                 </p>
                 <p className="mt-1.5 leading-relaxed">
-                  You&apos;ll see three ranked program matches with a personal
-                  rationale for each. We never silently boost partner universities,
-                  and you can always re-take the quiz or rewrite your description
-                  to get fresh matches.
+                  {t("footer.description")}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Button asChild variant="outline" size="sm">
-                    <Link href="/catalog">Or browse the full catalog</Link>
+                    <Link href="/catalog">{t("footer.browseCatalog")}</Link>
                   </Button>
                 </div>
               </div>

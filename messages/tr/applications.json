@@ -1,0 +1,240 @@
+{
+  "meta": {
+    "title": "Başvuruların",
+    "description": "Üzerinde çalıştığın her yüksek lisans başvurusunu takip et."
+  },
+  "status": {
+    "interested": "İlgileniyor",
+    "drafting": "Taslak",
+    "submitted": "Başvuruldu",
+    "accepted": "Kabul edildi",
+    "rejected": "Reddedildi",
+    "waitlisted": "Bekleme listesinde",
+    "withdrawn": "Geri çekildi"
+  },
+  "taskStatus": {
+    "todo": "Yapılacak",
+    "doing": "Devam ediyor",
+    "done": "Tamamlandı"
+  },
+  "taskCategory": {
+    "documents": "Belgeler",
+    "language_test": "Dil sınavı",
+    "writing": "Yazım",
+    "finance": "Finans",
+    "admin": "İdari işler",
+    "other": "Diğer"
+  },
+  "documentKind": {
+    "cv": "CV",
+    "cover_letter": "Motivasyon mektubu"
+  },
+  "testingTools": {
+    "summary": "Test araçları",
+    "confirmReset": "Tüm ilerleme sıfırlansın mı?\n\nBu işlem test yanıtlarını, eşleşmeleri, kaydedilenleri VE bu hesaba ait tüm takip edilen başvuruları ve görevleri siler. Geri alınamaz.",
+    "buttonTitle": "Test yanıtlarını, eşleşmeleri, kaydedilenleri, başvuruları ve görevleri sil",
+    "buttonReset": "Tüm ilerlemeyi sıfırla (test)",
+    "buttonDone": "Sıfırlandı"
+  },
+  "overview": {
+    "heading": "Başvuruların",
+    "emptyHint": "Takip etmeye başladığın programlar burada görünecek.",
+    "countSummary": "{total} programdan {filtered} tanesi",
+    "searchPlaceholder": "Program veya üniversite ara…",
+    "allStatuses": "Tüm durumlar",
+    "sort": {
+      "deadline": "Son tarih",
+      "recent": "Son eklenen",
+      "status": "İlerleme"
+    },
+    "emptyFiltered": {
+      "title": "Bu filtreyle eşleşen bulunamadı.",
+      "description": "Farklı bir durum dene ya da aramayı temizle."
+    },
+    "emptyNone": {
+      "title": "Henüz başvurun yok.",
+      "description": "Herhangi bir program sayfasını aç ve “Kaydet”e bas. Buraya ilgilendiğin bir program olarak eklenecek.",
+      "quizCta": "Testle program bul",
+      "catalogCta": "Kataloğa göz at"
+    }
+  },
+  "card": {
+    "advance": {
+      "interested": "Taslağa başla",
+      "drafting": "Gönderildi olarak işaretle"
+    },
+    "nextStep": {
+      "interested": "Başvurup başvurmayacağına karar ver. Başladığında Taslak'a geç.",
+      "draftingWithNotes": "Notlarındaki maddeleri bitir, sonra gönder.",
+      "draftingNoNotes": "Belgelerini ve motivasyon mektubunu taslak olarak hazırla.",
+      "submitted": "Programın kararını bekle. Gelen kutunu kontrol et.",
+      "waitlisted": "Yakın takipte kal — bir yer açılırsa hızlı yanıt ver.",
+      "accepted": "Teklifleri karşılaştır, sonra kaydını onayla.",
+      "rejected": "Bir nefes al. Diğer başvurularına odaklan.",
+      "withdrawn": "Arşivlendi. Temizlemek istersen kaldırabilirsin."
+    },
+    "nextLabel": "Sıradaki:",
+    "changeStatusTitle": "Durumu değiştir",
+    "tasksTitle": "{total} görevden {done} tanesi tamamlandı",
+    "tasksBadge": "{done} / {total} görev",
+    "deadlineInDays": "{date} · {days} gün sonra",
+    "deadlinePassed": "{date} · geçti",
+    "statusLabel": "Durum",
+    "deadlineLabel": "Senin son tarihin",
+    "deadlineProgramNote": "(program: {date})",
+    "notesLabel": "Notlar",
+    "notesPlaceholder": "Belgeler, referans mektupları, engeller…",
+    "officialSite": "Resmi site",
+    "remove": "Kaldır",
+    "removeConfirm": "\"{program}\" takibinden kaldırılsın mı?",
+    "open": "Aç",
+    "hide": "Gizle",
+    "edit": "Düzenle",
+    "moreAriaLabel": "Daha fazla"
+  },
+  "deadlineStrip": {
+    "ariaLabel": "Yaklaşan son tarihler",
+    "heading": "Son tarihler",
+    "passed": "geçti",
+    "today": "bugün",
+    "inDays": "{days} gün"
+  },
+  "kanban": {
+    "heading": "Görev panon",
+    "description": "Küçük adımlar, teker teker. Kartları sütunlar arasında sürükle (ya da okları kullan) ve yardımcı olacaksa görevleri bir programa bağla.",
+    "newTask": "Yeni görev",
+    "emptyColumn": "Henüz burada bir şey yok.",
+    "showLabel": "Göster:",
+    "allTasks": "Tüm görevler",
+    "unassigned": "Atanmamış",
+    "doneEncouragement": "Aferin — ivme kendini besliyor.",
+    "draft": {
+      "titlePlaceholder": "Ne yapılması gerekiyor?",
+      "noProgram": "Program yok (genel görev)",
+      "dueDateLabel": "Bitiş tarihi (opsiyonel)",
+      "cancel": "Vazgeç",
+      "add": "Ekle"
+    },
+    "suggestions": {
+      "heading": "Hızlı başlangıç",
+      "description": "Çoğu başvuru süreci aynı birkaç görevle başlar. Eklemek için dokun.",
+      "items": {
+        "uploadTranscript": "Transkript yükle",
+        "writeMotivationLetter": "Motivasyon mektubu yaz",
+        "bookLanguageTest": "IELTS / TOEFL randevusu al",
+        "requestRecommendation": "Referans mektubu iste",
+        "payFee": "Başvuru ücretini öde",
+        "submitPortal": "Başvuru portalını gönder"
+      }
+    }
+  },
+  "task": {
+    "unlinkAriaLabel": "Programdan bağlantıyı kaldır",
+    "addDueDate": "Bitiş tarihi ekle",
+    "dueDateAriaLabel": "Bitiş tarihi",
+    "changeDueDate": "Bitiş tarihini değiştir",
+    "overdue": "gecikti",
+    "dueInDays": "{days} gün",
+    "moveLeft": "Sola taşı",
+    "moveRight": "Sağa taşı",
+    "cancel": "Vazgeç",
+    "delete": "Sil",
+    "deleteAriaLabel": "Görevi sil"
+  },
+  "progressCard": {
+    "greeting": "Merhaba, {name} — yurt dışında eğitim yolculuğun ilerliyor.",
+    "subtitleEmpty": "İlgilendiğin programları takip et ve büyük, soyut hedefi küçük, yapılabilir adımlara dönüştür.",
+    "subtitleWithApps": "{destinations} arasında {applications} yönetiyorsun. Adım adım — bunu başarabilirsin.",
+    "applicationsCount": "{count, plural, other {# başvuru}}",
+    "destinationsCount": "{count, plural, other {# hedef ülke}}",
+    "destinationsYours": "hedef ülkelerin",
+    "status": {
+      "dreaming": "Büyük hayaller kuruyor",
+      "finishLine": "Bitiş çizgisine yaklaşıyor",
+      "closingIn": "Hedefe yaklaşıyor",
+      "momentum": "İvme kazanıyor",
+      "starting": "Yeni başlıyor"
+    },
+    "exploringDestinations": "Hedef ülkeleri keşfediyor",
+    "anyDestination": "Herhangi bir yere açık",
+    "degreePrograms": "{degree} programları",
+    "overallProgress": "Genel ilerleme",
+    "progressHintEmpty": "İlerlemeyi görmek için ilk programını ekle.",
+    "progressHint": "Başvuruları aşamalarda ilerlettikçe ilerleme çubuğu güncellenir."
+  },
+  "documentStudio": {
+    "heading": "Belge stüdyosu",
+    "description": "Yapay zekâyla bir CV ya da programa özel bir motivasyon mektubu taslağı hazırla, sonra kendi tarzına göre düzenle. Taslaklar yalnızca senin verdiğin gerçekleri kullanır — eksik bilgiler [yer tutucu] olarak kalır, asla uydurulmaz.",
+    "tailorAriaLabel": "CV'yi takip ettiğin bir programa göre uyarlamak istersen (opsiyonel)",
+    "coverLetterProgramAriaLabel": "Motivasyon mektubunun yazıldığı program",
+    "generalCv": "Genel CV (program yok)",
+    "pickProgram": "Bir program seç…",
+    "coverLetterNeedsProgram": "Önce bir program takip etmeye başla — motivasyon mektubu her zaman belirli bir başvuru için yazılır.",
+    "highlightsLabel": "Geçmişin, kendi cümlelerinle",
+    "highlightsOptional": "(opsiyonel ama tavsiye edilir)",
+    "highlightsPlaceholderCv": "Eğitim tarihleri, stajlar ve işler (işveren, pozisyon, ne yaptığın), projeler, beceriler, sertifikalar… Türkçe yazabilirsin — taslak İngilizce çıkar.",
+    "highlightsPlaceholderCoverLetter": "Bu programı neden istiyorsun? İlgili dersler, projeler, iş deneyimi, sonrasında ne yapmak istediğin… Türkçe yazabilirsin — mektup İngilizce çıkar.",
+    "charsRemaining": "En az {count} karakter daha ekle — bir CV taslağı için gerçek bilgiler gerekiyor.",
+    "charCount": "{count} / {max} karakter",
+    "quizTip": "İpucu: taslakların hedeflerini ve İngilizce seviyeni de bilmesi için <link>testi çöz</link>.",
+    "drafting": "Taslak hazırlanıyor…",
+    "draftCv": "CV taslağı oluştur",
+    "draftCoverLetter": "Motivasyon mektubu taslağı oluştur",
+    "updatedOn": "{date} tarihinde güncellendi",
+    "close": "Kapat",
+    "open": "Aç",
+    "editAriaLabel": "{title} belgesini düzenle",
+    "saveChanges": "Değişiklikleri kaydet",
+    "saved": "Kaydedildi",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı",
+    "downloadPdf": "PDF indir",
+    "downloadMd": ".md indir",
+    "untitledDocument": "belge",
+    "delete": "Sil",
+    "deleteConfirm": "\"{title}\" silinsin mi? Bu işlem geri alınamaz.",
+    "popupBlocked": "Tarayıcın yazdırma penceresini engelledi — bu site için pop-up'lara izin ver ve tekrar dene.",
+    "placeholdersTitle": "Dışa aktarmadan önce yer tutucuları doldur",
+    "placeholdersDescription": "Bu değerler yalnızca PDF'e uygulanır — kaydedilen taslak yer tutucularını korur. Bir alanı boş bırakırsan olduğu gibi kalır.",
+    "saveAsPdf": "PDF olarak kaydet",
+    "cancel": "Vazgeç",
+    "reviewFooter": "Göndermeden önce mutlaka gözden geçir — her [yer tutucuyu] doldur ve bilgileri kontrol et. Yapay zekâ taslakları bir başlangıç noktasıdır, bitmiş bir başvuru değil."
+  },
+  "documentTitle": {
+    "cv": "CV",
+    "cvTailored": "CV — {program} için uyarlandı",
+    "coverLetter": "Motivasyon mektubu — {program}"
+  },
+  "errors": {
+    "invalidInput": "Geçersiz giriş.",
+    "notAuthorized": "Yetkin yok.",
+    "signInToTrack": "Başvuruları takip etmek için giriş yap.",
+    "signInToUpdate": "Başvuruları güncellemek için giriş yap.",
+    "signInFirst": "Önce giriş yap.",
+    "signInToAddTasks": "Görev eklemek için giriş yap.",
+    "signInToUpdateTasks": "Görevleri güncellemek için giriş yap.",
+    "signInToGenerateDocuments": "Belge oluşturmak için giriş yap.",
+    "signInToEditDocuments": "Belgeleri düzenlemek için giriş yap.",
+    "signInToDeleteDocuments": "Belgeleri silmek için giriş yap.",
+    "untrackFailed": "Bu başvuru takipten çıkarılamadı.",
+    "trackFailed": "Bu başvuru takibe alınamadı.",
+    "statusUpdateFailed": "Durum güncellenemedi.",
+    "notesUpdateFailed": "Notlar güncellenemedi.",
+    "deadlineUpdateFailed": "Son tarih güncellenemedi.",
+    "removeFailed": "Başvuru kaldırılamadı.",
+    "resetFailed": "İlerleme sıfırlanamadı. Tekrar dene.",
+    "taskCreateFailed": "Görev oluşturulamadı.",
+    "taskUpdateFailed": "Görev güncellenemedi.",
+    "taskMoveFailed": "Görev taşınamadı.",
+    "taskDeleteFailed": "Görev silinemedi.",
+    "coverLetterNeedsApplication": "Motivasyon mektubu için takip edilen bir program seç.",
+    "cvNeedsHighlights": "Önce geçmişin hakkında biraz bilgi ver — hiçbir şey olmadan hazırlanan bir CV sadece yer tutucularla dolu olur.",
+    "documentLimitReached": "{limit} belge sınırına ulaştın — devam etmek için birkaç eski taslağı sil.",
+    "aiDisabled": "Yapay zekâ ile taslak hazırlama geçici olarak kapalı.",
+    "aiTimeout": "Yapay zekâ çok uzun sürdü — lütfen tekrar dene.",
+    "generateFailed": "Taslak oluşturulamadı. Tekrar dene.",
+    "saveFailed": "Taslak kaydedilemedi.",
+    "saveChangesFailed": "Değişikliklerin kaydedilemedi.",
+    "deleteDocumentFailed": "Belge silinemedi."
+  }
+}

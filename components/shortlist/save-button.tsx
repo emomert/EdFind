@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Bookmark, BookmarkCheck } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { toggleSavedProgram } from "@/app/shortlist/actions";
 import { getOrCreateClientId } from "@/lib/quiz/client-id";
@@ -28,6 +29,7 @@ export function SaveButton({
   variant = "pill",
   onToggle,
 }: Props) {
+  const t = useTranslations("results.save");
   const router = useRouter();
   const [saved, setSaved] = useState(initiallySaved);
   const [pending, startTransition] = useTransition();
@@ -62,7 +64,7 @@ export function SaveButton({
     });
   };
 
-  const label = saved ? "Saved" : "Save";
+  const label = saved ? t("labelSaved") : t("labelUnsaved");
 
   if (variant === "icon") {
     return (
@@ -71,7 +73,7 @@ export function SaveButton({
         onClick={handleClick}
         disabled={pending}
         aria-pressed={saved}
-        aria-label={saved ? "Remove from shortlist" : "Save to shortlist"}
+        aria-label={saved ? t("ariaRemove") : t("ariaAdd")}
         title={error ?? label}
         className={cn(
           "inline-flex size-9 items-center justify-center rounded-full border transition-colors",
@@ -97,7 +99,7 @@ export function SaveButton({
       onClick={handleClick}
       disabled={pending}
       aria-pressed={saved}
-      aria-label={saved ? "Remove from shortlist" : "Save to shortlist"}
+      aria-label={saved ? t("ariaRemove") : t("ariaAdd")}
       title={error ?? undefined}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",

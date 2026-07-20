@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -7,6 +9,7 @@ type Props = {
 };
 
 export function QuizProgressBar({ currentStep, totalSteps, className }: Props) {
+  const t = useTranslations("quiz");
   const clampedStep = Math.max(1, Math.min(currentStep, totalSteps));
   const percent = Math.round((clampedStep / totalSteps) * 100);
 
@@ -14,7 +17,9 @@ export function QuizProgressBar({ currentStep, totalSteps, className }: Props) {
     <div className={cn("w-full", className)}>
       <div className="mb-2 flex items-center justify-between text-sm">
         <span className="font-medium text-foreground">
-          Question {clampedStep} of {totalSteps}
+          {t.has("progress.question")
+            ? t("progress.question", { current: clampedStep, total: totalSteps })
+            : `Question ${clampedStep} of ${totalSteps}`}
         </span>
         <span className="tabular-nums text-muted-foreground">{percent}%</span>
       </div>
@@ -23,7 +28,7 @@ export function QuizProgressBar({ currentStep, totalSteps, className }: Props) {
         aria-valuenow={clampedStep}
         aria-valuemin={1}
         aria-valuemax={totalSteps}
-        aria-label="Quiz progress"
+        aria-label={t.has("progress.ariaLabel") ? t("progress.ariaLabel") : "Quiz progress"}
         className="h-2 w-full overflow-hidden rounded-full bg-muted"
       >
         <div

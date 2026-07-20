@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "Yapay Zekâ ile Arama",
+    "description": "Hayalindeki yüksek lisans programını kendi cümlelerinle anlat. Yapay zekâmız bunu analiz edip katalogdaki tüm programlarla eşleştirir."
+  },
+  "badge": "Yapay zekâ destekli arama",
+  "heading": "Ne aradığını bize anlat",
+  "intro": "Hayalindeki yüksek lisans programını kendi cümlelerinle anlat — ülke, alan, bütçe, zamanlama, aklına ne gelirse. Yapay zekâmız anlattıklarını yapılandırılmış bir profile dönüştürüp katalogumuzdaki tüm programlarla eşleştirir.",
+  "form": {
+    "queryLabel": "Sorgun",
+    "placeholder": "örneğin: 'İtalya ya da İspanya'da yıllık 15.000 €'nun altında, 2 yıllık bir işletme yüksek lisansı istiyorum, bir yıllık staj deneyimim var.'",
+    "charsRemaining": "{count, plural, other {En az # karakter daha ekle}}",
+    "charCount": "{count} / 1000 karakter",
+    "submitHint": "Göndermek için <kbd>⌘ Enter</kbd> tuşuna bas",
+    "submit": "Beni programlarla eşleştir",
+    "preferQuiz": "Rehberli testi mi tercih edersin?"
+  },
+  "examples": {
+    "heading": "İlham mı lazım? Şunlardan birini dene",
+    "items": [
+      "İtalya ya da İspanya'da yıllık 15.000 €'nun altında, 2 yıllık bir işletme yüksek lisansı istiyorum, bir yıllık staj deneyimim var.",
+      "Almanya ya da İsviçre'de araştırma ağırlıklı bir yapay zekâ yüksek lisansı arıyorum. Sonrasında doktora yapmak istiyorum. İngilizcem akıcı.",
+      "Yeni mezun bir ekonomi öğrencisiyim, burs arıyorum, Hollanda ya da İsveç'te finans okumak istiyorum. Sonrasında Avrupa'da çalışmayı planlıyorum."
+    ]
+  },
+  "error": {
+    "heading": "Bir şeyler ters gitti",
+    "fallback": "Lütfen tekrar dene.",
+    "editQuery": "Sorgunu düzenle",
+    "tryAgain": "Tekrar dene"
+  },
+  "actions": {
+    "tooShort": "Ne aradığını biraz daha detaylı anlatır mısın (en az 8 karakter).",
+    "signInRequired": "Arama yapmak için giriş yapmalısın.",
+    "parseFailed": "Bu sorguyu anlayamadık. Farklı ifade etmeyi dene ya da testi kullan."
+  }
+}

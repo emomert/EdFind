@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { CLIENT_ID_COOKIE } from "@/lib/quiz/client-id";
@@ -29,15 +30,16 @@ const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 export async function toggleSavedProgram(
   rawInput: unknown,
 ): Promise<ToggleResult> {
+  const t = await getTranslations("results.save.errors");
   const parsed = ToggleInputSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
   const { clientId, programId } = parsed.data;
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to save programs.",
+      error: t("signInRequired"),
       needsAuth: true,
     };
   }
@@ -69,7 +71,7 @@ export async function toggleSavedProgram(
       .eq("id", existing.data.id);
     if (del.error) {
       console.error("[toggleSavedProgram] delete failed", del.error);
-      return { ok: false, error: "Couldn't update your list." };
+      return { ok: false, error: t("updateFailed") };
     }
     revalidatePath("/applications");
     revalidatePath("/shortlist");
@@ -89,7 +91,7 @@ export async function toggleSavedProgram(
       return { ok: true, saved: true };
     }
     console.error("[toggleSavedProgram] insert failed", ins.error);
-    return { ok: false, error: "Couldn't save program." };
+    return { ok: false, error: t("saveFailed") };
   }
   revalidatePath("/applications");
   revalidatePath("/shortlist");

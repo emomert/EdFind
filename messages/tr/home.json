@@ -1,0 +1,153 @@
+{
+  "hero": {
+    "badge": "Yapay zekâ destekli, tarafsız rehberlik",
+    "title": "Sana en uygun <highlight>Avrupa'daki yüksek lisans programını</highlight> bul.",
+    "subtitle": "EdFind, kısa bir test, önceliklerin ve her programın <em>neden</em> sana uyduğunu açıklayan bir yapay zekâ ile Türkiyeli öğrencileri Avrupa'nın güvenilir yüksek lisans programlarıyla eşleştirir — sadece en yüksek sıralı olanlarla değil.",
+    "takeQuiz": "{totalSteps} soruluk testi çöz",
+    "searchWithAi": "Yapay zekâ ile ara",
+    "signInCta": "Başlamak için giriş yap",
+    "browseUniversities": "Üniversitelere göz at",
+    "signedInNote": "Giriş yaptın — eşleşmelerin tüm cihazlarında seninle birlikte.",
+    "signedOutNote": "Google ile giriş yap · Yaklaşık 2 dakika sürer · Partner üniversiteleri asla sessizce öne çıkarmayız",
+    "howItWorks": "Nasıl çalışır",
+    "step1": "Bize kendinden bahset — {totalSteps} hızlı soru, ya da aradığını kendi cümlelerinle anlat.",
+    "step2": "Profilini kataloğumuzdaki tüm programlarla karşılaştırırız — {countries} ülke, gerçek öğrenim ücretleri, son başvuru tarihleri ve sıralamalar — ve sana en uygun 3 programı, her biri için kişisel bir açıklamayla (ve varsa ödünleşimleriyle) sunarız.",
+    "step3": "Derinleş: seçenekleri karşılaştır, barınma maliyetlerine ve doğrulanmış öğrenci deneyimlerine bak, sonra başvurularını tek yerden takip et."
+  },
+  "stats": {
+    "universities": "üniversite",
+    "programs": "program",
+    "countries": "ülke"
+  },
+  "featured": {
+    "heading": "Avrupa'nın dört bir yanından üniversiteler",
+    "subheading": "{countries} ülkede {universities} kurum — ve sayısı artıyor",
+    "browseCatalog": "Tüm kataloğa göz at"
+  },
+  "welcomeTour": {
+    "replayLink": "Hızlı turu başlat",
+    "dialogLabel": "Karşılama turu",
+    "skip": "Atla",
+    "skipAria": "Turu atla",
+    "stepOfTotal": "Adım {current} / {total}",
+    "back": "Geri",
+    "next": "İleri",
+    "cta": "Programlarımı bul",
+    "browseCatalogLink": "ya da önce kataloğa göz at",
+    "steps": {
+      "welcome": {
+        "badge": "Hoş geldin",
+        "title": "EdFind'a hoş geldin 👋",
+        "description": "Avrupa'daki yüksek lisans programları için yapay zekâ destekli rehberin — dağınık üniversite bilgileri tek bir yerde toplanır ve sana özel eşleştirilir."
+      },
+      "quiz": {
+        "badge": "Yapay zekâ eşleştirmesi",
+        "title": "Kısa bir test çöz",
+        "description": "Yaklaşık on iki hızlı soruyu yanıtla — atlayabileceğimiz her şey için isteğe bağlı serbest metin notları da ekleyebilirsin. Yapay zekâmız sana en uygun 3 programı sıralar ve her birinin neden uyduğunu açıklar."
+      },
+      "search": {
+        "badge": "Yapay zekâ ile arama",
+        "title": "Ya da kendi cümlelerinle anlat",
+        "description": "Örneğin “Hollanda'da uygun fiyatlı, İngilizce eğitim veren bilgisayar bilimleri yüksek lisansı” yaz, yapay zekâ araması bunu gerçek eşleşmelere dönüştürsün."
+      },
+      "catalog": {
+        "badge": "Keşfet",
+        "title": "Tüm kataloğu keşfet",
+        "description": "Kapsadığımız her üniversite ve program; ülke, alan, dil ve süreye göre filtrelenebilir. İçeri girdikten sonra Ctrl+K herhangi bir yerden aramayı açar."
+      },
+      "shortlist": {
+        "badge": "Karar ver",
+        "title": "Kaydet ve karşılaştır",
+        "description": "Beğendiğin programları kaydet — başvuru takibine düşerler — sonra öğrenim ücreti, son başvuru tarihi, dil ve sıralamayla yan yana karşılaştır."
+      },
+      "applications": {
+        "badge": "Başvur",
+        "title": "Başvurularını takip et",
+        "description": "İlerleme, son başvuru tarihleri ve hiçbir şeyin gözden kaçmaması için bir görev panosu içeren kişisel bir kontrol paneli."
+      },
+      "community": {
+        "badge": "Bağlan",
+        "title": "Gerçek öğrencilerden dinle",
+        "description": "Üniversite ve program grupları, samimi yorumlar ve senin gitmek istediğin yoldan geçmiş kampüs sorumluları."
+      },
+      "cta": {
+        "badge": "Hazır mısın?",
+        "title": "Hadi programını bulalım",
+        "description": "İlk eşleşmelerini almak yaklaşık iki dakika sürer. Objektif şekilde karşılaştırırız — ve kimseyi asla sessizce öne çıkarmayız."
+      }
+    }
+  },
+  "quizDemo": {
+    "link": "Testi çalışırken izle",
+    "badge": "Test önizlemesi — kendi kendine oynar",
+    "closeAria": "Önizlemeyi kapat",
+    "dialogAria": "Test önizlemesi",
+    "done": "Tamamlandı",
+    "footer": "Kısaltılmış bir önizleme — gerçek test {totalSteps} hızlı sorudan oluşur ve yaklaşık 2 dakika sürer.",
+    "steps": {
+      "destination": {
+        "legend": "Yüksek lisans yolculuğun için hangi hedef sana uygun?",
+        "helper": "Bir veya daha fazlasını seç. Her yere açıksan “Fark etmez”i seç.",
+        "options": ["İtalya", "Hollanda", "Almanya", "İsveç", "Fransa", "Fark etmez"]
+      },
+      "situation": {
+        "legend": "Şu anki durumunu en iyi ne tanımlar?",
+        "options": ["Şu anda lisans öğrencisiyim", "Yakında mezun oluyorum (son sınıf)", "Yeni mezunum", "Çalışan bir profesyonelim"]
+      },
+      "studied": {
+        "legend": "Ne okudun?",
+        "helper": "Lisans alanını kendi cümlelerinle anlat.",
+        "typed": "İstanbul Teknik Üniversitesi'nde Endüstri Mühendisliği lisansı okudum"
+      },
+      "wantToStudy": {
+        "legend": "Ne okumak istiyorsun?",
+        "helper": "İstediğin kadar serbest ol — bir alan, net bir konu ya da sadece bir his olabilir.",
+        "typed": "Veri bilimine geçmek istiyorum — tercihen tedarik zincirlerine uygulanan"
+      },
+      "budget": {
+        "legend": "Yıllık bütçen ne kadar?",
+        "helper": "Sadece öğrenim ücreti — yaşam maliyeti değil.",
+        "options": ["Sadece ücretsiz / tam burslu", "10.000 €'nun altı", "10.000 € – 15.000 €", "Esnek / henüz emin değilim"]
+      }
+    },
+    "finale": {
+      "title": "…ve eşleştirme işte o zaman gerçekleşir",
+      "description": "Cevapların 196 programın tamamıyla karşılaştırılır — gerçek öğrenim ücretleri, son başvuru tarihleri ve sıralamalar — ve her biri için kişisel bir açıklamayla en uygun 3 programını alırsın.",
+      "takeRealQuiz": "Gerçek testi çöz",
+      "replay": "Tekrar oynat"
+    }
+  },
+  "start": {
+    "meta": {
+      "title": "Program bul — EdFind",
+      "description": "EdFind'ın yüksek lisans program eşleşmelerini sana nasıl sunmasını istediğini seç: yapılandırılmış test ya da kendi cümlelerinle ne istediğini anlat."
+    },
+    "badge": "Aynı eşleştiriciye giden iki yol",
+    "title": "Eşleşmelerini nasıl <highlight>bulmak</highlight> istersin?",
+    "subtitle": "İki yol da aynı program kataloğundan aynı eşleşmelere çıkar — hangisi sana daha kolay geliyorsa onu seç. İstediğin zaman değiştirebilirsin.",
+    "recommended": "Önerilen",
+    "paths": {
+      "quiz": {
+        "eyebrow": "Yapılandırılmış",
+        "title": "{totalSteps} soruluk testi çöz",
+        "description": "Durumunu, üniversiteni, geçmişini, ne okumak istediğini, not ortalamanı, bütçeni ve hedeflerini kapsayan {totalSteps} hızlı sorudan geç — çoğu tek dokunuş, birkaçı kısa metin cevabı. Ne istediğine hâlâ karar veremediysen en iyisi bu.",
+        "bullets": ["Çoğunlukla dokunuş — bir okul araması ve birkaç kısa metin kutusu", "Taslaklar otomatik kaydedilir", "Arka planda aynı yapay zekâ eşleştiricisi"],
+        "duration": "≈ 2 dakika",
+        "cta": "Teste başla"
+      },
+      "search": {
+        "eyebrow": "Serbest metin",
+        "title": "İstediğini anlat",
+        "description": "Kendi cümlelerinle birkaç cümle yaz — “Kuzey Avrupa'da, 15 binin altında, İngilizce eğitim veren veri bilimi yüksek lisansı” gibi — biz de bunu yapılandırılmış bir profile dönüştürüp eşleştirelim.",
+        "bullets": ["Doğal dilde giriş", "Net tercihler için en iyisi", "Soru soru ilerleyen akışı atlar"],
+        "duration": "≈ 30 saniye",
+        "cta": "Yapay zekâ ile ara"
+      }
+    },
+    "footer": {
+      "title": "İki yol da aynı türde bir sonuç üretir.",
+      "description": "Her biri için kişisel bir gerekçeyle sıralanmış üç program eşleşmesi göreceksin. Partner üniversiteleri asla sessizce öne çıkarmayız ve yeni eşleşmeler almak için testi yeniden çözebilir ya da açıklamanı yeniden yazabilirsin.",
+      "browseCatalog": "Ya da tüm kataloğa göz at"
+    }
+  }
+}

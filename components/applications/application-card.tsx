@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import {
   ArrowRight,
   CalendarDays,
@@ -17,6 +18,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { UniversityLogo } from "@/components/university/university-logo";
+import type { Locale } from "@/lib/i18n/config";
+import { localizeCity, localizeCountry } from "@/lib/i18n/data-labels";
 import {
   removeApplication,
   setApplicationDeadline,
@@ -27,7 +30,6 @@ import {
 import { StatusPill } from "./status-pill";
 import {
   ALL_APPLICATION_STATUSES,
-  APPLICATION_STATUS_LABELS,
   COUNTRY_NAMES,
   type ApplicationItem,
 } from "./types";
@@ -35,33 +37,10 @@ import {
 // The natural next stage per status, surfaced as a one-click button so the
 // most common action (advancing an application) doesn't require opening the
 // Edit panel. Terminal/waiting statuses have no advance.
-const ADVANCE: Partial<
-  Record<ApplicationStatus, { to: ApplicationStatus; label: string }>
-> = {
-  interested: { to: "drafting", label: "Start drafting" },
-  drafting: { to: "submitted", label: "Mark submitted" },
+const ADVANCE: Partial<Record<ApplicationStatus, ApplicationStatus>> = {
+  interested: "drafting",
+  drafting: "submitted",
 };
-
-function nextStepFor(status: ApplicationStatus, hasNotes: boolean): string {
-  switch (status) {
-    case "interested":
-      return "Decide whether to apply. Move to Drafting when you start.";
-    case "drafting":
-      return hasNotes
-        ? "Finish the items in your notes, then submit."
-        : "Outline your documents and motivation letter.";
-    case "submitted":
-      return "Wait for the program's decision. Watch your inbox.";
-    case "waitlisted":
-      return "Stay close — reply quickly if a spot opens.";
-    case "accepted":
-      return "Compare offers, then confirm your enrollment.";
-    case "rejected":
-      return "Take a breath. Lean into your other applications.";
-    case "withdrawn":
-      return "Archived. Remove if you'd like to clear it.";
-  }
-}
 
 function daysUntil(dateStr: string | null): number | null {
   if (!dateStr) return null;
@@ -72,12 +51,11 @@ function daysUntil(dateStr: string | null): number | null {
   return Math.round((t - today.getTime()) / (24 * 60 * 60 * 1000));
 }
 
-function formatDeadline(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+function formatDeadline(dateStr: string, locale: Locale): string {
+  return new Date(dateStr).toLocaleDateString(
+    locale === "tr" ? "tr-TR" : "en-GB",
+    { day: "numeric", month: "short", year: "numeric" },
+  );
 }
 
 export function ApplicationCard({
@@ -93,12 +71,35 @@ export function ApplicationCard({
   onChange: (next: ApplicationItem) => void;
   onRemove: (id: string) => void;
 }) {
+  const t = useTranslations("applications");
+  const locale = useLocale() as Locale;
   const [pending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const [notes, setNotes] = useState(item.notes ?? "");
   const statusMenuRef = useRef<HTMLDivElement | null>(null);
   const u = item.program.university;
+
+  const nextStepFor = (status: ApplicationStatus, hasNotes: boolean): string => {
+    switch (status) {
+      case "interested":
+        return t("card.nextStep.interested");
+      case "drafting":
+        return hasNotes
+          ? t("card.nextStep.draftingWithNotes")
+          : t("card.nextStep.draftingNoNotes");
+      case "submitted":
+        return t("card.nextStep.submitted");
+      case "waitlisted":
+        return t("card.nextStep.waitlisted");
+      case "accepted":
+        return t("card.nextStep.accepted");
+      case "rejected":
+        return t("card.nextStep.rejected");
+      case "withdrawn":
+        return t("card.nextStep.withdrawn");
+    }
+  };
 
   // Close the status menu on any outside click.
   useEffect(() => {
@@ -149,7 +150,11 @@ export function ApplicationCard({
   };
 
   const handleRemove = () => {
-    if (!window.confirm(`Remove "${item.program.name}" from your tracker?`)) {
+    if (
+      !window.confirm(
+        t("card.removeConfirm", { program: item.program.name }),
+      )
+    ) {
       return;
     }
     onRemove(item.id);
@@ -191,7 +196,9 @@ export function ApplicationCard({
             <span className="text-sm text-slate-600">{u.name}</span>
           </div>
           <p className="mt-0.5 text-xs text-slate-500">
-            {u.city}, {COUNTRY_NAMES[u.country] || u.country} · {item.program.degree}
+            {localizeCity(u.city, locale)},{" "}
+            {localizeCountry(COUNTRY_NAMES[u.country] || u.country, locale)} ·{" "}
+            {item.program.degree}
           </p>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -202,7 +209,7 @@ export function ApplicationCard({
                 disabled={pending}
                 aria-haspopup="menu"
                 aria-expanded={statusMenuOpen}
-                title="Change status"
+                title={t("card.changeStatusTitle")}
                 className="group/status inline-flex items-center rounded-full outline-none transition-transform focus-visible:ring-2 focus-visible:ring-teal-300 active:scale-95"
               >
                 <StatusPill status={item.status} />
@@ -229,7 +236,7 @@ export function ApplicationCard({
                           : "text-slate-600 hover:bg-slate-50",
                       )}
                     >
-                      {APPLICATION_STATUS_LABELS[s]}
+                      {t(`status.${s}`)}
                       {s === item.status ? (
                         <CheckCircle2 className="size-3.5 text-teal-600" />
                       ) : null}
@@ -241,11 +248,11 @@ export function ApplicationCard({
             {ADVANCE[item.status] ? (
               <button
                 type="button"
-                onClick={() => handleStatus(ADVANCE[item.status]!.to)}
+                onClick={() => handleStatus(ADVANCE[item.status]!)}
                 disabled={pending}
                 className="inline-flex items-center gap-1 rounded-full border border-teal-200 bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-700 transition-colors hover:bg-teal-100"
               >
-                {ADVANCE[item.status]!.label}
+                {t(`card.advance.${item.status}`)}
                 <ArrowRight className="size-3" />
               </button>
             ) : null}
@@ -257,15 +264,14 @@ export function ApplicationCard({
                     ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
                     : "bg-teal-50 text-teal-700 ring-teal-200",
                 )}
-                title={`${taskDone} of ${taskTotal} task${taskTotal === 1 ? "" : "s"} done`}
+                title={t("card.tasksTitle", { done: taskDone, total: taskTotal })}
               >
                 {taskDone === taskTotal ? (
                   <CheckCircle2 className="size-3" />
                 ) : (
                   <ListChecks className="size-3" />
                 )}
-                {taskDone} / {taskTotal}{" "}
-                {taskTotal === 1 ? "task" : "tasks"}
+                {t("card.tasksBadge", { done: taskDone, total: taskTotal })}
               </span>
             )}
             {effectiveDeadline && (
@@ -280,23 +286,28 @@ export function ApplicationCard({
               >
                 <CalendarDays className="size-3" />
                 {days != null && days >= 0
-                  ? `${formatDeadline(effectiveDeadline)} · in ${days}d`
+                  ? t("card.deadlineInDays", {
+                      date: formatDeadline(effectiveDeadline, locale),
+                      days,
+                    })
                   : days != null
-                  ? `${formatDeadline(effectiveDeadline)} · passed`
-                  : formatDeadline(effectiveDeadline)}
+                  ? t("card.deadlinePassed", {
+                      date: formatDeadline(effectiveDeadline, locale),
+                    })
+                  : formatDeadline(effectiveDeadline, locale)}
               </span>
             )}
           </div>
 
           <p className="mt-2 text-sm text-slate-600">
-            <span className="font-medium text-slate-800">Next:</span>{" "}
+            <span className="font-medium text-slate-800">{t("card.nextLabel")}</span>{" "}
             {nextStepFor(item.status, Boolean(item.notes?.trim()))}
           </p>
         </div>
 
         <div className="hidden flex-col items-end gap-2 sm:flex">
           <Button asChild size="sm" variant="default">
-            <Link href={`/programs/${u.slug}/${item.program.slug}`}>Open</Link>
+            <Link href={`/programs/${u.slug}/${item.program.slug}`}>{t("card.open")}</Link>
           </Button>
           <button
             type="button"
@@ -304,7 +315,7 @@ export function ApplicationCard({
             className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-700"
             aria-expanded={open}
           >
-            {open ? "Hide" : "Edit"}
+            {open ? t("card.hide") : t("card.edit")}
             <ChevronDown
               className={cn("size-3 transition-transform", open && "rotate-180")}
             />
@@ -315,7 +326,7 @@ export function ApplicationCard({
           type="button"
           onClick={() => setOpen((o) => !o)}
           className="sm:hidden inline-flex size-8 items-center justify-center rounded-md text-slate-500 hover:bg-slate-50"
-          aria-label="More"
+          aria-label={t("card.moreAriaLabel")}
         >
           <MoreHorizontal className="size-4" />
         </button>
@@ -331,7 +342,7 @@ export function ApplicationCard({
         >
           <label className="block">
             <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-              Status
+              {t("card.statusLabel")}
             </span>
             <select
               value={item.status}
@@ -341,7 +352,7 @@ export function ApplicationCard({
             >
               {ALL_APPLICATION_STATUSES.map((s) => (
                 <option key={s} value={s}>
-                  {APPLICATION_STATUS_LABELS[s]}
+                  {t(`status.${s}`)}
                 </option>
               ))}
             </select>
@@ -349,10 +360,15 @@ export function ApplicationCard({
 
           <label className="block">
             <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-              Your deadline
+              {t("card.deadlineLabel")}
               {item.program.application_deadline && (
                 <span className="ml-1 text-[10px] font-normal text-slate-400">
-                  (program: {formatDeadline(item.program.application_deadline)})
+                  {t("card.deadlineProgramNote", {
+                    date: formatDeadline(
+                      item.program.application_deadline,
+                      locale,
+                    ),
+                  })}
                 </span>
               )}
             </span>
@@ -367,7 +383,7 @@ export function ApplicationCard({
 
           <label className="block sm:col-span-1">
             <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-              Notes
+              {t("card.notesLabel")}
             </span>
             <textarea
               value={notes}
@@ -375,7 +391,7 @@ export function ApplicationCard({
               onBlur={handleNotesBlur}
               rows={2}
               maxLength={2000}
-              placeholder="Documents, recommenders, blockers…"
+              placeholder={t("card.notesPlaceholder")}
               className="mt-1 w-full resize-none rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
             />
           </label>
@@ -388,7 +404,7 @@ export function ApplicationCard({
                 rel="noreferrer noopener"
                 className="inline-flex items-center gap-1 text-xs font-medium text-teal-700 hover:underline"
               >
-                Official site
+                {t("card.officialSite")}
                 <ExternalLink className="size-3" />
               </a>
             ) : (
@@ -401,7 +417,7 @@ export function ApplicationCard({
               className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-50"
             >
               <Trash2 className="size-3" />
-              Remove
+              {t("card.remove")}
             </button>
           </div>
         </motion.div>

@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "matches": {
+      "title": "Eşleşmelerin",
+      "description": "Profiline göre eşleştirilen yüksek lisans programları."
+    },
+    "compare": {
+      "title": "Programları karşılaştır",
+      "description": "Kaydedilenler listendeki yüksek lisans programlarının yan yana karşılaştırması."
+    },
+    "shortlist": {
+      "title": "Kaydedilenlerin",
+      "description": "Kaydettiğin programlar."
+    }
+  },
+  "matches": {
+    "count": "{count, plural, other {Avrupa'daki yüksek lisans programları kataloğundan # eşleşme}}",
+    "retakeQuiz": "Testi tekrar çöz",
+    "topMatch": "En iyi eşleşmen",
+    "score": "Eşleşme puanı",
+    "whyThisFits": "Bu neden sana uygun",
+    "stat": {
+      "location": "Konum",
+      "field": "Alan",
+      "language": "Dil",
+      "duration": "Süre",
+      "durationValue": "{count} ay",
+      "tuition": "Öğrenim ücreti",
+      "starts": "Başlangıç",
+      "subjectRanking": "Alan sıralaması",
+      "subjectRankingValue": "{area} alanında #{rank}"
+    },
+    "qsWorldwide": "Dünyada QS #{rank}",
+    "qsRank": "QS #{rank}",
+    "partner": "Partner",
+    "aboutProgram": "Bu program hakkında",
+    "seeFullProgramDetails": "Programın tüm detaylarını gör",
+    "visitUniversitySite": "Üniversitenin sitesini ziyaret et",
+    "seeFullDetails": "Tüm detayları gör",
+    "otherMatches": {
+      "heading": "Diğer güçlü eşleşmeler",
+      "intro": "Profiline genel uyumuna göre sıralandı. Programın tüm detayları için tıkla."
+    },
+    "backToHome": "Ana sayfaya dön"
+  },
+  "save": {
+    "labelSaved": "Kaydedildi",
+    "labelUnsaved": "Kaydet",
+    "ariaRemove": "Kaydedilenlerden çıkar",
+    "ariaAdd": "Kaydedilenlere ekle",
+    "errors": {
+      "invalidInput": "Geçersiz giriş.",
+      "signInRequired": "Program kaydetmek için giriş yapmalısın.",
+      "updateFailed": "Listeni güncelleyemedik.",
+      "saveFailed": "Programı kaydedemedik."
+    }
+  },
+  "shortlist": {
+    "heading": "Kaydedilenlerin",
+    "emptyDescription": "Henüz hiç program kaydetmedin.",
+    "countDescription": "{count, plural, other {# program kaydedildi.}}",
+    "qsRank": "QS #{rank}",
+    "compareHelperZero": "Yan yana karşılaştırmak için en az 2 program işaretle (en fazla {max}).",
+    "compareHelperOne": "Karşılaştırmak için bir tane daha seç.",
+    "selectedCount": "{count} seçildi.",
+    "selectedCountMax": "{count} seçildi (maksimum).",
+    "compareButton": "Karşılaştır",
+    "selectForCompare": "Karşılaştırmak için seç",
+    "compareLabel": "Karşılaştır",
+    "seeFullDetails": "Tüm detayları gör",
+    "empty": {
+      "heading": "Henüz bir şey kaydetmedin",
+      "description": "Herhangi bir program kartındaki ya da detay sayfasındaki kaydet düğmesine bas, program burada belirsin — yan yana karşılaştırmaya hazır.",
+      "takeQuiz": "Testi çöz",
+      "searchWithAi": "Yapay zekâ ile ara"
+    },
+    "fields": {
+      "field": "Alan",
+      "tuition": "Öğrenim ücreti",
+      "duration": "Süre",
+      "durationValue": "{count} ay",
+      "language": "Dil",
+      "subjectRank": "Alan sıralaması",
+      "subjectRankValue": "{area} #{rank}"
+    }
+  },
+  "compare": {
+    "backToShortlist": "Kaydedilenlere dön",
+    "heading": "Programları karşılaştır",
+    "countLabel": "{count} program yan yana",
+    "groups": {
+      "basics": "Temel bilgiler",
+      "costTiming": "Maliyet ve zamanlama",
+      "rankings": "Sıralamalar",
+      "admissions": "Başvuru koşulları"
+    },
+    "rows": {
+      "field": "Alan",
+      "degree": "Derece",
+      "language": "Dil",
+      "duration": "Süre",
+      "durationValue": "{count} ay",
+      "tuition": "Öğrenim ücreti",
+      "applicationDeadline": "Son başvuru tarihi",
+      "startMonth": "Başlangıç ayı",
+      "universityQsWorld": "Üniversite (QS Dünya)",
+      "subjectRanking": "Alan sıralaması",
+      "subjectRankingValue": "{area} alanında #{rank}",
+      "gpaAcademic": "Not ortalaması / akademik",
+      "acceptedEnglishTests": "Kabul edilen İngilizce sınavları",
+      "documentsToPrepare": "Hazırlanması gereken belgeler"
+    },
+    "values": {
+      "notListed": "Belirtilmemiş",
+      "rollingNotPosted": "Sürekli kabul / belirtilmemiş",
+      "notPosted": "Belirtilmemiş",
+      "notSpecified": "Belirtilmemiş"
+    }
+  }
+}

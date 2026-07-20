@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   Award,
   Building2,
@@ -27,6 +28,14 @@ import { HOUSING_ENABLED } from "@/lib/feature-flags";
 import { getHousing } from "@/lib/housing/server";
 import { HousingSection } from "@/components/housing/housing-section";
 import { Reveal } from "@/components/motion";
+import type { Locale } from "@/lib/i18n/config";
+import {
+  localizeCity,
+  localizeCountry,
+  localizeField,
+  localizeLanguage,
+} from "@/lib/i18n/data-labels";
+import { COUNTRY_NAMES } from "@/components/applications/types";
 
 type Params = { universitySlug: string; programSlug: string };
 
@@ -51,12 +60,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { universitySlug, programSlug } = await params;
   const supabase = await createClient();
+  const t = await getTranslations("university");
   const uniRes = await supabase
     .from("universities")
     .select("id, name")
     .eq("slug", universitySlug)
     .maybeSingle();
-  if (!uniRes.data) return { title: "Program not found" };
+  if (!uniRes.data) return { title: t("programPage.meta.notFound") };
 
   const progRes = await supabase
     .from("programs")
@@ -65,13 +75,19 @@ export async function generateMetadata({
     .eq("slug", programSlug)
     .maybeSingle();
 
-  if (!progRes.data) return { title: "Program not found" };
+  if (!progRes.data) return { title: t("programPage.meta.notFound") };
 
   return {
-    title: `${progRes.data.name} — ${uniRes.data.name}`,
+    title: t("programPage.meta.title", {
+      program: progRes.data.name,
+      university: uniRes.data.name,
+    }),
     description:
       progRes.data.description?.slice(0, 160) ??
-      `${progRes.data.name} at ${uniRes.data.name}.`,
+      t("programPage.meta.descriptionFallback", {
+        program: progRes.data.name,
+        university: uniRes.data.name,
+      }),
   };
 }
 
@@ -82,6 +98,8 @@ export default async function ProgramPage({
 }) {
   const { universitySlug, programSlug } = await params;
   const publicDb = await createClient();
+  const t = await getTranslations("university");
+  const locale = (await getLocale()) as Locale;
 
   const uniRes = await publicDb
     .from("universities")
@@ -140,21 +158,26 @@ export default async function ProgramPage({
     ? new Date(p.application_deadline)
     : null;
   const deadlineLabel = deadlineDate
-    ? deadlineDate.toLocaleDateString("en-GB", {
+    ? deadlineDate.toLocaleDateString(locale === "tr" ? "tr-TR" : "en-GB", {
         day: "numeric",
         month: "long",
         year: "numeric",
       })
-    : "Rolling / not posted";
+    : t("programPage.deadlineNotPosted");
 
-  const tuitionLabel = formatTuition(p.tuition_per_year, p.currency);
+  const tuitionLabel = formatTuition(
+    p.tuition_per_year,
+    p.currency,
+    "long",
+    locale,
+  );
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
       <Breadcrumbs
         items={[
-          { href: "/", label: "Home" },
-          { href: "/catalog", label: "Catalog" },
+          { href: "/", label: t("breadcrumbs.home") },
+          { href: "/catalog", label: t("breadcrumbs.catalog") },
           { href: `/universities/${u.slug}`, label: u.name },
           { label: p.name },
         ]}
@@ -178,7 +201,7 @@ export default async function ProgramPage({
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1">
             <GraduationCap className="size-3.5" />
-            {formatField(p.field_of_study)}
+            {formatField(p.field_of_study, locale)}
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1">
             <Building2 className="size-3.5" />
@@ -186,12 +209,13 @@ export default async function ProgramPage({
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1">
             <MapPin className="size-3.5" />
-            {u.city}, {u.country}
+            {localizeCity(u.city, locale)},{" "}
+            {localizeCountry(COUNTRY_NAMES[u.country] || u.country, locale)}
           </span>
           {u.is_partner ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-secondary-foreground">
               <Sparkles className="size-3.5" />
-              Partner
+              {t("programPage.partnerBadge")}
             </span>
           ) : null}
         </div>
@@ -204,7 +228,10 @@ export default async function ProgramPage({
           {p.qs_subject_rank && p.qs_subject_area ? (
             <span className="ml-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
               <Award className="size-3" />
-              QS #{p.qs_subject_rank} in {p.qs_subject_area}
+              {t("programPage.qsSubjectRank", {
+                rank: p.qs_subject_rank,
+                area: localizeField(p.qs_subject_area ?? "", locale),
+              })}
             </span>
           ) : null}
         </p>
@@ -212,26 +239,26 @@ export default async function ProgramPage({
       </div>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
-        <Stat icon={<Wallet className="size-4" />} label="Tuition">
+        <Stat icon={<Wallet className="size-4" />} label={t("programPage.stats.tuition")}>
           {tuitionLabel}
         </Stat>
-        <Stat icon={<CalendarDays className="size-4" />} label="Duration">
-          {p.duration_months} months
+        <Stat icon={<CalendarDays className="size-4" />} label={t("programPage.stats.duration")}>
+          {t("duration.months", { months: p.duration_months })}
         </Stat>
-        <Stat icon={<Languages className="size-4" />} label="Language">
-          {formatLanguage(p.language)}
+        <Stat icon={<Languages className="size-4" />} label={t("programPage.stats.language")}>
+          {formatLanguage(p.language, locale)}
         </Stat>
-        <Stat icon={<CalendarDays className="size-4" />} label="Deadline">
+        <Stat icon={<CalendarDays className="size-4" />} label={t("programPage.stats.deadline")}>
           {deadlineLabel}
         </Stat>
         {p.start_month ? (
-          <Stat icon={<CalendarDays className="size-4" />} label="Starts">
+          <Stat icon={<CalendarDays className="size-4" />} label={t("programPage.stats.starts")}>
             {p.start_month}
           </Stat>
         ) : null}
         {u.qs_world_rank ? (
-          <Stat icon={<Award className="size-4" />} label="University rank">
-            QS #{u.qs_world_rank} worldwide
+          <Stat icon={<Award className="size-4" />} label={t("programPage.stats.universityRank")}>
+            {t("programPage.universityRankWorldwide", { rank: u.qs_world_rank })}
           </Stat>
         ) : null}
       </div>
@@ -239,7 +266,7 @@ export default async function ProgramPage({
       {p.description ? (
         <section className="mt-12">
           <h2 className="text-xl font-semibold tracking-tight">
-            About this program
+            {t("programPage.aboutHeading")}
           </h2>
           <p className="mt-3 leading-relaxed text-muted-foreground">
             {p.description}
@@ -252,19 +279,19 @@ export default async function ProgramPage({
           <div>
             <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               <ListChecks className="size-4" />
-              Admission requirements
+              {t("programPage.requirements.heading")}
             </h3>
             <dl className="mt-4 space-y-3 text-sm">
               {requirements.gpa_min ? (
                 <div>
-                  <dt className="font-medium text-foreground">GPA / academic background</dt>
+                  <dt className="font-medium text-foreground">{t("programPage.requirements.gpaLabel")}</dt>
                   <dd className="mt-1 text-muted-foreground">{requirements.gpa_min}</dd>
                 </div>
               ) : null}
               {requirements.language_tests &&
               requirements.language_tests.length > 0 ? (
                 <div>
-                  <dt className="font-medium text-foreground">Accepted English tests</dt>
+                  <dt className="font-medium text-foreground">{t("programPage.requirements.englishTestsLabel")}</dt>
                   <dd className="mt-1 text-muted-foreground">
                     {requirements.language_tests.join(" · ")}
                   </dd>
@@ -276,7 +303,7 @@ export default async function ProgramPage({
             <div>
               <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 <FileText className="size-4" />
-                Documents to prepare
+                {t("programPage.requirements.documentsHeading")}
               </h3>
               <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
                 {requirements.documents.map((d) => (
@@ -295,14 +322,14 @@ export default async function ProgramPage({
         {u.website ? (
           <Button asChild>
             <a href={u.website} target="_blank" rel="noreferrer noopener">
-              Apply on {u.name}&apos;s site
+              {t("programPage.applyOnSite", { university: u.name })}
               <ExternalLink />
             </a>
           </Button>
         ) : null}
         <Button asChild variant="outline">
           <Link href={`/universities/${u.slug}`}>
-            See all programs at {u.name}
+            {t("programPage.seeAllPrograms", { university: u.name })}
           </Link>
         </Button>
         <SaveButton programId={p.id} initiallySaved={isSaved} />
@@ -321,7 +348,7 @@ export default async function ProgramPage({
       {peers.length > 0 ? (
         <section className="mt-16 border-t border-border pt-10">
           <h2 className="text-xl font-semibold tracking-tight">
-            Other programs at {u.name}
+            {t("programPage.otherProgramsHeading", { university: u.name })}
           </h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {peers.map((peer) => (
@@ -331,13 +358,14 @@ export default async function ProgramPage({
                 className="group rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/40 hover:bg-accent/30"
               >
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  {formatField(peer.field_of_study)}
+                  {formatField(peer.field_of_study, locale)}
                 </p>
                 <p className="mt-1 text-sm font-semibold leading-snug group-hover:text-primary">
                   {peer.name}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {peer.degree} · {peer.duration_months} months
+                  {peer.degree} ·{" "}
+                  {t("duration.months", { months: peer.duration_months })}
                 </p>
               </Link>
             ))}
@@ -379,8 +407,8 @@ const FIELD_LABELS: Record<string, string> = {
   social_sciences: "Social Sciences",
 };
 
-function formatField(field: string): string {
-  return FIELD_LABELS[field] ?? field;
+function formatField(field: string, locale: Locale): string {
+  return localizeField(FIELD_LABELS[field] ?? field, locale);
 }
 
 const LANGUAGE_LABELS: Record<string, string> = {
@@ -391,6 +419,6 @@ const LANGUAGE_LABELS: Record<string, string> = {
   fr: "French",
 };
 
-function formatLanguage(code: string): string {
-  return LANGUAGE_LABELS[code] ?? code.toUpperCase();
+function formatLanguage(code: string, locale: Locale): string {
+  return localizeLanguage(LANGUAGE_LABELS[code] ?? code.toUpperCase(), locale);
 }

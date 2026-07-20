@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "title": "Canlı demo",
+    "description": "EdFind testinin ve yapay zekâ eşleştirmesinin baştan sona nasıl işlediğini izle — gerçek 14 soruluk akış ve kişiselleştirilmiş gerekçeleriyle sıralanmış ilk 3 eşleşme."
+  },
+  "home": {
+    "badge": "Yapay zekâ destekli, tarafsız rehberlik",
+    "title": "Sana en uygun <highlight>Avrupa'daki yüksek lisans programını</highlight> bul.",
+    "intro": "EdFind, kısa bir test, önceliklerin ve her programın <em>neden</em> sana uyduğunu açıklayan bir yapay zekâ ile Türkiyeli öğrencileri Avrupa'nın güvenilir yüksek lisans programlarıyla eşleştirir — sadece en yüksek sıralı olanlarla değil.",
+    "ctaQuiz": "{count} soruluk testi çöz",
+    "ctaSearch": "Yapay zekâ ile ara",
+    "signInNote": "Google ile giriş yap · Yaklaşık 2 dakika sürer · Partner üniversiteleri asla sessizce öne çıkarmayız",
+    "statUniversities": "üniversite",
+    "statPrograms": "program",
+    "statCountries": "ülke",
+    "howItWorksTitle": "Nasıl çalışır",
+    "step1": "Bize kendinden bahset — {count} hızlı soru, ya da aradığını kendi cümlelerinle anlat.",
+    "step2": "Profilini kataloğumuzdaki tüm programlarla karşılaştırırız — {countries} ülke, gerçek öğrenim ücretleri, son başvuru tarihleri ve sıralamalar — ve sana en uygun 3 programı, her biri için kişisel bir açıklamayla (ve varsa ödünleşimleriyle) sunarız.",
+    "step3": "Derinleş: seçenekleri karşılaştır, barınma maliyetlerine ve doğrulanmış öğrenci deneyimlerine bak, sonra başvurularını tek yerden takip et.",
+    "universitiesHeading": "Avrupa'nın dört bir yanından üniversiteler",
+    "universitiesSubtitle": "{countries} ülkede {universities} kurum — ve sayısı artıyor"
+  },
+  "results": {
+    "matchCount": "Avrupa yüksek lisans programları kataloğundan {count, plural, one {# eşleşme} other {# eşleşme}}",
+    "replay": "Demoyu tekrar oynat",
+    "savedBanner": "Başvurularına kaydedildi",
+    "viewApplications": "Başvuruları görüntüle",
+    "otherMatchesTitle": "Diğer güçlü eşleşmeler",
+    "otherMatchesSubtitle": "Profiline genel uygunluğa göre sıralandı. Programın tüm ayrıntıları için tıkla.",
+    "replayFromStart": "Baştan tekrar oynat",
+    "save": "Kaydet",
+    "saved": "Kaydedildi"
+  },
+  "chrome": {
+    "badge": "Demo — otomatik oynatılıyor",
+    "replay": "Tekrar oynat"
+  }
+}

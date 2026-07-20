@@ -1,0 +1,9 @@
+{
+  "errors": {
+    "signInRequired": "Profilini göndermek için giriş yapman gerekiyor.",
+    "profileSaveFailed": "Profilin kaydedilemedi. Lütfen tekrar dene.",
+    "catalogNotReady": "Program kataloğumuz henüz hazır değil. Lütfen biraz sonra tekrar dene.",
+    "matcherFailed": "Eşleştirme çalıştırılamadı. Lütfen tekrar dene.",
+    "matchesSaveFailed": "Eşleşmelerin kaydedilemedi. Lütfen tekrar dene."
+  }
+}

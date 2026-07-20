@@ -12,6 +12,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import type { CommunityGroup, CommunityUser } from "@/lib/community/types";
@@ -32,10 +33,11 @@ const ACTIVITY_DOT: Record<CommunityGroup["activityLevel"], string> = {
   high: "bg-emerald-500",
 };
 
-const ACTIVITY_LABEL: Record<CommunityGroup["activityLevel"], string> = {
-  low: "Quiet",
-  medium: "Active",
-  high: "Buzzing",
+// Maps activity level to its translation key under community.group.
+const ACTIVITY_LABEL_KEY: Record<CommunityGroup["activityLevel"], string> = {
+  low: "activityLow",
+  medium: "activityMedium",
+  high: "activityHigh",
 };
 
 // The display name for a group: program groups encode their parent uni in
@@ -64,6 +66,7 @@ export function CommunityGroupCard({
   onOpenChat: (g: CommunityGroup) => void;
 }) {
   const { isSubscribed } = useSubscription();
+  const t = useTranslations("community");
   const isProgram = group.type === "program";
   const displayName = groupDisplayName(group);
   // Programs don't have their own logo — they show the parent university's.
@@ -103,7 +106,7 @@ export function CommunityGroupCard({
             ) : (
               <Building2 className="size-2.5" />
             )}
-            {isProgram ? "Program" : "University"}
+            {isProgram ? t("group.typeProgram") : t("group.typeUniversity")}
           </span>
           <h3 className="line-clamp-1 text-sm font-semibold text-slate-900">
             <Link
@@ -135,10 +138,10 @@ export function CommunityGroupCard({
           className={cn(
             "inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600 ring-1 ring-inset ring-slate-200",
           )}
-          title={`Activity: ${ACTIVITY_LABEL[group.activityLevel]}`}
+          title={t("group.activityTitle", { label: t(`group.${ACTIVITY_LABEL_KEY[group.activityLevel]}`) })}
         >
           <span className={cn("inline-block size-1.5 rounded-full", ACTIVITY_DOT[group.activityLevel])} />
-          {ACTIVITY_LABEL[group.activityLevel]}
+          {t(`group.${ACTIVITY_LABEL_KEY[group.activityLevel]}`)}
         </span>
       </header>
 
@@ -153,13 +156,13 @@ export function CommunityGroupCard({
         </span>
         <span className="inline-flex items-center gap-1 text-teal-700">
           <BadgeCheck className="size-3.5" />
-          {group.verifiedStudentCount} verified
+          {t("group.verifiedCount", { count: group.verifiedStudentCount })}
         </span>
       </div>
 
       {group.latestDiscussionPreview && (
         <div className="rounded-xl bg-slate-50 px-3 py-2 text-xs leading-relaxed text-slate-700">
-          <span className="text-slate-400">Latest discussion · </span>
+          <span className="text-slate-400">{t("group.latestDiscussion")}</span>
           <span className="italic">“{group.latestDiscussionPreview}”</span>
         </div>
       )}
@@ -174,12 +177,12 @@ export function CommunityGroupCard({
               ))}
             </div>
             <span className="truncate text-[11px] text-slate-500">
-              Campus responsible{responsibles.length > 1 ? "s" : ""}
+              {t("group.responsiblePlural", { count: responsibles.length })}
             </span>
           </div>
         ) : (
           <span className="text-[11px] italic text-slate-400">
-            Responsible coming soon
+            {t("group.responsibleComingSoon")}
           </span>
         )}
 
@@ -188,7 +191,7 @@ export function CommunityGroupCard({
             href={groupDetailHref(group)}
             className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:border-teal-300 hover:text-teal-700"
           >
-            {isProgram ? "Program page" : "University page"}
+            {isProgram ? t("group.programPage") : t("group.universityPage")}
             <ArrowUpRight className="size-3" />
           </Link>
           <button
@@ -204,12 +207,12 @@ export function CommunityGroupCard({
             {isSubscribed ? (
               <>
                 <MessagesSquare className="size-3.5" />
-                Join chat
+                {t("group.joinChat")}
               </>
             ) : (
               <>
                 <Lock className="size-3" />
-                Preview
+                {t("common.preview")}
               </>
             )}
           </button>
@@ -231,6 +234,7 @@ export function CommunityGroupChip({
   universityLogoUrl?: string | null;
   onClick: () => void;
 }) {
+  const t = useTranslations("community.group");
   return (
     <button
       type="button"
@@ -248,7 +252,7 @@ export function CommunityGroupChip({
           {group.name.replace(" Community", "")}
         </p>
         <p className="text-[11px] text-slate-500">
-          {countryName} · {group.memberCount.toLocaleString()} members
+          {countryName} · {t("memberCount", { count: group.memberCount })}
         </p>
       </div>
       <Zap className="size-3 text-slate-300 group-hover:text-teal-500" />

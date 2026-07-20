@@ -1,0 +1,176 @@
+{
+  "meta": {
+    "title": "Topluluk — Doğrulanmış Öğrenci Deneyimleri",
+    "description": "Avrupa'daki doğrulanmış öğrencilerden gerçek deneyimler. Üniversite ve program topluluklarına katıl, sorular sor ve sana en uygun yolu seç."
+  },
+  "hero": {
+    "badge": "Doğrulanmış Öğrenci Deneyimleri",
+    "heading": "Gerçek deneyimler. Gerçek öğrenciler. <highlight>Gerçek cevaplar.</highlight>",
+    "body": "Soru sormak, deneyimleri karşılaştırmak ve sana en uygun yolu seçmek için üniversite ve program topluluklarına katıl. Her ses doğrulanmıştır — spam yok, anonim gürültü yok.",
+    "chips": {
+      "verifiedOnly": "Sadece doğrulanmış",
+      "europeanFocus": "Avrupa odaklı",
+      "communityDriven": "Topluluk destekli",
+      "campusResponsibles": "Kampüs sorumluları",
+      "programSpecificGroups": "Programa özel gruplar"
+    }
+  },
+  "tabs": {
+    "ariaLabel": "Topluluk bölümleri",
+    "reviews": "Değerlendirmeler",
+    "groups": "Gruplar",
+    "questions": "Sorular",
+    "responsibles": "Kampüs sorumluları"
+  },
+  "filters": {
+    "searchPlaceholder": "Değerlendirme, grup, soru ara…",
+    "countryAriaLabel": "Ülkeye göre filtrele",
+    "universityAriaLabel": "Üniversiteye göre filtrele",
+    "fieldAriaLabel": "Alana göre filtrele",
+    "sortAriaLabel": "Sonuçları sırala",
+    "sortPrefix": "Sırala:",
+    "allCountries": "Tüm ülkeler",
+    "allUniversities": "Tüm üniversiteler",
+    "allFields": "Tüm alanlar",
+    "verifiedOnly": "Sadece doğrulanmış",
+    "sort": {
+      "mostHelpful": "En yararlı",
+      "mostActive": "En aktif",
+      "mostRecent": "En yeni",
+      "mostMembers": "En çok üye",
+      "highestRated": "En yüksek puanlı"
+    }
+  },
+  "groupType": {
+    "ariaLabel": "Grupları türe göre filtrele",
+    "all": "Tümü",
+    "universities": "Üniversiteler",
+    "programs": "Programlar"
+  },
+  "actionCards": {
+    "verifyNote": "{action}, doğrulanmış öğrenciler içindir — üniversite e-postanı “Doğrulanmış öğrenci ol” kartında onayla.",
+    "askAction": "Soru sorma",
+    "shareAction": "Değerlendirme yazma",
+    "ask": {
+      "heading": "Topluluğa sor",
+      "body": "Belirli bir konuda mı takıldın? Bir soru bırak — doğrulanmış öğrenciler ve sorumlular, net ve kısa sorulara en hızlı cevap verir.",
+      "button": "Soru sor"
+    },
+    "share": {
+      "heading": "Deneyimini paylaş",
+      "body": "Şu anda okuyor ya da mezun mu oldun? Doğrulanmış bir değerlendirme yaz ve bir sonraki döneme daha iyi bir karar vermesinde yardımcı ol.",
+      "button": "Değerlendirme yaz"
+    }
+  },
+  "verify": {
+    "errors": {
+      "invalidEmail": "Bu geçerli bir e-posta adresine benzemiyor.",
+      "freeMail": "Kişisel sağlayıcılar (Gmail, Outlook, …) sayılmaz — üniversite adresini kullan.",
+      "notAcademic": "Bunu bir üniversite alan adı olarak tanıyamadık. Adresi kontrol et.",
+      "alreadyVerified": "Hesabında zaten doğrulanmış bir üniversite e-postası var.",
+      "cooldown": "Sana az önce bir bağlantı gönderdik — yeniden istemeden önce birkaç dakika bekle.",
+      "sendFailed": "E-postayı şu anda gönderemedik. Lütfen tekrar dene.",
+      "storageFailed": "İsteğini kaydederken bir sorun oluştu. Lütfen tekrar dene.",
+      "unauthorized": "Lütfen tekrar giriş yap ve yeniden dene.",
+      "network": "Ağ hatası — lütfen tekrar dene."
+    },
+    "verifiedHeading": "Doğrulanmış öğrenci",
+    "verifiedBody": "Topluluk genelinde sohbet edebilir, değerlendirme yazabilir ve soru sorabilirsin.",
+    "sentBody": "<strong>{email}</strong> adresine bir onay bağlantısı gönderdik. 24 saat geçerli — gelen kutunu (ve spam klasörünü) kontrol et.",
+    "devModeLabel": "Geliştirici modu — e-posta gönderimi yapılandırılmadı",
+    "devLinkFor": "<strong>{email}</strong> için onay bağlantısı:",
+    "emailPlaceholder": "sen@universite.edu",
+    "emailAriaLabel": "Üniversite e-posta adresi",
+    "expiredNotice": "Önceki bağlantının süresi doldu — yeni bir tane iste.",
+    "sending": "Bağlantı gönderiliyor…",
+    "sendButton": "Onay bağlantısı gönder",
+    "resend": "Yeniden gönder veya farklı bir adres kullan",
+    "inputVariantNotice": "Sadece doğrulanmış öğrenciler mesaj gönderebilir — sohbete katılmak için üniversite e-postanı onayla.",
+    "sidebarHeading": "Doğrulanmış öğrenci ol",
+    "sidebarBody": "Herkes topluluğu okuyabilir. Yazmak için — sohbet, değerlendirme, soru — hesabına bağlı bir üniversite e-posta adresini onayla."
+  },
+  "badges": {
+    "verifiedEnrolledStudent": "Doğrulanmış kayıtlı öğrenci",
+    "responsible": "Sorumlu",
+    "roleProspect": "Aday",
+    "roleApplicant": "Başvuran",
+    "roleVerifiedStudent": "Doğrulanmış Öğrenci",
+    "roleAlumni": "Mezun",
+    "roleCampusResponsible": "Kampüs Sorumlusu"
+  },
+  "common": {
+    "reply": "Yanıtla",
+    "preview": "Önizleme",
+    "messageName": "{name} ile mesajlaş"
+  },
+  "review": {
+    "helpful": "Yararlı · {count}",
+    "subscribeToMessage": "Mesaj göndermek için abone ol",
+    "reportAriaLabel": "Bildir"
+  },
+  "question": {
+    "replies": "{count, plural, one {# yanıt} other {# yanıt}}",
+    "verifyToReply": "Yanıtlamak için doğrula"
+  },
+  "group": {
+    "typeProgram": "Program",
+    "typeUniversity": "Üniversite",
+    "activityLow": "Sakin",
+    "activityMedium": "Aktif",
+    "activityHigh": "Çok hareketli",
+    "activityTitle": "Aktivite: {label}",
+    "verifiedCount": "{count} doğrulanmış",
+    "memberCount": "{count, plural, one {# üye} other {# üye}}",
+    "latestDiscussion": "Son tartışma · ",
+    "responsiblePlural": "{count, plural, one {Kampüs sorumlusu} other {Kampüs sorumluları}}",
+    "responsibleComingSoon": "Sorumlu yakında geliyor",
+    "programPage": "Program sayfası",
+    "universityPage": "Üniversite sayfası",
+    "joinChat": "Sohbete katıl"
+  },
+  "client": {
+    "emptyReviews": "Filtrelerine uyan değerlendirme yok.",
+    "emptyGroups": "Filtrelerine uyan grup yok.",
+    "emptyQuestions": "Bu filtre için popüler soru yok.",
+    "emptyResponsibles": "Bu filtreye uyan kampüs sorumlusu yok. Filtreyi temizlemeyi dene — her üniversitenin bir sorumlusu var.",
+    "typeHintUniversity": "Üniversite genelindeki topluluklar — tüm kohortla tanış.",
+    "typeHintProgram": "Programa özel topluluklar — tek bir yüksek lisans programına odaklanır.",
+    "typeHintAll": "Üniversiteler ve programlar tek bir görünümde.",
+    "showingCount": "{total} gruptan {shown} tanesi gösteriliyor. Daraltmak için filtreleri kullan."
+  },
+  "chat": {
+    "closeAriaLabel": "Kapat",
+    "sendAriaLabel": "Gönder",
+    "composerPlaceholder": "Başvurular, barınma, ders yükü, burslar hakkında sor…",
+    "emptyHeading": "Bu topluluk henüz yeni başlıyor",
+    "emptyBody": "Buzları kıran ilk kişi ol — merhaba de ya da buraya gelme amacın olan soruyu sor.",
+    "you": "Sen"
+  },
+  "upgrade": {
+    "ctaDefault": "Sohbete katılmak için yükselt",
+    "inputMessageDefault": "Bu toplulukta mesaj göndermek için abone ol.",
+    "goPremium": "Premium'a geç",
+    "inlineMessageDefault": "Kilidi açmak için abone ol",
+    "panelHeading": "Topluluğun tamamının kilidini aç",
+    "panelMessageDefault": "Doğrulanmış öğrencilere ve EdFind kampüs sorumlularına mesaj göndermek, grup sohbetlerine katılmak ve programa özel ayrıntılı içgörülere erişmek için abone ol.",
+    "bullets": {
+      "messageResponsibles": "Kampüs sorumlularına mesaj gönder",
+      "joinGroupChats": "Grup sohbetlerine katıl",
+      "replyDiscussions": "Tartışmalara yanıt ver",
+      "detailedInsights": "Ayrıntılı doğrulanmış öğrenci içgörüleri"
+    },
+    "priceLine": "Ayda 5 € · istediğin zaman iptal et"
+  },
+  "responsible": {
+    "goPremiumToMessage": "{name} ile mesajlaşmak için Premium'a geç"
+  },
+  "devToggle": {
+    "heading": "Demo modu",
+    "body": "Stripe henüz bağlanmadı. İki durumu önizlemek için Ücretsiz ve Premium arasında geçiş yap. Bir çerezde saklanır.",
+    "free": "Ücretsiz",
+    "premium": "Premium",
+    "freeDescription": "Sadece herkese açık önizlemeler",
+    "premiumDescription": "Tam erişim",
+    "pillLabel": "Demo: {state}"
+  }
+}

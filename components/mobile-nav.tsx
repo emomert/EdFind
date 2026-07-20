@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ export type MobileNavLink = { href: string; label: string };
 export function MobileNav({ links }: { links: MobileNavLink[] }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const t = useTranslations("common.mobileNav");
 
   return (
     <div className="md:hidden">
@@ -26,7 +28,7 @@ export function MobileNav({ links }: { links: MobileNavLink[] }) {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-controls="mobile-nav-panel"
-        aria-label={open ? "Close menu" : "Open menu"}
+        aria-label={open ? t("closeMenu") : t("openMenu")}
         className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-card text-foreground transition-colors hover:bg-accent"
       >
         {open ? <X className="size-4" /> : <Menu className="size-4" />}
@@ -35,7 +37,7 @@ export function MobileNav({ links }: { links: MobileNavLink[] }) {
       {open ? (
         <nav
           id="mobile-nav-panel"
-          aria-label="Main menu"
+          aria-label={t("mainMenu")}
           className="absolute inset-x-0 top-16 border-b border-border bg-background/95 shadow-lg backdrop-blur"
         >
           <ul className="mx-auto max-w-6xl space-y-1 px-4 py-3">

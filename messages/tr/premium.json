@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "title": "Premium'a geç — EdFind",
+    "description": "Yapay zekâ eşleştirmesi, başvuru takibi ve kampüs sorumlularına doğrudan erişim — EdFind Premium."
+  },
+  "badge": "EdFind Premium",
+  "title": "Eşleşmelerinin kilidini aç",
+  "subtitle": "Yapay zekâ eşleştirmesi, başvuru takibi ve kampüsteki öğrencilere doğrudan ulaşım — “Avrupa'da bir yerde” demekten gönderilmiş bir başvuruya geçmek için ihtiyacın olan her şey.",
+  "free": {
+    "heading": "Ücretsiz",
+    "tagline": "Her şeye göz at, kararını sonra ver.",
+    "price": "€0",
+    "features": {
+      "catalog": "Kataloğun tamamına göz at — 58 üniversite, 196 program",
+      "detailPages": "Üniversite ve program detay sayfaları, barınma maliyetleri, kampüs fotoğrafları",
+      "communityRead": "Topluluktaki her yorumu, grubu ve soruyu oku",
+      "communityWrite": "Doğrulanmış bir üniversite e-postasıyla toplulukta yaz"
+    },
+    "cta": "Ücretsiz'de keşfetmeye devam et"
+  },
+  "premium": {
+    "heading": "Premium",
+    "badge": "Önerilen",
+    "tagline": "Ücretsiz'deki her şeye ek olarak, seni kabule götüren araçlar.",
+    "priceSuffix": "/ay · istediğin zaman iptal et",
+    "features": {
+      "matching": "Yapay zekâ eşleştirmesi — kişiselleştirilmiş gerekçelerle rehberli test ve serbest metinli yapay zekâ araması",
+      "tracking": "Başvuru takibi — kaydedilenler, karşılaştırma, son başvuru tarihleri ve görev panosu",
+      "documents": "Yapay zekâ belge stüdyosu — kişiye özel CV ve motivasyon mektubu taslakları",
+      "messaging": "Kampüs sorumlularına doğrudan mesaj gönder"
+    },
+    "cta": "Premium'u etkinleştir ve devam et",
+    "demoNote": "Demo modu: bu buton başarılı bir ödeme işlemini simüle eder. Tam sürümde güvenli ödeme burada gerçekleşir."
+  },
+  "footerNote": "Topluluk herkese açık kalır — okumak için hesap gerekmez, yazmanın kilidini ise abonelik değil doğrulanmış bir üniversite e-postası açar."
+}

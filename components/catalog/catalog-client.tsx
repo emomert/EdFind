@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import {
   ArrowRight,
   Building2,
@@ -22,6 +23,13 @@ import {
 import { UniversityLogo } from "@/components/university/university-logo";
 import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
 import { formatTuition } from "@/lib/format/currency";
+import type { Locale } from "@/lib/i18n/config";
+import {
+  localizeCity,
+  localizeCountry,
+  localizeField,
+  localizeLanguage,
+} from "@/lib/i18n/data-labels";
 
 export type CatalogUniversity = {
   slug: string;
@@ -77,6 +85,8 @@ export function CatalogClient({
   universities: CatalogUniversity[];
   programs: CatalogProgram[];
 }) {
+  const t = useTranslations("catalog");
+  const locale = useLocale() as Locale;
   const [tab, setTab] = useState<Tab>("universities");
   const [query, setQuery] = useState("");
   const [country, setCountry] = useState("");
@@ -92,25 +102,34 @@ export function CatalogClient({
     const codes = new Set<string>();
     universities.forEach((u) => codes.add(u.country));
     return Array.from(codes)
-      .map((code) => ({ code, name: COUNTRY_NAMES[code] || code }))
+      .map((code) => ({
+        code,
+        name: localizeCountry(COUNTRY_NAMES[code] || code, locale),
+      }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [universities]);
+  }, [universities, locale]);
 
   const fields = useMemo(() => {
     const set = new Set<string>();
     programs.forEach((p) => p.field_of_study && set.add(p.field_of_study));
     return Array.from(set)
-      .map((value) => ({ value, label: FIELD_LABELS[value] || value }))
+      .map((value) => ({
+        value,
+        label: localizeField(FIELD_LABELS[value] || value, locale),
+      }))
       .sort((a, b) => a.label.localeCompare(b.label));
-  }, [programs]);
+  }, [programs, locale]);
 
   const languages = useMemo(() => {
     const set = new Set<string>();
     programs.forEach((p) => p.language && set.add(p.language));
     return Array.from(set)
-      .map((value) => ({ value, label: LANG_NAMES[value] || value }))
+      .map((value) => ({
+        value,
+        label: localizeLanguage(LANG_NAMES[value] || value, locale),
+      }))
       .sort((a, b) => a.label.localeCompare(b.label));
-  }, [programs]);
+  }, [programs, locale]);
 
   // Derive duration options from the data so no real program length is ever
   // unselectable (previously hardcoded to 12/18/24, which hid every other
@@ -212,22 +231,23 @@ export function CatalogClient({
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-card/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary shadow-sm ring-1 ring-inset ring-primary/20">
               <Sparkles className="size-3.5" />
-              EdFind Catalog
+              {t("hero.badge")}
             </span>
             <h1 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl">
-              Browse every university and master&apos;s program{" "}
-              <span className="text-primary">we&apos;ve verified.</span>
+              {t.rich("hero.title", {
+                highlight: (chunks) => (
+                  <span className="text-primary">{chunks}</span>
+                ),
+              })}
             </h1>
             <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-              Filter by country, field, language, or tuition — or jump straight
-              to a university you already have in mind. Every entry links to a
-              detailed program page.
+              {t("hero.subtitle")}
             </p>
           </div>
           <dl className="grid grid-cols-3 gap-3 text-center">
-            <Stat n={universities.length} label="Universities" />
-            <Stat n={programs.length} label="Programs" />
-            <Stat n={countries.length} label="Countries" />
+            <Stat n={universities.length} label={t("entities.universities")} />
+            <Stat n={programs.length} label={t("entities.programs")} />
+            <Stat n={countries.length} label={t("entities.countries")} />
           </dl>
         </div>
       </header>
@@ -239,35 +259,35 @@ export function CatalogClient({
             [
               {
                 key: "universities",
-                label: "Universities",
+                label: t("entities.universities"),
                 icon: <Building2 className="size-3.5" />,
                 count: filteredUniversities.length,
               },
               {
                 key: "programs",
-                label: "Programs",
+                label: t("entities.programs"),
                 icon: <GraduationCap className="size-3.5" />,
                 count: filteredPrograms.length,
               },
             ] as const
-          ).map((t) => {
-            const active = tab === t.key;
+          ).map((tabItem) => {
+            const active = tab === tabItem.key;
             return (
               <button
-                key={t.key}
+                key={tabItem.key}
                 type="button"
                 role="tab"
                 aria-selected={active}
-                onClick={() => setTab(t.key)}
+                onClick={() => setTab(tabItem.key)}
                 className={cn(
                   "relative inline-flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-colors",
                   active ? "text-teal-700" : "text-slate-500 hover:text-slate-800",
                 )}
               >
                 <span className={active ? "text-teal-600" : "text-slate-400"}>
-                  {t.icon}
+                  {tabItem.icon}
                 </span>
-                {t.label}
+                {tabItem.label}
                 <span
                   className={cn(
                     "rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums",
@@ -276,7 +296,7 @@ export function CatalogClient({
                       : "bg-slate-100 text-slate-600",
                   )}
                 >
-                  {t.count}
+                  {tabItem.count}
                 </span>
                 {active && (
                   <motion.span
@@ -300,8 +320,8 @@ export function CatalogClient({
               type="text"
               placeholder={
                 tab === "universities"
-                  ? "Search universities or cities…"
-                  : "Search programs by name…"
+                  ? t("filters.searchUniversitiesPlaceholder")
+                  : t("filters.searchProgramsPlaceholder")
               }
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -310,11 +330,11 @@ export function CatalogClient({
           </label>
 
           <SelectPill
-            ariaLabel="Filter by country"
+            ariaLabel={t("filters.countryAriaLabel")}
             value={country}
             onChange={setCountry}
             options={[
-              { value: "", label: "All countries" },
+              { value: "", label: t("filters.allCountries") },
               ...countries.map((c) => ({ value: c.code, label: c.name })),
             ]}
           />
@@ -322,32 +342,32 @@ export function CatalogClient({
           {showProgramFilters && (
             <>
               <SelectPill
-                ariaLabel="Filter by field"
+                ariaLabel={t("filters.fieldAriaLabel")}
                 value={field}
                 onChange={setField}
                 options={[
-                  { value: "", label: "All fields" },
+                  { value: "", label: t("filters.allFields") },
                   ...fields.map((f) => ({ value: f.value, label: f.label })),
                 ]}
               />
               <SelectPill
-                ariaLabel="Filter by language"
+                ariaLabel={t("filters.languageAriaLabel")}
                 value={language}
                 onChange={setLanguage}
                 options={[
-                  { value: "", label: "All languages" },
+                  { value: "", label: t("filters.allLanguages") },
                   ...languages.map((l) => ({ value: l.value, label: l.label })),
                 ]}
               />
               <SelectPill
-                ariaLabel="Filter by duration"
+                ariaLabel={t("filters.durationAriaLabel")}
                 value={duration}
                 onChange={setDuration}
                 options={[
-                  { value: "", label: "Any duration" },
+                  { value: "", label: t("filters.anyDuration") },
                   ...durations.map((d) => ({
                     value: String(d),
-                    label: `${d} months`,
+                    label: t("filters.durationOption", { months: d }),
                   })),
                 ]}
               />
@@ -372,33 +392,33 @@ export function CatalogClient({
                   partnerOnly ? "fill-teal-500 text-teal-500" : "text-slate-400",
                 )}
               />
-              Partner only
+              {t("filters.partnerOnly")}
             </button>
           )}
 
           {tab === "universities" ? (
             <SelectPill
-              ariaLabel="Sort universities"
-              prefix="Sort:"
+              ariaLabel={t("filters.sortUniversitiesAriaLabel")}
+              prefix={t("filters.sortPrefix")}
               value={uniSort}
               onChange={(v) => setUniSort(v as UniSort)}
               options={[
-                { value: "rank", label: "QS rank" },
-                { value: "name", label: "Name (A→Z)" },
-                { value: "country", label: "Country" },
+                { value: "rank", label: t("filters.sortRank") },
+                { value: "name", label: t("filters.sortNameAZ") },
+                { value: "country", label: t("filters.sortCountry") },
               ]}
             />
           ) : (
             <SelectPill
-              ariaLabel="Sort programs"
-              prefix="Sort:"
+              ariaLabel={t("filters.sortProgramsAriaLabel")}
+              prefix={t("filters.sortPrefix")}
               value={progSort}
               onChange={(v) => setProgSort(v as ProgSort)}
               options={[
-                { value: "name", label: "Name (A→Z)" },
-                { value: "tuition_asc", label: "Tuition (low→high)" },
-                { value: "tuition_desc", label: "Tuition (high→low)" },
-                { value: "duration", label: "Duration" },
+                { value: "name", label: t("filters.sortNameAZ") },
+                { value: "tuition_asc", label: t("filters.sortTuitionAsc") },
+                { value: "tuition_desc", label: t("filters.sortTuitionDesc") },
+                { value: "duration", label: t("filters.sortDuration") },
               ]}
             />
           )}
@@ -409,7 +429,7 @@ export function CatalogClient({
       <div className="mt-6">
         {tab === "universities" ? (
           filteredUniversities.length === 0 ? (
-            <EmptyState message="No universities match these filters." />
+            <EmptyState message={t("empty.noUniversities")} />
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {filteredUniversities.map((u) => (
@@ -418,7 +438,7 @@ export function CatalogClient({
             </div>
           )
         ) : filteredPrograms.length === 0 ? (
-          <EmptyState message="No programs match these filters." />
+          <EmptyState message={t("empty.noPrograms")} />
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
             {filteredPrograms.map((p) => (
@@ -453,6 +473,8 @@ function EmptyState({ message }: { message: string }) {
 }
 
 function UniversityCard({ uni }: { uni: CatalogUniversity }) {
+  const t = useTranslations("catalog");
+  const locale = useLocale() as Locale;
   return (
     <motion.div
       layout
@@ -478,13 +500,14 @@ function UniversityCard({ uni }: { uni: CatalogUniversity }) {
             </h3>
             <p className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-slate-500">
               <MapPin className="size-3 text-slate-400" />
-              {uni.city}, {COUNTRY_NAMES[uni.country] || uni.country}
+              {localizeCity(uni.city, locale)},{" "}
+              {localizeCountry(COUNTRY_NAMES[uni.country] || uni.country, locale)}
             </p>
           </div>
           {uni.is_partner && (
             <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-200">
               <Star className="size-2.5 fill-amber-400 text-amber-500" />
-              Partner
+              {t("universityCard.partner")}
             </span>
           )}
         </div>
@@ -492,17 +515,19 @@ function UniversityCard({ uni }: { uni: CatalogUniversity }) {
         <div className="flex flex-wrap gap-1.5 text-[11px]">
           {uni.qs_world_rank != null && (
             <span className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2 py-0.5 font-medium text-teal-700 ring-1 ring-inset ring-teal-200">
-              QS #{uni.qs_world_rank}
+              {t("universityCard.qsRank", { rank: uni.qs_world_rank })}
             </span>
           )}
           {uni.institution_type && (
             <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-0.5 font-medium text-slate-600 ring-1 ring-inset ring-slate-200 capitalize">
-              {uni.institution_type}
+              {t.has(`institutionType.${uni.institution_type}`)
+                ? t(`institutionType.${uni.institution_type}`)
+                : uni.institution_type}
             </span>
           )}
           {uni.established_year != null && (
             <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-0.5 font-medium text-slate-600 ring-1 ring-inset ring-slate-200">
-              Est. {uni.established_year}
+              {t("universityCard.established", { year: uni.established_year })}
             </span>
           )}
         </div>
@@ -516,10 +541,10 @@ function UniversityCard({ uni }: { uni: CatalogUniversity }) {
         <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
           <span className="inline-flex items-center gap-1">
             <GraduationCap className="size-3.5 text-slate-400" />
-            {uni.program_count} {uni.program_count === 1 ? "program" : "programs"}
+            {t("universityCard.programCount", { count: uni.program_count })}
           </span>
           <span className="inline-flex items-center gap-1 text-teal-700 group-hover:underline">
-            View university
+            {t("universityCard.viewUniversity")}
             <ArrowRight className="size-3" />
           </span>
         </div>
@@ -529,6 +554,8 @@ function UniversityCard({ uni }: { uni: CatalogUniversity }) {
 }
 
 function ProgramCard({ prog }: { prog: CatalogProgram }) {
+  const t = useTranslations("catalog");
+  const locale = useLocale() as Locale;
   return (
     <motion.div
       layout
@@ -560,24 +587,34 @@ function ProgramCard({ prog }: { prog: CatalogProgram }) {
             </h3>
             <p className="mt-0.5 text-[11px] text-slate-500">
               ↳ <span className="font-medium text-slate-600">{prog.university_name}</span>
-              <span> · {prog.university_city}, {COUNTRY_NAMES[prog.university_country] || prog.university_country}</span>
+              <span>
+                {" "}
+                · {localizeCity(prog.university_city, locale)},{" "}
+                {localizeCountry(
+                  COUNTRY_NAMES[prog.university_country] || prog.university_country,
+                  locale,
+                )}
+              </span>
             </p>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-1.5 text-[11px]">
           <span className="rounded-full bg-slate-50 px-2 py-0.5 font-medium text-slate-700 ring-1 ring-inset ring-slate-200">
-            {FIELD_LABELS[prog.field_of_study] || prog.field_of_study}
+            {localizeField(
+              FIELD_LABELS[prog.field_of_study] || prog.field_of_study,
+              locale,
+            )}
           </span>
           <span className="rounded-full bg-teal-50 px-2 py-0.5 font-medium text-teal-700 ring-1 ring-inset ring-teal-200 uppercase">
             {prog.language}
           </span>
           <span className="rounded-full bg-slate-50 px-2 py-0.5 font-medium text-slate-700 ring-1 ring-inset ring-slate-200">
-            {prog.duration_months} mo
+            {t("programCard.durationMonths", { months: prog.duration_months })}
           </span>
           {prog.tuition_per_year != null && (
             <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200">
-              {formatTuition(prog.tuition_per_year, prog.currency, "chip")}
+              {formatTuition(prog.tuition_per_year, prog.currency, "chip", locale)}
             </span>
           )}
         </div>
@@ -585,17 +622,22 @@ function ProgramCard({ prog }: { prog: CatalogProgram }) {
         <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-2.5 text-[11px] text-slate-500">
           {prog.application_deadline ? (
             <span>
-              Apply by{" "}
-              {new Date(prog.application_deadline).toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short",
+              {t("programCard.applyBy", {
+                date: new Date(prog.application_deadline).toLocaleDateString(
+                  locale === "tr" ? "tr-TR" : "en-GB",
+                  { day: "numeric", month: "short" },
+                ),
               })}
             </span>
           ) : (
-            <span>{prog.start_month ? `Starts ${prog.start_month}` : "Year-round intake"}</span>
+            <span>
+              {prog.start_month
+                ? t("programCard.startsMonth", { month: prog.start_month })
+                : t("programCard.yearRoundIntake")}
+            </span>
           )}
           <span className="inline-flex items-center gap-1 text-teal-700 group-hover:underline">
-            View program
+            {t("programCard.viewProgram")}
             <ArrowRight className="size-3" />
           </span>
         </div>

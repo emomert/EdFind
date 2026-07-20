@@ -1,0 +1,251 @@
+{
+  "meta": {
+    "title": "Profile Quiz",
+    "description": "Answer 14 quick questions (the last is an optional free-text) and we'll match you to master's programs in Europe."
+  },
+  "progress": {
+    "question": "Question {current} of {total}",
+    "ariaLabel": "Quiz progress"
+  },
+  "buttons": {
+    "back": "Back",
+    "next": "Next",
+    "seeMyMatches": "See my matches",
+    "backToQuestions": "Back to questions",
+    "tryAgain": "Try again"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "default": "Please try submitting again.",
+    "validation": "Some answers were missing or unrecognized. Please try again."
+  },
+  "mascot": {
+    "default": "There's no right or wrong answer — just what feels right for you!"
+  },
+  "loading": {
+    "title": "Matching you to programs…",
+    "subtitle": "Our AI is comparing your answers against every program in the catalog. This usually takes about 2 seconds.",
+    "stages": {
+      "readingPreferences": "Reading your preferences",
+      "searchingCatalog": "Searching the European master's catalog",
+      "askingAi": "Asking the AI matcher to rank your top 3"
+    }
+  },
+  "freeText": {
+    "requiredHint": "A sentence or two is plenty — it sharpens your matches.",
+    "optionalHint": "You can skip this — the AI will still match using your other answers.",
+    "charsLeft": "{count} characters left",
+    "pleaseDescribe": "Please describe"
+  },
+  "questions": {
+    "destinations": {
+      "legend": "Which destination feels right for your master's journey?",
+      "helper": "Pick one or more. Choose \"No preference\" if you're open to anywhere.",
+      "options": {
+        "IT": "Italy",
+        "NL": "Netherlands",
+        "DE": "Germany",
+        "GB": "United Kingdom",
+        "ES": "Spain",
+        "FR": "France",
+        "CH": "Switzerland",
+        "SE": "Sweden",
+        "DK": "Denmark",
+        "IE": "Ireland",
+        "AT": "Austria",
+        "BE": "Belgium",
+        "CZ": "Czechia",
+        "EE": "Estonia",
+        "FI": "Finland",
+        "NO": "Norway",
+        "PL": "Poland",
+        "PT": "Portugal",
+        "ANY": "No preference"
+      },
+      "anywhereInEurope": "Anywhere in Europe",
+      "removeCountryAria": "Remove {country} from selection",
+      "matchingAllCountries": "Matching across all 18 countries in our catalog.",
+      "clickToAdd": "Click any highlighted country to add it. Click a chip to remove.",
+      "selectedCount": "{count} selected — click again to remove, or pick more.",
+      "or": "or",
+      "globeAriaLabel": "Globe — drag to rotate, click a highlighted country to select",
+      "centerAriaLabel": "Center the globe on Europe",
+      "centerButton": "Center on Europe",
+      "noneSelectedAria": "No countries selected.",
+      "countSelectedAria": "{count, plural, one {# country} other {# countries}} selected.",
+      "countryAriaSelected": "{country} — selected",
+      "countryAriaUnselected": "{country} — click to select",
+      "loadingMap": "Loading map…",
+      "loadingGlobe": "Loading globe…"
+    },
+    "current_situation": {
+      "legend": "What best describes your current situation?",
+      "options": {
+        "undergraduate": "Current undergraduate student",
+        "graduating_soon": "Graduating soon (final year)",
+        "recent_graduate": "Recent graduate",
+        "gap_year": "On a gap year / break",
+        "working_professional": "Working professional",
+        "other": "Other"
+      },
+      "optionDescriptions": {
+        "recent_graduate": "Finished within the last couple of years",
+        "gap_year": "Graduated and currently taking time before the next step"
+      },
+      "other": {
+        "placeholder": "Tell us in a few words…"
+      }
+    },
+    "institution": {
+      "legend": {
+        "undergraduate": "Which university are you studying at?",
+        "graduatingSoon": "Which university will you graduate from?",
+        "graduated": "Which university did you graduate from?",
+        "default": "Which university did you study at?"
+      },
+      "helper": "Start typing to search Turkish universities — or type any institution if yours isn't listed.",
+      "searchPlaceholder": "Search for your university…",
+      "notListedHint": "Not listed? Just type it in — we'll use exactly what you write.",
+      "useMyOwn": "Use my own: “<b>{query}</b>”"
+    },
+    "study_background": {
+      "legend": "What did you study?",
+      "helper": "Your undergraduate field, in your own words — just what you studied. The AI reads this to judge fit and eligibility. (What you want to study next is the following question.)",
+      "placeholder": "e.g. BSc Civil Engineering, or BA Sociology with an econ minor…"
+    },
+    "desired_study": {
+      "legend": "What do you want to study?",
+      "helper": "Be as free as you like. A field works (\"economics\"), so does something very specific (\"political economy of East Asia\") — and even a vague \"I like politics\" is enough. We'll work out the right programs either way.",
+      "placeholder": "e.g. data science, sustainable architecture, or just 'something with politics'…"
+    },
+    "gpa_range": {
+      "legend": "What's your GPA?",
+      "helper": "Pick the grading scale your school uses, then type your exact GPA. Not every school grades the same way — a ballpark is fine.",
+      "scaleOptions": {
+        "4_point": "4.0 scale",
+        "100_point": "Out of 100",
+        "5_point": "5.0 scale",
+        "10_point": "Out of 10",
+        "ects_letter": "ECTS / letter grades",
+        "uk_class": "UK classification",
+        "other": "Other"
+      },
+      "rangeOptions": {
+        "below_2_0": "Below 2.0",
+        "2_0_2_5": "2.0 – 2.5",
+        "2_5_3_0": "2.5 – 3.0",
+        "3_0_3_5": "3.0 – 3.5",
+        "3_5_plus": "3.5+"
+      },
+      "exactPlaceholder": "e.g. 3.42, 85/100, or 2.1 (Upper Second)",
+      "chooseScalePrompt": "First, which grading scale does your school use?",
+      "gradingScaleLabel": "Grading scale:",
+      "change": "Change",
+      "enterGpaLabel": "Now enter your GPA",
+      "orPickRange": "…or pick a rough range",
+      "rangeScaleNote": "(4.0 scale)"
+    },
+    "english_level": {
+      "legend": "How would you describe your English?",
+      "helper": "We'll match against each program's actual entry requirement. Self-assessment is fine.",
+      "options": {
+        "certified": "I have a valid IELTS / TOEFL / Duolingo score",
+        "exam_ready": "Fluent — ready to sit IELTS/TOEFL",
+        "advanced": "Advanced (C1)",
+        "upper_intermediate": "Upper-intermediate (B2)",
+        "intermediate": "Intermediate (B1)",
+        "beginner": "Beginner / basic (A2 or below)"
+      },
+      "optionDescriptions": {
+        "certified": "Test already passed and in date",
+        "exam_ready": "Could pass the test, just haven't booked it yet",
+        "advanced": "Comfortable with academic English",
+        "intermediate": "Solid everyday English, still improving"
+      },
+      "other": {
+        "label": "Your IELTS / TOEFL / Duolingo score",
+        "placeholder": "e.g. IELTS 7.5, TOEFL 102, or Duolingo 125"
+      }
+    },
+    "budget_per_year": {
+      "legend": "What's your budget per year?",
+      "helper": "Tuition only — not living costs. We'll show scholarships separately.",
+      "options": {
+        "tuition_free": "Tuition-free / fully-funded only",
+        "<10k": "Under €10,000",
+        "10-15k": "€10,000 – €15,000",
+        "15-20k": "€15,000 – €20,000",
+        "20-25k": "€20,000 – €25,000",
+        "25k+": "Over €25,000",
+        "flexible": "Flexible / not sure yet"
+      },
+      "optionDescriptions": {
+        "tuition_free": "Public universities with no or nominal tuition, or full scholarships"
+      }
+    },
+    "duration_preference": {
+      "legend": "How long do you want your program to be?",
+      "options": {
+        "12mo": "12 months",
+        "18mo": "18 months",
+        "24mo": "24 months",
+        "flexible": "Flexible"
+      }
+    },
+    "scholarship_need": {
+      "legend": "Do you need scholarship support?",
+      "options": {
+        "required": "Required — I need funding to attend",
+        "helpful": "Helpful — I'd take one but can manage without",
+        "not_needed": "Not needed"
+      }
+    },
+    "career_goal": {
+      "legend": "What's your goal after the master's?",
+      "helper": "We use this to weigh program character, location, and brand differently.",
+      "options": {
+        "work_in_europe": "Work in Europe after graduating",
+        "return_to_turkey": "Return to Turkey with an international degree",
+        "work_internationally": "Work internationally / global mobility",
+        "phd_research": "Pursue a PhD or research career",
+        "industry_expert": "Grow into a senior / specialist role in my field",
+        "career_switch": "Switch into a new field or industry",
+        "entrepreneurship": "Start my own company / venture",
+        "unsure": "Still figuring it out",
+        "other": "Other"
+      },
+      "other": {
+        "placeholder": "Describe your goal in a few words…"
+      }
+    },
+    "academic_focus": {
+      "legend": "What style of master's appeals to you?",
+      "helper": "We'll weigh research-heavy programs differently from job-oriented ones.",
+      "options": {
+        "research": "Research-heavy",
+        "applied": "Industry-applied",
+        "balanced": "Balanced"
+      },
+      "optionDescriptions": {
+        "research": "Stepping stone to a PhD, theoretical depth, thesis-driven",
+        "applied": "Hands-on projects, internships, job-ready skills",
+        "balanced": "A bit of both — keep options open"
+      }
+    },
+    "work_experience": {
+      "legend": "How much full-time work experience do you have?",
+      "helper": "Some programs (like LBS MiM) prefer 1-3 years; others welcome fresh graduates.",
+      "options": {
+        "none": "None or under a year",
+        "1-2_years": "1-2 years",
+        "3-5_years": "3-5 years",
+        "5_plus_years": "5+ years"
+      }
+    },
+    "additional_context": {
+      "legend": "Anything else we should know? (optional)",
+      "helper": "Specific labs you want to work with, family in a city you'd join, why this field really, anything we'd miss from multiple choice. The AI reads this and quotes it in your rationale.",
+      "placeholder": "e.g. I want to be near my partner in Berlin, or I'm aiming for Prof. Smith's robotics lab at TU Delft…"
+    }
+  }
+}

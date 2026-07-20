@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, RotateCw } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import {
   ANSWERS_VERSION,
@@ -84,6 +85,7 @@ export function QuizClient() {
 }
 
 function QuizClientInner() {
+  const t = useTranslations("quiz");
   const router = useRouter();
   const reduce = useReducedMotion();
   const { play } = useSound();
@@ -247,19 +249,22 @@ function QuizClientInner() {
         className="mx-auto flex max-w-md flex-col items-center px-6 py-16 text-center"
       >
         <h2 className="text-2xl font-semibold tracking-tight">
-          Something went wrong
+          {t.has("error.title") ? t("error.title") : "Something went wrong"}
         </h2>
         <p className="mt-3 text-sm text-muted-foreground">
-          {errorMessage ?? "Please try submitting again."}
+          {errorMessage ??
+            (t.has("error.default") ? t("error.default") : "Please try submitting again.")}
         </p>
         <div className="mt-8 flex gap-3">
           <Button type="button" variant="outline" onClick={handleRetry}>
             <ArrowLeft />
-            Back to questions
+            {t.has("buttons.backToQuestions")
+              ? t("buttons.backToQuestions")
+              : "Back to questions"}
           </Button>
           <Button type="button" onClick={handleSubmit}>
             <RotateCw />
-            Try again
+            {t.has("buttons.tryAgain") ? t("buttons.tryAgain") : "Try again"}
           </Button>
         </div>
       </div>

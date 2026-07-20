@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { BadgeCheck, MessageSquare } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import type { CommunityQuestion, CommunityUser } from "@/lib/community/types";
 import { UserAvatar } from "./user-avatar";
@@ -50,6 +51,7 @@ function QuestionRow({
 }) {
   const { isSubscribed } = useSubscription();
   const { canWrite } = useVerification();
+  const t = useTranslations("community");
   // Replying writes content → needs subscription AND a verified university
   // email. Unverified subscribers see "Verify to reply" (the sidebar card
   // handles the actual flow); free users keep the "Preview" upsell.
@@ -88,7 +90,7 @@ function QuestionRow({
               ))}
             </div>
           )}
-          <span>{q.replyCount} replies</span>
+          <span>{t("question.replies", { count: q.replyCount })}</span>
           <span className="inline-flex items-center gap-1 text-teal-700">
             <BadgeCheck className="size-3" /> {q.verifiedReplyCount}
           </span>
@@ -104,7 +106,11 @@ function QuestionRow({
           )}
         >
           <MessageSquare className="size-3" />
-          {canReply ? "Reply" : isSubscribed ? "Verify to reply" : "Preview"}
+          {canReply
+            ? t("common.reply")
+            : isSubscribed
+            ? t("question.verifyToReply")
+            : t("common.preview")}
         </button>
       </div>
     </motion.article>

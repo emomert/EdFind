@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import {
   BadgeCheck,
   CircleAlert,
@@ -10,9 +11,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { confirmUniversityVerification } from "@/lib/verification/server";
 
-export const metadata: Metadata = {
-  title: "Verify university email",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("auth.verifyEmail.meta");
+  return { title: t("title") };
+}
 
 /**
  * Landing page for the confirmation link in the verification email.
@@ -29,6 +31,7 @@ export default async function VerifyUniversityEmailPage({
   const result = token
     ? await confirmUniversityVerification(token)
     : ({ ok: false, error: "invalid" } as const);
+  const t = await getTranslations("auth.verifyEmail");
 
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-6 py-20 text-center">
@@ -39,18 +42,21 @@ export default async function VerifyUniversityEmailPage({
           </span>
           <h1 className="mt-5 text-balance text-3xl font-bold tracking-tight">
             {result.alreadyVerified
-              ? "Already verified"
-              : "University email verified!"}
+              ? t("verified.alreadyVerifiedTitle")
+              : t("verified.title")}
           </h1>
           <p className="mt-4 text-pretty text-sm text-muted-foreground">
-            <strong className="text-foreground">{result.email}</strong> is
-            linked to your EdFind account. You can now write in the community —
-            chat in groups, post reviews, and ask questions.
+            {t.rich("verified.description", {
+              email: result.email,
+              strong: (chunks) => (
+                <strong className="text-foreground">{chunks}</strong>
+              ),
+            })}
           </p>
           <Button asChild size="lg" className="mt-8">
             <Link href="/community">
               <MessagesSquare aria-hidden />
-              Go to the community
+              {t("verified.cta")}
             </Link>
           </Button>
         </>
@@ -60,14 +66,13 @@ export default async function VerifyUniversityEmailPage({
             <Clock className="size-7" aria-hidden />
           </span>
           <h1 className="mt-5 text-balance text-3xl font-bold tracking-tight">
-            This link has expired
+            {t("expired.title")}
           </h1>
           <p className="mt-4 text-pretty text-sm text-muted-foreground">
-            Confirmation links are valid for 24 hours. Request a new one from
-            the community page and check your inbox again.
+            {t("expired.description")}
           </p>
           <Button asChild size="lg" className="mt-8">
-            <Link href="/community">Request a new link</Link>
+            <Link href="/community">{t("expired.cta")}</Link>
           </Button>
         </>
       ) : (
@@ -77,16 +82,16 @@ export default async function VerifyUniversityEmailPage({
           </span>
           <h1 className="mt-5 text-balance text-3xl font-bold tracking-tight">
             {result.error === "conflict"
-              ? "This email was just verified elsewhere"
-              : "Invalid confirmation link"}
+              ? t("invalid.conflictTitle")
+              : t("invalid.title")}
           </h1>
           <p className="mt-4 text-pretty text-sm text-muted-foreground">
             {result.error === "conflict"
-              ? "A university email can only be linked to one account. If that wasn't you, request a new link from the community page."
-              : "The link is incomplete or was replaced by a newer request. Open the most recent email, or request a new link from the community page."}
+              ? t("invalid.conflictDescription")
+              : t("invalid.description")}
           </p>
           <Button asChild size="lg" variant="outline" className="mt-8">
-            <Link href="/community">Back to the community</Link>
+            <Link href="/community">{t("invalid.cta")}</Link>
           </Button>
         </>
       )}

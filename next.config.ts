@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 const supabaseHost = (() => {
   const raw = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -42,4 +43,8 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Locale comes from the edfind_locale cookie (ADR 0007); the plugin wires
+// i18n/request.ts as the per-request next-intl config.
+const withNextIntl = createNextIntlPlugin();
+
+export default withNextIntl(nextConfig);

@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Check, ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -41,9 +42,10 @@ export function SelectPill({
   const rootRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const listboxId = useId();
+  const t = useTranslations("common.selectPill");
 
   const selected = options.find((o) => o.value === value);
-  const triggerLabel = selected?.label ?? placeholder ?? "Select…";
+  const triggerLabel = selected?.label ?? placeholder ?? t("placeholder");
 
   // Close on outside click / Esc.
   useEffect(() => {

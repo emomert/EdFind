@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { BadgeCheck, Loader2, MailCheck, ShieldCheck } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { useVerification } from "./verification-context";
 
@@ -25,19 +26,17 @@ type Phase =
   | { kind: "dev-link"; email: string; confirmUrl: string }
   | { kind: "error"; code: string };
 
-const ERROR_MESSAGES: Record<string, string> = {
-  "invalid-email": "That doesn't look like a valid email address.",
-  "free-mail":
-    "Personal providers (Gmail, Outlook, …) don't count — use your university address.",
-  "not-academic":
-    "We couldn't recognise this as a university domain. Double-check the address.",
-  "already-verified": "Your account already has a verified university email.",
-  cooldown:
-    "We just sent you a link — wait a couple of minutes before requesting another.",
-  "send-failed": "We couldn't send the email right now. Please try again.",
-  "storage-failed": "Something went wrong saving your request. Please try again.",
-  unauthorized: "Please sign in again, then retry.",
-  network: "Network error — please try again.",
+// Maps the API's error codes to keys under community.verify.errors.
+const ERROR_KEYS: Record<string, string> = {
+  "invalid-email": "invalidEmail",
+  "free-mail": "freeMail",
+  "not-academic": "notAcademic",
+  "already-verified": "alreadyVerified",
+  cooldown: "cooldown",
+  "send-failed": "sendFailed",
+  "storage-failed": "storageFailed",
+  unauthorized: "unauthorized",
+  network: "network",
 };
 
 export function VerifyUniversityEmailCard({
@@ -46,6 +45,7 @@ export function VerifyUniversityEmailCard({
   variant?: "sidebar" | "input";
 }) {
   const { verification } = useVerification();
+  const t = useTranslations("community.verify");
   const [email, setEmail] = useState(
     verification.status === "expired" ? verification.email : "",
   );
@@ -94,14 +94,14 @@ export function VerifyUniversityEmailCard({
         <div className="flex items-center gap-2">
           <BadgeCheck className="size-4 text-emerald-600" aria-hidden />
           <h3 className="text-sm font-semibold tracking-tight text-slate-900">
-            Verified student
+            {t("verifiedHeading")}
           </h3>
         </div>
         <p className="mt-2 break-all text-xs text-slate-600">
           {verification.email}
         </p>
         <p className="mt-1 text-[11px] text-slate-500">
-          You can chat, review, and ask questions across the community.
+          {t("verifiedBody")}
         </p>
       </section>
     );
@@ -120,19 +120,26 @@ export function VerifyUniversityEmailCard({
         <div className="mt-3 flex items-start gap-2 rounded-xl bg-teal-50 px-3 py-2.5">
           <MailCheck className="mt-0.5 size-4 shrink-0 text-teal-600" aria-hidden />
           <p className="text-xs leading-relaxed text-teal-900">
-            We emailed a confirmation link to{" "}
-            <strong className="break-all">{sentState.email}</strong>. It&apos;s
-            valid for 24 hours — check your inbox (and spam).
+            {t.rich("sentBody", {
+              email: sentState.email,
+              strong: (chunks) => (
+                <strong className="break-all">{chunks}</strong>
+              ),
+            })}
           </p>
         </div>
       ) : phase.kind === "dev-link" ? (
         <div className="mt-3 rounded-xl border border-dashed border-amber-300 bg-amber-50 px-3 py-2.5">
           <p className="text-[11px] font-medium uppercase tracking-wider text-amber-700">
-            Dev mode — email sending not configured
+            {t("devModeLabel")}
           </p>
           <p className="mt-1 text-xs text-amber-900">
-            Confirmation link for{" "}
-            <strong className="break-all">{phase.email}</strong>:
+            {t.rich("devLinkFor", {
+              email: phase.email,
+              strong: (chunks) => (
+                <strong className="break-all">{chunks}</strong>
+              ),
+            })}
           </p>
           <a
             href={phase.confirmUrl}
@@ -154,18 +161,18 @@ export function VerifyUniversityEmailCard({
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@university.edu"
-            aria-label="University email address"
+            placeholder={t("emailPlaceholder")}
+            aria-label={t("emailAriaLabel")}
             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs placeholder:text-slate-400 focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-100"
           />
           {phase.kind === "error" && (
             <p role="alert" className="text-xs text-rose-600">
-              {ERROR_MESSAGES[phase.code] ?? ERROR_MESSAGES.network}
+              {t(`errors.${ERROR_KEYS[phase.code] ?? "network"}`)}
             </p>
           )}
           {verification.status === "expired" && phase.kind === "idle" && (
             <p className="text-xs text-amber-700">
-              Your previous link expired — request a new one.
+              {t("expiredNotice")}
             </p>
           )}
           <button
@@ -178,9 +185,7 @@ export function VerifyUniversityEmailCard({
             ) : (
               <ShieldCheck className="size-3.5" aria-hidden />
             )}
-            {phase.kind === "submitting"
-              ? "Sending link…"
-              : "Send confirmation link"}
+            {phase.kind === "submitting" ? t("sending") : t("sendButton")}
           </button>
         </form>
       )}
@@ -195,7 +200,7 @@ export function VerifyUniversityEmailCard({
           }}
           className="mt-2 text-[11px] font-medium text-teal-700 underline-offset-2 hover:underline"
         >
-          Resend or use a different address
+          {t("resend")}
         </button>
       )}
     </>
@@ -207,8 +212,7 @@ export function VerifyUniversityEmailCard({
         <div className="flex items-center gap-2">
           <ShieldCheck className="size-4 text-teal-600" aria-hidden />
           <p className="text-xs font-medium text-slate-800">
-            Only verified students can send messages — confirm your university
-            email to join the conversation.
+            {t("inputVariantNotice")}
           </p>
         </div>
         {body}
@@ -227,12 +231,11 @@ export function VerifyUniversityEmailCard({
       <div className="flex items-center gap-2">
         <ShieldCheck className="size-4 text-teal-600" aria-hidden />
         <h3 className="text-sm font-semibold tracking-tight text-slate-900">
-          Become a verified student
+          {t("sidebarHeading")}
         </h3>
       </div>
       <p className="mt-2 text-xs leading-relaxed text-slate-600">
-        Everyone can read the community. To write — chat, reviews, questions —
-        confirm a university email address linked to your account.
+        {t("sidebarBody")}
       </p>
       {body}
     </motion.section>

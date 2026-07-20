@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Award,
   CalendarDays,
@@ -22,6 +23,13 @@ import {
 } from "@/components/decor/marker";
 import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
 import { formatTuition } from "@/lib/format/currency";
+import type { Locale } from "@/lib/i18n/config";
+import {
+  localizeCity,
+  localizeCountry,
+  localizeField,
+  localizeLanguage,
+} from "@/lib/i18n/data-labels";
 
 export type MatchCardProgram = {
   slug: string;
@@ -78,12 +86,12 @@ const LANGUAGE_LABELS: Record<string, string> = {
   fr: "French",
 };
 
-function formatField(field: string): string {
-  return FIELD_LABELS[field] ?? field;
+function formatField(field: string, locale: Locale): string {
+  return localizeField(FIELD_LABELS[field] ?? field, locale);
 }
 
-function formatLanguage(code: string): string {
-  return LANGUAGE_LABELS[code] ?? code.toUpperCase();
+function formatLanguage(code: string, locale: Locale): string {
+  return localizeLanguage(LANGUAGE_LABELS[code] ?? code.toUpperCase(), locale);
 }
 
 function scoreToNumber(score: number | string | null): number | null {
@@ -93,12 +101,13 @@ function scoreToNumber(score: number | string | null): number | null {
 }
 
 function ScoreBar({ score }: { score: number }) {
+  const t = useTranslations("results.matches");
   const pct = Math.max(0, Math.min(100, score));
   return (
     <div className="w-full">
       <div className="flex items-baseline justify-between text-xs">
         <span className="font-medium uppercase tracking-wider text-muted-foreground">
-          Match score
+          {t("score")}
         </span>
         <span className="font-mono text-base font-semibold text-foreground">
           {Math.round(pct)}
@@ -117,11 +126,29 @@ function ScoreBar({ score }: { score: number }) {
   );
 }
 
-export function HeroMatchCard({ match }: { match: MatchCardData }) {
+export function HeroMatchCard({
+  match,
+  saveSlot,
+}: {
+  match: MatchCardData;
+  /**
+   * Optional override for the Save control. Production passes nothing (the real
+   * SaveButton renders). The self-playing /demo passes a server-action-free
+   * stand-in so its scripted "save" doesn't trigger an auth redirect.
+   */
+  saveSlot?: React.ReactNode;
+}) {
+  const t = useTranslations("results.matches");
+  const locale = useLocale() as Locale;
   const { program } = match;
   const { university: u } = program;
   const score = scoreToNumber(match.score);
-  const tuitionLabel = formatTuition(program.tuition_per_year, program.currency);
+  const tuitionLabel = formatTuition(
+    program.tuition_per_year,
+    program.currency,
+    "long",
+    locale,
+  );
 
   return (
     <motion.section
@@ -152,7 +179,7 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
       <div className="relative z-10">
         <div className="flex items-center gap-2 text-sm font-medium text-primary">
           <Sparkles className="size-4" />
-          Your top match
+          {t("topMatch")}
         </div>
         <div className="mt-3 flex items-center gap-3">
           <UniversityLogo
@@ -180,12 +207,12 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
           </Link>
           {u.qs_world_rank ? (
             <span className="ml-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-              QS #{u.qs_world_rank} worldwide
+              {t("qsWorldwide", { rank: u.qs_world_rank })}
             </span>
           ) : null}
           {u.is_partner ? (
             <span className="ml-2 inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
-              Partner
+              {t("partner")}
             </span>
           ) : null}
         </p>
@@ -204,36 +231,39 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
             className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-5 text-sm leading-relaxed text-foreground"
           >
             <span className="block text-xs font-semibold uppercase tracking-wider text-primary">
-              Why this fits you
+              {t("whyThisFits")}
             </span>
             <span className="mt-2 block">{match.rationale}</span>
           </motion.p>
         ) : null}
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
-          <Stat icon={<MapPin className="size-4" />} label="Location">
-            {u.city}, {u.country}
+          <Stat icon={<MapPin className="size-4" />} label={t("stat.location")}>
+            {localizeCity(u.city, locale)}, {localizeCountry(u.country, locale)}
           </Stat>
-          <Stat icon={<GraduationCap className="size-4" />} label="Field">
-            {formatField(program.field_of_study)}
+          <Stat icon={<GraduationCap className="size-4" />} label={t("stat.field")}>
+            {formatField(program.field_of_study, locale)}
           </Stat>
-          <Stat icon={<Languages className="size-4" />} label="Language">
-            {formatLanguage(program.language)}
+          <Stat icon={<Languages className="size-4" />} label={t("stat.language")}>
+            {formatLanguage(program.language, locale)}
           </Stat>
-          <Stat icon={<CalendarDays className="size-4" />} label="Duration">
-            {program.duration_months} months
+          <Stat icon={<CalendarDays className="size-4" />} label={t("stat.duration")}>
+            {t("stat.durationValue", { count: program.duration_months })}
           </Stat>
-          <Stat icon={<Wallet className="size-4" />} label="Tuition">
+          <Stat icon={<Wallet className="size-4" />} label={t("stat.tuition")}>
             {tuitionLabel}
           </Stat>
           {program.start_month ? (
-            <Stat icon={<CalendarDays className="size-4" />} label="Starts">
+            <Stat icon={<CalendarDays className="size-4" />} label={t("stat.starts")}>
               {program.start_month}
             </Stat>
           ) : null}
           {program.qs_subject_rank && program.qs_subject_area ? (
-            <Stat icon={<Award className="size-4" />} label="Subject ranking">
-              #{program.qs_subject_rank} in {program.qs_subject_area}
+            <Stat icon={<Award className="size-4" />} label={t("stat.subjectRanking")}>
+              {t("stat.subjectRankingValue", {
+                rank: program.qs_subject_rank,
+                area: localizeField(program.qs_subject_area, locale),
+              })}
             </Stat>
           ) : null}
         </div>
@@ -241,7 +271,7 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
         {program.description ? (
           <section className="mt-10">
             <h2 className="text-xl font-semibold tracking-tight">
-              About this program
+              {t("aboutProgram")}
             </h2>
             <p className="mt-3 leading-relaxed text-muted-foreground">
               {program.description}
@@ -252,21 +282,23 @@ export function HeroMatchCard({ match }: { match: MatchCardData }) {
         <div className="mt-10 flex flex-wrap gap-3">
           <Button asChild>
             <Link href={`/programs/${u.slug}/${program.slug}`}>
-              See full program details
+              {t("seeFullProgramDetails")}
             </Link>
           </Button>
           {u.website ? (
             <Button asChild variant="outline">
               <a href={u.website} target="_blank" rel="noreferrer noopener">
-                Visit university site
+                {t("visitUniversitySite")}
                 <ExternalLink />
               </a>
             </Button>
           ) : null}
-          <SaveButton
-            programId={match.program_id}
-            initiallySaved={match.is_saved}
-          />
+          {saveSlot ?? (
+            <SaveButton
+              programId={match.program_id}
+              initiallySaved={match.is_saved}
+            />
+          )}
         </div>
       </div>
     </motion.section>
@@ -280,6 +312,8 @@ export function SiblingMatchCard({
   match: MatchCardData;
   index: number;
 }) {
+  const t = useTranslations("results.matches");
+  const locale = useLocale() as Locale;
   const { program } = match;
   const { university: u } = program;
   const score = scoreToNumber(match.score);
@@ -316,7 +350,7 @@ export function SiblingMatchCard({
           />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {u.city}, {u.country}
+              {localizeCity(u.city, locale)}, {localizeCountry(u.country, locale)}
             </p>
             <p className="mt-0.5 truncate text-xs text-muted-foreground">
               {u.name}
@@ -330,7 +364,7 @@ export function SiblingMatchCard({
           {program.degree}
           {u.qs_world_rank ? (
             <span className="ml-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-              QS #{u.qs_world_rank}
+              {t("qsRank", { rank: u.qs_world_rank })}
             </span>
           ) : null}
         </p>
@@ -349,27 +383,32 @@ export function SiblingMatchCard({
 
         <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-muted-foreground">
           <div>
-            <dt className="font-medium text-foreground">Field</dt>
-            <dd>{formatField(program.field_of_study)}</dd>
+            <dt className="font-medium text-foreground">{t("stat.field")}</dt>
+            <dd>{formatField(program.field_of_study, locale)}</dd>
           </div>
           <div>
-            <dt className="font-medium text-foreground">Tuition</dt>
+            <dt className="font-medium text-foreground">{t("stat.tuition")}</dt>
             <dd>
-              {formatTuition(program.tuition_per_year, program.currency)}
+              {formatTuition(
+                program.tuition_per_year,
+                program.currency,
+                "long",
+                locale,
+              )}
             </dd>
           </div>
           <div>
-            <dt className="font-medium text-foreground">Duration</dt>
-            <dd>{program.duration_months} months</dd>
+            <dt className="font-medium text-foreground">{t("stat.duration")}</dt>
+            <dd>{t("stat.durationValue", { count: program.duration_months })}</dd>
           </div>
           <div>
-            <dt className="font-medium text-foreground">Language</dt>
-            <dd>{formatLanguage(program.language)}</dd>
+            <dt className="font-medium text-foreground">{t("stat.language")}</dt>
+            <dd>{formatLanguage(program.language, locale)}</dd>
           </div>
         </dl>
 
         <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 transition-opacity group-hover:opacity-100">
-          See full details
+          {t("seeFullDetails")}
           <span aria-hidden="true">→</span>
         </span>
       </Link>

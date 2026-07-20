@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import {
   ArrowLeft,
   ArrowRight,
@@ -119,6 +120,7 @@ export function WelcomeTour({
   const restoreFocusRef = useRef<HTMLElement | null>(null);
   const backdropPointerDown = useRef(false);
   const reduceMotion = useReducedMotion();
+  const t = useTranslations("home");
 
   const steps = useMemo<TourStep[]>(() => {
     const list: TourStep[] = [
@@ -126,46 +128,41 @@ export function WelcomeTour({
         key: "welcome",
         icon: null,
         accent: "teal",
-        badge: "Welcome",
-        title: "Welcome to EdFind 👋",
-        description:
-          "Your AI guide to master's programs in Europe — scattered university info, gathered in one place and matched to you.",
+        badge: t("welcomeTour.steps.welcome.badge"),
+        title: t("welcomeTour.steps.welcome.title"),
+        description: t("welcomeTour.steps.welcome.description"),
       },
       {
         key: "quiz",
         icon: GraduationCap,
         accent: "sky",
-        badge: "AI matching",
-        title: "Take a short quiz",
-        description:
-          "Answer about a dozen quick questions — plus optional free-text notes for anything we'd miss. Our AI ranks your top 3 programs and explains why each one fits you.",
+        badge: t("welcomeTour.steps.quiz.badge"),
+        title: t("welcomeTour.steps.quiz.title"),
+        description: t("welcomeTour.steps.quiz.description"),
       },
       {
         key: "search",
         icon: MessageSquareText,
         accent: "violet",
-        badge: "AI search",
-        title: "Or say it in your own words",
-        description:
-          'Type something like "affordable CS master\'s in the Netherlands, taught in English" and AI search turns it into real matches.',
+        badge: t("welcomeTour.steps.search.badge"),
+        title: t("welcomeTour.steps.search.title"),
+        description: t("welcomeTour.steps.search.description"),
       },
       {
         key: "catalog",
         icon: LayoutGrid,
         accent: "amber",
-        badge: "Browse",
-        title: "Explore the full catalog",
-        description:
-          "Every university and program we cover, filterable by country, field, language, and duration. Once you're in, Ctrl+K opens search from anywhere.",
+        badge: t("welcomeTour.steps.catalog.badge"),
+        title: t("welcomeTour.steps.catalog.title"),
+        description: t("welcomeTour.steps.catalog.description"),
       },
       {
         key: "shortlist",
         icon: Bookmark,
         accent: "rose",
-        badge: "Decide",
-        title: "Save and compare",
-        description:
-          "Save programs you like — they land in your applications tracker — then put them side by side: tuition, deadlines, language, rankings.",
+        badge: t("welcomeTour.steps.shortlist.badge"),
+        title: t("welcomeTour.steps.shortlist.title"),
+        description: t("welcomeTour.steps.shortlist.description"),
       },
     ];
     if (APPLICATIONS_ENABLED) {
@@ -173,10 +170,9 @@ export function WelcomeTour({
         key: "applications",
         icon: ClipboardList,
         accent: "emerald",
-        badge: "Apply",
-        title: "Track your applications",
-        description:
-          "A personal dashboard with progress, deadlines, and a task board so nothing slips through the cracks.",
+        badge: t("welcomeTour.steps.applications.badge"),
+        title: t("welcomeTour.steps.applications.title"),
+        description: t("welcomeTour.steps.applications.description"),
       });
     }
     if (COMMUNITY_ENABLED) {
@@ -184,23 +180,21 @@ export function WelcomeTour({
         key: "community",
         icon: MessagesSquare,
         accent: "teal",
-        badge: "Connect",
-        title: "Hear it from real students",
-        description:
-          "University and program groups, honest reviews, and campus responsibles who have been where you are going.",
+        badge: t("welcomeTour.steps.community.badge"),
+        title: t("welcomeTour.steps.community.title"),
+        description: t("welcomeTour.steps.community.description"),
       });
     }
     list.push({
       key: "cta",
       icon: Sparkles,
       accent: "sky",
-      badge: "Ready?",
-      title: "Let's find your program",
-      description:
-        "It takes about two minutes to get your first matches. We compare objectively — and never silently boost anyone.",
+      badge: t("welcomeTour.steps.cta.badge"),
+      title: t("welcomeTour.steps.cta.title"),
+      description: t("welcomeTour.steps.cta.description"),
     });
     return list;
-  }, []);
+  }, [t]);
 
   const dismiss = useCallback(() => {
     markSeen();
@@ -378,7 +372,7 @@ export function WelcomeTour({
             ref={dialogRef}
             role="dialog"
             aria-modal
-            aria-label="Welcome tour"
+            aria-label={t("welcomeTour.dialogLabel")}
             className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-3xl bg-white shadow-2xl sm:max-h-[calc(100dvh-3rem)]"
           >
             {/* Part-by-part progress bar */}
@@ -413,10 +407,10 @@ export function WelcomeTour({
                 ref={closeRef}
                 type="button"
                 onClick={dismiss}
-                aria-label="Skip the tour"
+                aria-label={t("welcomeTour.skipAria")}
                 className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-slate-100 hover:text-foreground"
               >
-                Skip
+                {t("welcomeTour.skip")}
                 <X className="size-3.5" aria-hidden />
               </button>
             </div>
@@ -469,7 +463,12 @@ export function WelcomeTour({
                       {step.badge}
                     </span>
 
-                    <p className="sr-only">{`Step ${index + 1} of ${steps.length}`}</p>
+                    <p className="sr-only">
+                      {t("welcomeTour.stepOfTotal", {
+                        current: index + 1,
+                        total: steps.length,
+                      })}
+                    </p>
                     <h2 className="mt-3 text-balance text-xl font-bold tracking-tight text-foreground sm:text-2xl">
                       {step.title}
                     </h2>
@@ -479,9 +478,18 @@ export function WelcomeTour({
 
                     {step.key === "welcome" && totals.universities > 0 && (
                       <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-                        <StatChip value={totals.universities} label="universities" />
-                        <StatChip value={totals.programs} label="programs" />
-                        <StatChip value={totals.countries} label="countries" />
+                        <StatChip
+                          value={totals.universities}
+                          label={t("stats.universities")}
+                        />
+                        <StatChip
+                          value={totals.programs}
+                          label={t("stats.programs")}
+                        />
+                        <StatChip
+                          value={totals.countries}
+                          label={t("stats.countries")}
+                        />
                       </div>
                     )}
 
@@ -491,7 +499,7 @@ export function WelcomeTour({
                         onClick={dismiss}
                         className="mt-5 inline-block text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
                       >
-                        or browse the catalog first
+                        {t("welcomeTour.browseCatalogLink")}
                       </Link>
                     )}
                   </div>
@@ -533,19 +541,19 @@ export function WelcomeTour({
                     onClick={() => goTo(index - 1)}
                   >
                     <ArrowLeft aria-hidden />
-                    Back
+                    {t("welcomeTour.back")}
                   </Button>
                 )}
                 {isLast ? (
                   <Button asChild size="sm">
                     <Link ref={ctaRef} href="/start" onClick={dismiss}>
-                      Find my programs
+                      {t("welcomeTour.cta")}
                       <ArrowRight aria-hidden />
                     </Link>
                   </Button>
                 ) : (
                   <Button type="button" size="sm" onClick={() => goTo(index + 1)}>
-                    Next
+                    {t("welcomeTour.next")}
                     <ArrowRight aria-hidden />
                   </Button>
                 )}
@@ -569,6 +577,7 @@ function StatChip({ value, label }: { value: number; label: string }) {
 
 /** Small trigger that replays the tour — lives in the homepage hero. */
 export function WelcomeTourReplayLink({ className }: { className?: string }) {
+  const t = useTranslations("home");
   return (
     <button
       type="button"
@@ -579,7 +588,7 @@ export function WelcomeTourReplayLink({ className }: { className?: string }) {
       )}
     >
       <Sparkles className="size-3.5" aria-hidden />
-      Take the quick tour
+      {t("welcomeTour.replayLink")}
     </button>
   );
 }

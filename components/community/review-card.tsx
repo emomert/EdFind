@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Flag, MessageCircle, Star, ThumbsUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import type { CommunityUser, StudentReview } from "@/lib/community/types";
@@ -29,6 +30,7 @@ export function ReviewCard({
 }) {
   const [helpful, setHelpful] = useState(review.helpfulCount);
   const [marked, setMarked] = useState(false);
+  const t = useTranslations("community");
 
   return (
     <motion.article
@@ -113,21 +115,21 @@ export function ReviewCard({
             )}
           >
             <ThumbsUp className={cn("size-3.5", marked && "fill-teal-500/30")} />
-            Helpful · {helpful}
+            {t("review.helpful", { count: helpful })}
           </button>
           <button
             type="button"
             className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700"
           >
             <MessageCircle className="size-3.5" />
-            Reply
+            {t("common.reply")}
           </button>
         </div>
         <div className="flex items-center gap-1">
           <SubscriberOnly
             fallback={
               <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-1 text-[11px] text-slate-500">
-                Subscribe to message
+                {t("review.subscribeToMessage")}
               </span>
             }
           >
@@ -136,14 +138,14 @@ export function ReviewCard({
               className="inline-flex items-center gap-1.5 rounded-full bg-teal-600 px-3 py-1 text-[11px] font-medium text-white transition hover:bg-teal-700"
             >
               <MessageCircle className="size-3" />
-              Message {user.name.split(" ")[0]}
+              {t("common.messageName", { name: user.name.split(" ")[0] })}
             </button>
           </SubscriberOnly>
           <button
             type="button"
             className="inline-flex size-7 items-center justify-center rounded-full text-slate-300 transition-colors hover:bg-rose-50 hover:text-rose-600"
-            aria-label="Report"
-            title="Report"
+            aria-label={t("review.reportAriaLabel")}
+            title={t("review.reportAriaLabel")}
           >
             <Flag className="size-3.5" />
           </button>

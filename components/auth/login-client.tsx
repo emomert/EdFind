@@ -2,15 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { AlertCircle, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
-
-const ERROR_MESSAGES: Record<string, string> = {
-  missing_code: "Sign-in didn't complete — please try again.",
-  exchange_failed: "Couldn't complete sign-in. Please try again.",
-};
 
 export function LoginClient({
   next,
@@ -19,8 +15,14 @@ export function LoginClient({
   next: string;
   error: string | null;
 }) {
+  const t = useTranslations("auth.login");
   const [submitting, setSubmitting] = useState(false);
   const [internalError, setInternalError] = useState<string | null>(null);
+
+  const ERROR_MESSAGES: Record<string, string> = {
+    missing_code: t("errors.missingCode"),
+    exchange_failed: t("errors.exchangeFailed"),
+  };
 
   const handleGoogle = async () => {
     setSubmitting(true);
@@ -56,15 +58,13 @@ export function LoginClient({
       />
       <span className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-primary">
         <Sparkles className="size-3.5" />
-        Welcome
+        {t("welcomeBadge")}
       </span>
       <h1 className="mt-5 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-        Sign in to EdFind
+        {t("heading")}
       </h1>
       <p className="mt-4 text-pretty text-sm text-muted-foreground">
-        Your matches, shortlist, and tracked applications stay with you across
-        devices. We only use your Google account for authentication — never to
-        post or email anything.
+        {t("description")}
       </p>
 
       <div className="mt-10 w-full">
@@ -76,7 +76,7 @@ export function LoginClient({
           className="w-full"
         >
           <GoogleIcon />
-          {submitting ? "Redirecting to Google…" : "Continue with Google"}
+          {submitting ? t("redirecting") : t("continueWithGoogle")}
         </Button>
 
         {errorMessage ? (
@@ -91,8 +91,7 @@ export function LoginClient({
       </div>
 
       <p className="mt-10 text-xs text-muted-foreground">
-        By continuing you agree to share your Google profile (name and email)
-        with EdFind for account purposes.
+        {t("consent")}
       </p>
     </div>
   );

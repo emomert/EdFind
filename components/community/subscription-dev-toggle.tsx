@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Beaker, Check, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import { useSubscription } from "./subscription-context";
@@ -14,6 +15,7 @@ import { toggleSubscriptionAction } from "@/app/community/actions";
  */
 export function SubscriptionDevToggle() {
   const { isSubscribed } = useSubscription();
+  const t = useTranslations("community.devToggle");
   const [pending, startTransition] = useTransition();
   const [expanded, setExpanded] = useState(false);
 
@@ -41,11 +43,10 @@ export function SubscriptionDevToggle() {
               <Beaker className="size-4 text-amber-600" />
               <div className="flex-1">
                 <p className="text-xs font-semibold uppercase tracking-wider text-amber-700">
-                  Demo mode
+                  {t("heading")}
                 </p>
                 <p className="mt-1 text-xs text-slate-600">
-                  Stripe isn&apos;t wired yet. Flip between Free and Premium
-                  to preview both states. Saves to a cookie.
+                  {t("body")}
                 </p>
               </div>
             </div>
@@ -63,9 +64,9 @@ export function SubscriptionDevToggle() {
               >
                 <span className="flex items-center gap-1 font-semibold">
                   {!isSubscribed && <Check className="size-3" />}
-                  Free
+                  {t("free")}
                 </span>
-                <span className="text-slate-500">Public previews only</span>
+                <span className="text-slate-500">{t("freeDescription")}</span>
               </button>
               <button
                 type="button"
@@ -80,9 +81,9 @@ export function SubscriptionDevToggle() {
               >
                 <span className="flex items-center gap-1 font-semibold">
                   {isSubscribed && <Check className="size-3" />}
-                  Premium
+                  {t("premium")}
                 </span>
-                <span className="text-slate-500">Full access</span>
+                <span className="text-slate-500">{t("premiumDescription")}</span>
               </button>
             </div>
           </motion.div>
@@ -100,7 +101,7 @@ export function SubscriptionDevToggle() {
         )}
       >
         <Beaker className="size-3.5" />
-        Demo: {isSubscribed ? "Premium" : "Free"}
+        {t("pillLabel", { state: isSubscribed ? t("premium") : t("free") })}
         {expanded ? <X className="size-3.5" /> : null}
       </button>
     </div>

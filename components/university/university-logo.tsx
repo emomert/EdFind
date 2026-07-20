@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 /**
  * UniversityLogo — visual identity for a university card or header.
@@ -43,6 +44,7 @@ export function UniversityLogo({
   size?: UniversityLogoSize;
   className?: string;
 }) {
+  const t = useTranslations("university");
   const px = SIZE_PX[size];
   const baseClass = [
     "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-white shadow-sm",
@@ -56,7 +58,7 @@ export function UniversityLogo({
       <span
         className={baseClass}
         style={{ width: px, height: px }}
-        aria-label={`${name} logo`}
+        aria-label={t("logo.altLabel", { name })}
         role="img"
       >
         <Image
@@ -87,6 +89,7 @@ function InitialsTile({
   size: UniversityLogoSize;
   className: string;
 }) {
+  const t = useTranslations("university");
   const px = SIZE_PX[size];
   const initials = computeInitials(name);
   const palette = pickPalette(slug);
@@ -99,7 +102,7 @@ function InitialsTile({
         background: palette.bg,
         color: palette.fg,
       }}
-      aria-label={`${name} logo`}
+      aria-label={t("logo.altLabel", { name })}
       role="img"
     >
       <span

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useFormatter, useTranslations } from "next-intl";
 
 import { Reveal } from "@/components/motion";
 
@@ -17,10 +18,13 @@ export function LegalPage({
 }: {
   eyebrow?: string;
   title: string;
-  updated: string;
+  updated: Date;
   intro?: ReactNode;
   children: ReactNode;
 }) {
+  const t = useTranslations("legal.shell");
+  const format = useFormatter();
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
       <Reveal>
@@ -29,7 +33,13 @@ export function LegalPage({
           {title}
         </h1>
         <p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">
-          Last updated {updated}
+          {t("lastUpdated", {
+            date: format.dateTime(updated, {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }),
+          })}
         </p>
         {intro ? (
           <p className="mt-6 text-base leading-relaxed text-muted-foreground">

@@ -1,0 +1,153 @@
+{
+  "hero": {
+    "badge": "AI-curated, neutral guidance",
+    "title": "Find the right <highlight>master's in Europe</highlight> for you.",
+    "subtitle": "EdFind matches Turkish students to vetted European master's programs using a short quiz, your priorities, and an AI that explains <em>why</em> each program fits — not just which ones rank highest.",
+    "takeQuiz": "Take the {totalSteps}-question quiz",
+    "searchWithAi": "Search with AI",
+    "signInCta": "Sign in to get started",
+    "browseUniversities": "Browse universities",
+    "signedInNote": "Signed in — your matches travel with you across devices.",
+    "signedOutNote": "Sign in with Google · Takes about 2 minutes · We never silently boost partner universities",
+    "howItWorks": "How it works",
+    "step1": "Tell us about yourself — {totalSteps} quick questions, or just describe what you're looking for in your own words.",
+    "step2": "We compare your profile against every program in our catalog — {countries} countries, real tuition, deadlines, and rankings — and pick your top 3, each with a personal explanation of why it fits (and where the trade-offs are).",
+    "step3": "Go deeper: compare options, check housing costs and verified student insights, then track your applications in one place."
+  },
+  "stats": {
+    "universities": "universities",
+    "programs": "programs",
+    "countries": "countries"
+  },
+  "featured": {
+    "heading": "Universities from across Europe",
+    "subheading": "{universities} institutions across {countries} countries — and growing",
+    "browseCatalog": "Browse the full catalog"
+  },
+  "welcomeTour": {
+    "replayLink": "Take the quick tour",
+    "dialogLabel": "Welcome tour",
+    "skip": "Skip",
+    "skipAria": "Skip the tour",
+    "stepOfTotal": "Step {current} of {total}",
+    "back": "Back",
+    "next": "Next",
+    "cta": "Find my programs",
+    "browseCatalogLink": "or browse the catalog first",
+    "steps": {
+      "welcome": {
+        "badge": "Welcome",
+        "title": "Welcome to EdFind 👋",
+        "description": "Your AI guide to master's programs in Europe — scattered university info, gathered in one place and matched to you."
+      },
+      "quiz": {
+        "badge": "AI matching",
+        "title": "Take a short quiz",
+        "description": "Answer about a dozen quick questions — plus optional free-text notes for anything we'd miss. Our AI ranks your top 3 programs and explains why each one fits you."
+      },
+      "search": {
+        "badge": "AI search",
+        "title": "Or say it in your own words",
+        "description": "Type something like \"affordable CS master's in the Netherlands, taught in English\" and AI search turns it into real matches."
+      },
+      "catalog": {
+        "badge": "Browse",
+        "title": "Explore the full catalog",
+        "description": "Every university and program we cover, filterable by country, field, language, and duration. Once you're in, Ctrl+K opens search from anywhere."
+      },
+      "shortlist": {
+        "badge": "Decide",
+        "title": "Save and compare",
+        "description": "Save programs you like — they land in your applications tracker — then put them side by side: tuition, deadlines, language, rankings."
+      },
+      "applications": {
+        "badge": "Apply",
+        "title": "Track your applications",
+        "description": "A personal dashboard with progress, deadlines, and a task board so nothing slips through the cracks."
+      },
+      "community": {
+        "badge": "Connect",
+        "title": "Hear it from real students",
+        "description": "University and program groups, honest reviews, and campus responsibles who have been where you are going."
+      },
+      "cta": {
+        "badge": "Ready?",
+        "title": "Let's find your program",
+        "description": "It takes about two minutes to get your first matches. We compare objectively — and never silently boost anyone."
+      }
+    }
+  },
+  "quizDemo": {
+    "link": "Watch the quiz in action",
+    "badge": "Quiz preview — plays by itself",
+    "closeAria": "Close preview",
+    "dialogAria": "Quiz preview",
+    "done": "Done",
+    "footer": "A shortened preview — the real quiz is {totalSteps} quick questions and takes about 2 minutes.",
+    "steps": {
+      "destination": {
+        "legend": "Which destination feels right for your master's journey?",
+        "helper": "Pick one or more — or \"No preference\" to stay open.",
+        "options": ["Italy", "Netherlands", "Germany", "Sweden", "France", "No preference"]
+      },
+      "situation": {
+        "legend": "What best describes your current situation?",
+        "options": ["Current undergraduate student", "Graduating soon (final year)", "Recent graduate", "Working professional"]
+      },
+      "studied": {
+        "legend": "What did you study?",
+        "helper": "Your undergraduate field, in your own words.",
+        "typed": "BSc Industrial Engineering at Istanbul Technical University"
+      },
+      "wantToStudy": {
+        "legend": "What do you want to study?",
+        "helper": "Be as free as you like — a field, a precise topic, or just a feeling.",
+        "typed": "I want to move into data science — ideally applied to supply chains"
+      },
+      "budget": {
+        "legend": "What's your budget per year?",
+        "helper": "Tuition only — not living costs.",
+        "options": ["Tuition-free / fully-funded only", "Under €10,000", "€10,000 – €15,000", "Flexible / not sure yet"]
+      }
+    },
+    "finale": {
+      "title": "…and that's when the matching happens",
+      "description": "Your answers are compared against all 196 programs — real tuition, deadlines, and rankings — and you get your top 3 with a personal explanation for each.",
+      "takeRealQuiz": "Take the real quiz",
+      "replay": "Replay"
+    }
+  },
+  "start": {
+    "meta": {
+      "title": "Find programs — EdFind",
+      "description": "Pick how you want EdFind to surface your master's program matches: structured quiz, or describe what you want in your own words."
+    },
+    "badge": "Two paths to the same matcher",
+    "title": "How would you like to <highlight>find your matches</highlight>?",
+    "subtitle": "Both paths lead to the same matches from the same program catalog — pick whichever feels easier. You can always switch.",
+    "recommended": "Recommended",
+    "paths": {
+      "quiz": {
+        "eyebrow": "Structured",
+        "title": "Take the {totalSteps}-question quiz",
+        "description": "Walk through {totalSteps} quick questions covering your situation, university, background, what you want to study, GPA, budget, and goals — mostly single taps, plus a few short text answers. Best if you're still figuring out what you want.",
+        "bullets": ["Mostly taps — a school search and a few short text boxes", "Drafts saved automatically", "Same AI matcher under the hood"],
+        "duration": "≈ 2 minutes",
+        "cta": "Start the quiz"
+      },
+      "search": {
+        "eyebrow": "Free-form",
+        "title": "Describe what you want",
+        "description": "Type a few sentences in your own words — \"MSc in data science in Northern Europe, under 15k, English-taught\" — and we'll extract the structured profile and match against it.",
+        "bullets": ["Natural language input", "Best for clear preferences", "Skips the question-by-question flow"],
+        "duration": "≈ 30 seconds",
+        "cta": "Search with AI"
+      }
+    },
+    "footer": {
+      "title": "Both paths produce the same kind of result.",
+      "description": "You'll see three ranked program matches with a personal rationale for each. We never silently boost partner universities, and you can always re-take the quiz or rewrite your description to get fresh matches.",
+      "browseCatalog": "Or browse the full catalog"
+    }
+  }
+}

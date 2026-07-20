@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "matches": {
+      "title": "Your matches",
+      "description": "Master's programs matched to your profile."
+    },
+    "compare": {
+      "title": "Compare programs",
+      "description": "Side-by-side comparison of master's programs in your shortlist."
+    },
+    "shortlist": {
+      "title": "Your shortlist",
+      "description": "Programs you've saved."
+    }
+  },
+  "matches": {
+    "count": "{count, plural, one {# match} other {# matches}} from a catalog of European master's programs",
+    "retakeQuiz": "Re-take quiz",
+    "topMatch": "Your top match",
+    "score": "Match score",
+    "whyThisFits": "Why this fits you",
+    "stat": {
+      "location": "Location",
+      "field": "Field",
+      "language": "Language",
+      "duration": "Duration",
+      "durationValue": "{count} months",
+      "tuition": "Tuition",
+      "starts": "Starts",
+      "subjectRanking": "Subject ranking",
+      "subjectRankingValue": "#{rank} in {area}"
+    },
+    "qsWorldwide": "QS #{rank} worldwide",
+    "qsRank": "QS #{rank}",
+    "partner": "Partner",
+    "aboutProgram": "About this program",
+    "seeFullProgramDetails": "See full program details",
+    "visitUniversitySite": "Visit university site",
+    "seeFullDetails": "See full details",
+    "otherMatches": {
+      "heading": "Other strong matches",
+      "intro": "Ranked by overall fit to your profile. Click through for full program details."
+    },
+    "backToHome": "Back to home"
+  },
+  "save": {
+    "labelSaved": "Saved",
+    "labelUnsaved": "Save",
+    "ariaRemove": "Remove from shortlist",
+    "ariaAdd": "Save to shortlist",
+    "errors": {
+      "invalidInput": "Invalid input.",
+      "signInRequired": "Please sign in to save programs.",
+      "updateFailed": "Couldn't update your list.",
+      "saveFailed": "Couldn't save program."
+    }
+  },
+  "shortlist": {
+    "heading": "Your shortlist",
+    "emptyDescription": "You haven't saved any programs yet.",
+    "countDescription": "{count, plural, one {# program} other {# programs}} saved.",
+    "qsRank": "QS #{rank}",
+    "compareHelperZero": "Tick at least 2 programs to compare side-by-side (up to {max}).",
+    "compareHelperOne": "Select one more to compare.",
+    "selectedCount": "{count} selected.",
+    "selectedCountMax": "{count} selected (max).",
+    "compareButton": "Compare",
+    "selectForCompare": "Select for compare",
+    "compareLabel": "Compare",
+    "seeFullDetails": "See full details",
+    "empty": {
+      "heading": "Nothing saved yet",
+      "description": "Hit the save button on any program card or detail page and it'll land here — ready to compare side-by-side.",
+      "takeQuiz": "Take the quiz",
+      "searchWithAi": "Search with AI"
+    },
+    "fields": {
+      "field": "Field",
+      "tuition": "Tuition",
+      "duration": "Duration",
+      "durationValue": "{count} months",
+      "language": "Language",
+      "subjectRank": "Subject rank",
+      "subjectRankValue": "#{rank} {area}"
+    }
+  },
+  "compare": {
+    "backToShortlist": "Back to shortlist",
+    "heading": "Compare programs",
+    "countLabel": "{count} programs side-by-side",
+    "groups": {
+      "basics": "Basics",
+      "costTiming": "Cost & timing",
+      "rankings": "Rankings",
+      "admissions": "Admissions"
+    },
+    "rows": {
+      "field": "Field",
+      "degree": "Degree",
+      "language": "Language",
+      "duration": "Duration",
+      "durationValue": "{count} months",
+      "tuition": "Tuition",
+      "applicationDeadline": "Application deadline",
+      "startMonth": "Start month",
+      "universityQsWorld": "University (QS World)",
+      "subjectRanking": "Subject ranking",
+      "subjectRankingValue": "#{rank} in {area}",
+      "gpaAcademic": "GPA / academic",
+      "acceptedEnglishTests": "Accepted English tests",
+      "documentsToPrepare": "Documents to prepare"
+    },
+    "values": {
+      "notListed": "Not listed",
+      "rollingNotPosted": "Rolling / not posted",
+      "notPosted": "Not posted",
+      "notSpecified": "Not specified"
+    }
+  }
+}

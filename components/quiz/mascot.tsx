@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -8,7 +10,11 @@ type Props = {
 const DEFAULT_MESSAGE =
   "There's no right or wrong answer — just what feels right for you!";
 
-export function QuizMascot({ message = DEFAULT_MESSAGE, className }: Props) {
+export function QuizMascot({ message, className }: Props) {
+  const t = useTranslations("quiz");
+  const text =
+    message ?? (t.has("mascot.default") ? t("mascot.default") : DEFAULT_MESSAGE);
+
   return (
     <div
       className={cn(
@@ -17,7 +23,7 @@ export function QuizMascot({ message = DEFAULT_MESSAGE, className }: Props) {
       )}
     >
       <MascotIllustration className="size-14 shrink-0" />
-      <p className="text-sm text-muted-foreground">{message}</p>
+      <p className="text-sm text-muted-foreground">{text}</p>
     </div>
   );
 }

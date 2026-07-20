@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 import type {
   CommunityGroup,
@@ -378,8 +379,9 @@ function ReviewsTab({
   universityNames: Readonly<Record<string, string>>;
   programNames: Readonly<Record<string, string>>;
 }) {
+  const t = useTranslations("community.client");
   if (reviews.length === 0)
-    return <EmptyState message="No reviews match your filters yet." />;
+    return <EmptyState message={t("emptyReviews")} />;
   return (
     <div className="grid gap-3 lg:grid-cols-2">
       {reviews.map((r) => {
@@ -422,6 +424,7 @@ function GroupsTab({
   onChangeType: (t: "all" | "university" | "program") => void;
   onOpen: (g: CommunityGroup) => void;
 }) {
+  const t = useTranslations("community.client");
   const initial = groups.slice(0, 24);
   return (
     <div className="space-y-4">
@@ -433,15 +436,15 @@ function GroupsTab({
         />
         <p className="text-xs text-slate-500">
           {typeFilter === "university"
-            ? "University-wide communities — meet the whole cohort."
+            ? t("typeHintUniversity")
             : typeFilter === "program"
-            ? "Program-specific communities — laser-focused on one master's."
-            : "Universities and programs in one view."}
+            ? t("typeHintProgram")
+            : t("typeHintAll")}
         </p>
       </div>
 
       {groups.length === 0 ? (
-        <EmptyState message="No groups match your filters yet." />
+        <EmptyState message={t("emptyGroups")} />
       ) : (
         <>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -465,8 +468,7 @@ function GroupsTab({
           </div>
           {groups.length > 24 && (
             <p className="text-center text-xs text-slate-500">
-              Showing {initial.length} of {groups.length} groups. Refine filters
-              to narrow.
+              {t("showingCount", { shown: initial.length, total: groups.length })}
             </p>
           )}
         </>
@@ -484,8 +486,9 @@ function QuestionsTab({
   usersById: Readonly<Record<string, CommunityUser>>;
   universityNames: Readonly<Record<string, string>>;
 }) {
+  const t = useTranslations("community.client");
   if (questions.length === 0)
-    return <EmptyState message="No popular questions for this filter yet." />;
+    return <EmptyState message={t("emptyQuestions")} />;
   return (
     <PopularQuestionsList
       questions={questions}
@@ -503,12 +506,9 @@ function ResponsiblesTab({
   responsibles: CommunityUser[];
   universityNames: Readonly<Record<string, string>>;
 }) {
+  const t = useTranslations("community.client");
   if (responsibles.length === 0)
-    return (
-      <EmptyState
-        message="No campus responsibles match this filter. Try clearing it — every university has one."
-      />
-    );
+    return <EmptyState message={t("emptyResponsibles")} />;
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {responsibles.map((r) => (

@@ -2,9 +2,12 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import { Sparkles, GraduationCap, Target, Compass } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import type { Locale } from "@/lib/i18n/config";
+import { localizeCountry, localizeField } from "@/lib/i18n/data-labels";
 import type { ApplicationItem, ProfileSummary } from "./types";
 import { COUNTRY_NAMES, FIELD_LABELS, STATUS_PROGRESS_WEIGHT } from "./types";
 
@@ -20,35 +23,23 @@ function deriveTargetCountries(
   return fromApps.slice(0, 5);
 }
 
+type FieldOfInterest =
+  | { kind: "field"; value: string }
+  | { kind: "degree"; value: string };
+
 function deriveFieldOfInterest(
   apps: ApplicationItem[],
   profile: ProfileSummary,
-): string | null {
-  if (profile.fieldOfStudy) return FIELD_LABELS[profile.fieldOfStudy] ?? null;
+): FieldOfInterest | null {
+  if (profile.fieldOfStudy) {
+    const label = FIELD_LABELS[profile.fieldOfStudy];
+    return label ? { kind: "field", value: label } : null;
+  }
   // Fallback: most common degree word across applications.
   if (apps.length === 0) return null;
   const degrees = apps.map((a) => a.program.degree).filter(Boolean);
   if (degrees.length === 0) return null;
-  return `${degrees[0]} programs`;
-}
-
-function statusBadge(progress: number, hasApps: boolean): {
-  label: string;
-  tone: string;
-} {
-  if (!hasApps) {
-    return { label: "Dreaming big", tone: "bg-white/15 text-white" };
-  }
-  if (progress >= 0.9) {
-    return { label: "Crossing the finish line", tone: "bg-emerald-300/20 text-emerald-50" };
-  }
-  if (progress >= 0.6) {
-    return { label: "Closing in", tone: "bg-sky-300/20 text-sky-50" };
-  }
-  if (progress >= 0.3) {
-    return { label: "Building momentum", tone: "bg-amber-200/25 text-amber-50" };
-  }
-  return { label: "Getting started", tone: "bg-white/15 text-white" };
+  return { kind: "degree", value: degrees[0] };
 }
 
 export function StudentProgressCard({
@@ -62,6 +53,8 @@ export function StudentProgressCard({
   applications: ApplicationItem[];
   profile: ProfileSummary;
 }) {
+  const t = useTranslations("applications.progressCard");
+  const locale = useLocale() as Locale;
   // Title-case the first token only. We avoid /\b\w/ here: in JS regex (no /u
   // flag with \w), `\w` is [A-Za-z0-9_], so Turkish letters like ğ/ş/ç/ı/ü/ö
   // are not word chars — that creates a fake word boundary inside names like
@@ -95,7 +88,32 @@ export function StudentProgressCard({
   }, [applications]);
   const progressPct = Math.round(progress * 100);
 
-  const badge = statusBadge(progress, applications.length > 0);
+  const badge = useMemo(() => {
+    if (applications.length === 0) {
+      return { label: t("status.dreaming"), tone: "bg-white/15 text-white" };
+    }
+    if (progress >= 0.9) {
+      return {
+        label: t("status.finishLine"),
+        tone: "bg-emerald-300/20 text-emerald-50",
+      };
+    }
+    if (progress >= 0.6) {
+      return { label: t("status.closingIn"), tone: "bg-sky-300/20 text-sky-50" };
+    }
+    if (progress >= 0.3) {
+      return {
+        label: t("status.momentum"),
+        tone: "bg-amber-200/25 text-amber-50",
+      };
+    }
+    return { label: t("status.starting"), tone: "bg-white/15 text-white" };
+  }, [progress, applications.length, t]);
+
+  const destinationsPhrase =
+    targetCountries.length > 0
+      ? t("destinationsCount", { count: targetCountries.length })
+      : t("destinationsYours");
 
   return (
     <motion.section
@@ -138,7 +156,7 @@ export function StudentProgressCard({
               transition={{ delay: 0.25, duration: 0.5 }}
               className="text-2xl font-semibold leading-tight tracking-tight sm:text-3xl"
             >
-              Hello, {firstName} — your study-abroad journey is on the move.
+              {t("greeting", { name: firstName })}
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 8 }}
@@ -147,8 +165,13 @@ export function StudentProgressCard({
               className="mt-1.5 max-w-xl text-sm text-white/85"
             >
               {applications.length === 0
-                ? "Track the programs you care about and turn the big abstract goal into small, doable steps."
-                : `You're managing ${applications.length} application${applications.length === 1 ? "" : "s"} across ${targetCountries.length || "your"} destination${targetCountries.length === 1 ? "" : "s"}. One step at a time — you've got this.`}
+                ? t("subtitleEmpty")
+                : t("subtitleWithApps", {
+                    applications: t("applicationsCount", {
+                      count: applications.length,
+                    }),
+                    destinations: destinationsPhrase,
+                  })}
             </motion.p>
 
             <motion.div
@@ -161,17 +184,25 @@ export function StudentProgressCard({
               className="mt-4 flex flex-wrap items-center gap-2"
             >
               {fieldOfInterest && (
-                <Chip icon={<GraduationCap className="size-3.5" />}>{fieldOfInterest}</Chip>
+                <Chip icon={<GraduationCap className="size-3.5" />}>
+                  {fieldOfInterest.kind === "field"
+                    ? localizeField(fieldOfInterest.value, locale)
+                    : t("degreePrograms", { degree: fieldOfInterest.value })}
+                </Chip>
               )}
               {targetCountries.length > 0 ? (
                 <Chip icon={<Target className="size-3.5" />}>
                   {targetCountries
-                    .map((c) => COUNTRY_NAMES[c] || c)
+                    .map((c) =>
+                      c === "ANY"
+                        ? t("anyDestination")
+                        : localizeCountry(COUNTRY_NAMES[c] || c, locale),
+                    )
                     .join(" · ")}
                 </Chip>
               ) : (
                 <Chip icon={<Compass className="size-3.5" />}>
-                  Exploring destinations
+                  {t("exploringDestinations")}
                 </Chip>
               )}
             </motion.div>
@@ -180,7 +211,7 @@ export function StudentProgressCard({
 
         <div className="w-full max-w-sm shrink-0 lg:w-72">
           <div className="flex items-baseline justify-between text-sm text-white/90">
-            <span className="font-medium">Overall progress</span>
+            <span className="font-medium">{t("overallProgress")}</span>
             <motion.span
               key={progressPct}
               initial={{ opacity: 0, y: 4 }}
@@ -201,8 +232,8 @@ export function StudentProgressCard({
           </div>
           <p className="mt-2 text-xs text-white/75">
             {applications.length === 0
-              ? "Add your first program to see progress."
-              : "Progress moves as you advance applications through stages."}
+              ? t("progressHintEmpty")
+              : t("progressHint")}
           </p>
         </div>
       </div>

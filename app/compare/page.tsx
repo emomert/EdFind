@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   ArrowLeft,
   Award,
@@ -17,11 +18,21 @@ import { requireUser } from "@/lib/supabase/auth";
 import { requirePremium } from "@/lib/premium/premium";
 import { UniversityLogo } from "@/components/university/university-logo";
 import { formatTuition as formatTuitionWithEur } from "@/lib/format/currency";
+import type { Locale } from "@/lib/i18n/config";
+import {
+  localizeCity,
+  localizeCountry,
+  localizeField,
+  localizeLanguage,
+} from "@/lib/i18n/data-labels";
 
-export const metadata: Metadata = {
-  title: "Compare programs",
-  description: "Side-by-side comparison of master's programs in your shortlist.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("results.meta.compare");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 type CompareProgram = {
   id: string;
@@ -80,12 +91,12 @@ const LANGUAGE_LABELS: Record<string, string> = {
   fr: "French",
 };
 
-function formatField(field: string): string {
-  return FIELD_LABELS[field] ?? field;
+function formatField(field: string, locale: Locale): string {
+  return localizeField(FIELD_LABELS[field] ?? field, locale);
 }
 
-function formatLanguage(code: string): string {
-  return LANGUAGE_LABELS[code] ?? code.toUpperCase();
+function formatLanguage(code: string, locale: Locale): string {
+  return localizeLanguage(LANGUAGE_LABELS[code] ?? code.toUpperCase(), locale);
 }
 
 // Compare table cells are already labelled "Tuition" by the row header, so
@@ -93,18 +104,27 @@ function formatLanguage(code: string): string {
 function formatTuition(
   amount: string | number | null,
   currency: string,
+  notListedLabel: string,
+  locale: Locale,
 ): string {
-  if (amount == null) return "Not listed";
-  return formatTuitionWithEur(amount, currency);
+  if (amount == null) return notListedLabel;
+  return formatTuitionWithEur(amount, currency, "long", locale);
 }
 
-function formatDeadline(date: string | null): string {
-  if (!date) return "Rolling / not posted";
-  return new Date(date).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+function formatDeadline(
+  date: string | null,
+  rollingLabel: string,
+  locale: Locale,
+): string {
+  if (!date) return rollingLabel;
+  return new Date(date).toLocaleDateString(
+    locale === "tr" ? "tr-TR" : "en-GB",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    },
+  );
 }
 
 export default async function ComparePage({
@@ -127,6 +147,8 @@ export default async function ComparePage({
     redirect("/shortlist");
   }
 
+  const t = await getTranslations("results.compare");
+  const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
   const res = await supabase
     .from("programs")
@@ -157,15 +179,15 @@ export default async function ComparePage({
         className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
-        Back to shortlist
+        {t("backToShortlist")}
       </Link>
 
       <div className="mt-6 flex flex-wrap items-baseline justify-between gap-3">
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Compare programs
+          {t("heading")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          {ordered.length} programs side-by-side
+          {t("countLabel", { count: ordered.length })}
         </p>
       </div>
 
@@ -177,54 +199,67 @@ export default async function ComparePage({
           }}
         >
           {ordered.map((p) => (
-            <ProgramHeader key={p.id} program={p} />
+            <ProgramHeader key={p.id} program={p} locale={locale} />
           ))}
         </div>
 
-        <RowGroup title="Basics">
+        <RowGroup title={t("groups.basics")}>
           <Row
-            label="Field"
+            label={t("rows.field")}
             icon={<GraduationCap className="size-4" />}
-            values={ordered.map((p) => formatField(p.field_of_study))}
+            values={ordered.map((p) => formatField(p.field_of_study, locale))}
           />
           <Row
-            label="Degree"
+            label={t("rows.degree")}
             values={ordered.map((p) => p.degree)}
           />
           <Row
-            label="Language"
+            label={t("rows.language")}
             icon={<Languages className="size-4" />}
-            values={ordered.map((p) => formatLanguage(p.language))}
+            values={ordered.map((p) => formatLanguage(p.language, locale))}
           />
           <Row
-            label="Duration"
+            label={t("rows.duration")}
             icon={<CalendarDays className="size-4" />}
-            values={ordered.map((p) => `${p.duration_months} months`)}
+            values={ordered.map((p) =>
+              t("rows.durationValue", { count: p.duration_months }),
+            )}
           />
         </RowGroup>
 
-        <RowGroup title="Cost & timing">
+        <RowGroup title={t("groups.costTiming")}>
           <Row
-            label="Tuition"
+            label={t("rows.tuition")}
             icon={<Wallet className="size-4" />}
             values={ordered.map((p) =>
-              formatTuition(p.tuition_per_year, p.currency),
+              formatTuition(
+                p.tuition_per_year,
+                p.currency,
+                t("values.notListed"),
+                locale,
+              ),
             )}
           />
           <Row
-            label="Application deadline"
+            label={t("rows.applicationDeadline")}
             icon={<CalendarDays className="size-4" />}
-            values={ordered.map((p) => formatDeadline(p.application_deadline))}
+            values={ordered.map((p) =>
+              formatDeadline(
+                p.application_deadline,
+                t("values.rollingNotPosted"),
+                locale,
+              ),
+            )}
           />
           <Row
-            label="Start month"
-            values={ordered.map((p) => p.start_month ?? "Not posted")}
+            label={t("rows.startMonth")}
+            values={ordered.map((p) => p.start_month ?? t("values.notPosted"))}
           />
         </RowGroup>
 
-        <RowGroup title="Rankings">
+        <RowGroup title={t("groups.rankings")}>
           <Row
-            label="University (QS World)"
+            label={t("rows.universityQsWorld")}
             icon={<Award className="size-4" />}
             values={ordered.map((p) =>
               p.university.qs_world_rank
@@ -233,37 +268,40 @@ export default async function ComparePage({
             )}
           />
           <Row
-            label="Subject ranking"
+            label={t("rows.subjectRanking")}
             values={ordered.map((p) =>
               p.qs_subject_rank && p.qs_subject_area
-                ? `#${p.qs_subject_rank} in ${p.qs_subject_area}`
+                ? t("rows.subjectRankingValue", {
+                    rank: p.qs_subject_rank,
+                    area: localizeField(p.qs_subject_area, locale),
+                  })
                 : "—",
             )}
           />
         </RowGroup>
 
-        <RowGroup title="Admissions">
+        <RowGroup title={t("groups.admissions")}>
           <Row
-            label="GPA / academic"
+            label={t("rows.gpaAcademic")}
             values={ordered.map(
-              (p) => p.requirements?.gpa_min ?? "Not specified",
+              (p) => p.requirements?.gpa_min ?? t("values.notSpecified"),
             )}
           />
           <Row
-            label="Accepted English tests"
+            label={t("rows.acceptedEnglishTests")}
             values={ordered.map((p) =>
               p.requirements?.language_tests &&
               p.requirements.language_tests.length > 0
                 ? p.requirements.language_tests.join(" · ")
-                : "Not specified",
+                : t("values.notSpecified"),
             )}
           />
           <Row
-            label="Documents to prepare"
+            label={t("rows.documentsToPrepare")}
             values={ordered.map((p) =>
               p.requirements?.documents && p.requirements.documents.length > 0
                 ? p.requirements.documents.join(", ")
-                : "Not specified",
+                : t("values.notSpecified"),
             )}
           />
         </RowGroup>
@@ -273,7 +311,7 @@ export default async function ComparePage({
         <Button asChild variant="outline">
           <Link href="/shortlist">
             <ArrowLeft />
-            Back to shortlist
+            {t("backToShortlist")}
           </Link>
         </Button>
       </div>
@@ -281,7 +319,13 @@ export default async function ComparePage({
   );
 }
 
-function ProgramHeader({ program }: { program: CompareProgram }) {
+function ProgramHeader({
+  program,
+  locale,
+}: {
+  program: CompareProgram;
+  locale: Locale;
+}) {
   const u = program.university;
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
@@ -295,7 +339,7 @@ function ProgramHeader({ program }: { program: CompareProgram }) {
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             <MapPin className="mr-1 inline size-3" aria-hidden="true" />
-            {u.city}, {u.country}
+            {localizeCity(u.city, locale)}, {localizeCountry(u.country, locale)}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">{u.name}</p>
         </div>

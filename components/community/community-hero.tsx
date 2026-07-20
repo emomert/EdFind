@@ -3,15 +3,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { BadgeCheck, Globe, MessagesSquare, Crown, GraduationCap } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { HeroBackgroundGraphics } from "@/components/decor/hero-background-graphics";
 
 const TRUST_CHIPS = [
-  { icon: BadgeCheck, label: "Verified only" },
-  { icon: Globe, label: "European focus" },
-  { icon: MessagesSquare, label: "Community driven" },
-  { icon: Crown, label: "Campus responsibles" },
-  { icon: GraduationCap, label: "Program-specific groups" },
+  { icon: BadgeCheck, labelKey: "verifiedOnly" },
+  { icon: Globe, labelKey: "europeanFocus" },
+  { icon: MessagesSquare, labelKey: "communityDriven" },
+  { icon: Crown, labelKey: "campusResponsibles" },
+  { icon: GraduationCap, labelKey: "programSpecificGroups" },
 ];
 
 /**
@@ -23,6 +24,7 @@ const TRUST_CHIPS = [
  */
 export function CommunityHero() {
   const [videoFailed, setVideoFailed] = useState(false);
+  const t = useTranslations("community.hero");
 
   return (
     <motion.section
@@ -66,7 +68,7 @@ export function CommunityHero() {
           className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-teal-700 shadow-sm ring-1 ring-inset ring-teal-200"
         >
           <BadgeCheck className="size-3.5" />
-          Verified Student Insights
+          {t("badge")}
         </motion.span>
         <motion.h1
           initial={{ opacity: 0, y: 8 }}
@@ -74,8 +76,11 @@ export function CommunityHero() {
           transition={{ delay: 0.15, duration: 0.5 }}
           className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-4xl"
         >
-          Real experiences. Real students.{" "}
-          <span className="text-teal-700">Real answers.</span>
+          {t.rich("heading", {
+            highlight: (chunks) => (
+              <span className="text-teal-700">{chunks}</span>
+            ),
+          })}
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 8 }}
@@ -83,9 +88,7 @@ export function CommunityHero() {
           transition={{ delay: 0.22, duration: 0.5 }}
           className="mt-4 max-w-xl text-base text-slate-700"
         >
-          Join university and program communities to ask questions, compare
-          experiences, and choose your best path. Every voice is verified — no
-          spam, no anonymous noise.
+          {t("body")}
         </motion.p>
 
         <motion.div
@@ -97,9 +100,9 @@ export function CommunityHero() {
           }}
           className="mt-6 flex flex-wrap gap-2"
         >
-          {TRUST_CHIPS.map(({ icon: Icon, label }) => (
+          {TRUST_CHIPS.map(({ icon: Icon, labelKey }) => (
             <motion.span
-              key={label}
+              key={labelKey}
               variants={{
                 hidden: { opacity: 0, y: 6 },
                 show: { opacity: 1, y: 0 },
@@ -107,7 +110,7 @@ export function CommunityHero() {
               className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-slate-700 shadow-sm ring-1 ring-slate-200"
             >
               <Icon className="size-3.5 text-teal-600" />
-              {label}
+              {t(`chips.${labelKey}`)}
             </motion.span>
           ))}
         </motion.div>

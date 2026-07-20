@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Check,
   Copy,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import type { Locale } from "@/lib/i18n/config";
 import {
   applyPlaceholders,
   extractPlaceholders,
@@ -27,7 +29,6 @@ import {
 } from "@/app/applications/document-actions";
 import {
   CV_HIGHLIGHTS_MIN_LENGTH,
-  DOCUMENT_KIND_LABELS,
   HIGHLIGHTS_MAX_LENGTH,
   type ApplicationItem,
   type DocumentItem,
@@ -45,6 +46,8 @@ export function DocumentStudio({
   setDocuments: React.Dispatch<React.SetStateAction<DocumentItem[]>>;
   hasProfile: boolean;
 }) {
+  const t = useTranslations("applications.documentStudio");
+  const tKind = useTranslations("applications.documentKind");
   const [kind, setKind] = useState<DocumentKind>("cv");
   const [applicationId, setApplicationId] = useState<string>("");
   const [highlights, setHighlights] = useState("");
@@ -93,13 +96,9 @@ export function DocumentStudio({
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold tracking-tight text-foreground">
-            Document studio
+            {t("heading")}
           </h2>
-          <p className="text-sm text-muted-foreground">
-            Draft a CV or a program-specific cover letter with AI, then edit it
-            into your own. Drafts only use facts you give — gaps become
-            [placeholders], never invented details.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
       </header>
 
@@ -107,8 +106,8 @@ export function DocumentStudio({
         <div className="flex flex-wrap items-center gap-2">
           {(
             [
-              ["cv", "CV", FileText],
-              ["cover_letter", "Cover letter", Mail],
+              ["cv", tKind("cv"), FileText],
+              ["cover_letter", tKind("cover_letter"), Mail],
             ] as const
           ).map(([value, label, Icon]) => (
             <button
@@ -136,12 +135,12 @@ export function DocumentStudio({
             className="min-w-[200px] flex-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm shadow-sm transition focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 sm:flex-none"
             aria-label={
               kind === "cv"
-                ? "Optionally tailor the CV to a tracked program"
-                : "Program the cover letter is for"
+                ? t("tailorAriaLabel")
+                : t("coverLetterProgramAriaLabel")
             }
           >
             <option value="">
-              {kind === "cv" ? "General CV (no program)" : "Pick a program…"}
+              {kind === "cv" ? t("generalCv") : t("pickProgram")}
             </option>
             {appOptions.map((o) => (
               <option key={o.id} value={o.id}>
@@ -153,8 +152,7 @@ export function DocumentStudio({
 
         {kind === "cover_letter" && appOptions.length === 0 && (
           <p className="mt-3 text-sm text-amber-700">
-            Track a program first — a cover letter is always written for a
-            specific application.
+            {t("coverLetterNeedsProgram")}
           </p>
         )}
 
@@ -162,10 +160,10 @@ export function DocumentStudio({
           htmlFor="doc-highlights"
           className="mt-4 block text-sm font-medium text-foreground"
         >
-          Your background, in your own words
+          {t("highlightsLabel")}
           {kind === "cover_letter" && (
             <span className="ml-1 font-normal text-muted-foreground">
-              (optional but recommended)
+              {t("highlightsOptional")}
             </span>
           )}
         </label>
@@ -177,21 +175,34 @@ export function DocumentStudio({
           maxLength={HIGHLIGHTS_MAX_LENGTH}
           placeholder={
             kind === "cv"
-              ? "Education dates, internships and jobs (employer, role, what you did), projects, skills, certificates… Turkish is fine — the draft comes out in English."
-              : "Why this program? Relevant courses, projects, work experience, what you want to do after… Turkish is fine — the letter comes out in English."
+              ? t("highlightsPlaceholderCv")
+              : t("highlightsPlaceholderCoverLetter")
           }
           className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm shadow-sm transition focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
         />
         <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
           <span>
             {cvTooShort
-              ? `Add at least ${CV_HIGHLIGHTS_MIN_LENGTH - trimmed.length} more characters — a CV needs real facts to draft from.`
-              : `${highlights.length} / ${HIGHLIGHTS_MAX_LENGTH} characters`}
+              ? t("charsRemaining", {
+                  count: CV_HIGHLIGHTS_MIN_LENGTH - trimmed.length,
+                })
+              : t("charCount", {
+                  count: highlights.length,
+                  max: HIGHLIGHTS_MAX_LENGTH,
+                })}
           </span>
           {!hasProfile && (
             <span>
-              Tip: <a href="/quiz" className="font-medium text-teal-700 hover:underline">take the quiz</a>{" "}
-              so drafts also know your goals and English level.
+              {t.rich("quizTip", {
+                link: (chunks) => (
+                  <a
+                    href="/quiz"
+                    className="font-medium text-teal-700 hover:underline"
+                  >
+                    {chunks}
+                  </a>
+                ),
+              })}
             </span>
           )}
         </div>
@@ -212,8 +223,10 @@ export function DocumentStudio({
               <Sparkles className="size-4" />
             )}
             {pending
-              ? "Drafting…"
-              : `Draft ${DOCUMENT_KIND_LABELS[kind].toLowerCase()}`}
+              ? t("drafting")
+              : kind === "cv"
+                ? t("draftCv")
+                : t("draftCoverLetter")}
           </button>
           {error && <p className="text-sm text-rose-600">{error}</p>}
         </div>
@@ -254,6 +267,9 @@ function DocumentCard({
   onToggle: () => void;
   setDocuments: React.Dispatch<React.SetStateAction<DocumentItem[]>>;
 }) {
+  const t = useTranslations("applications.documentStudio");
+  const tKind = useTranslations("applications.documentKind");
+  const locale = useLocale() as Locale;
   const [draft, setDraft] = useState(doc.content);
   const [copied, setCopied] = useState(false);
   const [saving, startSaving] = useTransition();
@@ -287,7 +303,7 @@ function DocumentCard({
   };
 
   const handleDelete = () => {
-    if (!window.confirm(`Delete "${doc.title}"? This cannot be undone.`)) return;
+    if (!window.confirm(t("deleteConfirm", { title: doc.title }))) return;
     startSaving(async () => {
       const res = await deleteApplicationDocument({ id: doc.id });
       if (res.ok) {
@@ -309,7 +325,7 @@ function DocumentCard({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${doc.title.replace(/[^\w\- ]+/g, "").trim() || "document"}.md`;
+    a.download = `${doc.title.replace(/[^\w\- ]+/g, "").trim() || t("untitledDocument")}.md`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -319,9 +335,7 @@ function DocumentCard({
   const exportPdf = (values: Record<string, string>) => {
     const ok = printDocumentAsPdf(doc.title, applyPlaceholders(draft, values));
     if (!ok) {
-      window.alert(
-        "Your browser blocked the print window — allow pop-ups for this site and try again.",
-      );
+      window.alert(t("popupBlocked"));
       return;
     }
     setPdfPanelOpen(false);
@@ -365,17 +379,19 @@ function DocumentCard({
             {doc.title}
           </span>
           <span className="block truncate text-xs text-slate-500">
-            {DOCUMENT_KIND_LABELS[doc.kind]}
+            {tKind(doc.kind)}
             {linkedApp && ` · ${linkedApp.program.university.name}`}
-            {" · updated "}
-            {new Date(doc.updated_at).toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
+            {" · "}
+            {t("updatedOn", {
+              date: new Date(doc.updated_at).toLocaleDateString(
+                locale === "tr" ? "tr-TR" : "en-GB",
+                { day: "numeric", month: "short" },
+              ),
             })}
           </span>
         </span>
         <span className="text-xs font-medium text-teal-700">
-          {open ? "Close" : "Open"}
+          {open ? t("close") : t("open")}
         </span>
       </button>
 
@@ -386,7 +402,7 @@ function DocumentCard({
             onChange={(e) => setDraft(e.target.value)}
             rows={18}
             className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 font-mono text-xs leading-relaxed text-slate-800 shadow-inner transition focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-100"
-            aria-label={`Edit ${doc.title}`}
+            aria-label={t("editAriaLabel", { title: doc.title })}
           />
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <StudioButton
@@ -399,7 +415,7 @@ function DocumentCard({
               ) : (
                 <Check className="size-3.5" />
               )}
-              {dirty ? "Save changes" : "Saved"}
+              {dirty ? t("saveChanges") : t("saved")}
             </StudioButton>
             <StudioButton onClick={handleCopy}>
               {copied ? (
@@ -407,31 +423,30 @@ function DocumentCard({
               ) : (
                 <Copy className="size-3.5" />
               )}
-              {copied ? "Copied" : "Copy"}
+              {copied ? t("copied") : t("copy")}
             </StudioButton>
             <StudioButton onClick={handlePdfClick}>
               <FileType2 className="size-3.5" />
-              Download PDF
+              {t("downloadPdf")}
             </StudioButton>
             <StudioButton onClick={handleDownload}>
               <Download className="size-3.5" />
-              Download .md
+              {t("downloadMd")}
             </StudioButton>
             <div className="flex-1" />
             <StudioButton onClick={handleDelete} danger disabled={saving}>
               <Trash2 className="size-3.5" />
-              Delete
+              {t("delete")}
             </StudioButton>
           </div>
 
           {pdfPanelOpen && placeholders.length > 0 && (
             <div className="mt-3 rounded-xl border border-teal-100 bg-teal-50/40 p-3.5">
               <p className="text-xs font-medium text-slate-800">
-                Fill in the placeholders before exporting
+                {t("placeholdersTitle")}
               </p>
               <p className="mt-0.5 text-[11px] text-slate-500">
-                Only the PDF gets these values — the saved draft keeps its
-                placeholders. Leave a field blank to keep it as-is.
+                {t("placeholdersDescription")}
               </p>
               <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
                 {placeholders.map((token) => (
@@ -457,18 +472,17 @@ function DocumentCard({
               <div className="mt-3 flex items-center gap-2">
                 <StudioButton onClick={() => exportPdf(placeholderValues)} primary>
                   <FileType2 className="size-3.5" />
-                  Save as PDF
+                  {t("saveAsPdf")}
                 </StudioButton>
                 <StudioButton onClick={() => setPdfPanelOpen(false)}>
-                  Cancel
+                  {t("cancel")}
                 </StudioButton>
               </div>
             </div>
           )}
 
           <p className="mt-2 text-xs text-muted-foreground">
-            Always review before sending — fill every [placeholder] and check
-            facts. AI drafts are a starting point, not a finished application.
+            {t("reviewFooter")}
           </p>
         </div>
       )}

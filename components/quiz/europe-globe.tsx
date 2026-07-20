@@ -38,6 +38,7 @@ import type { Topology } from "topojson-specification";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import { motion, useReducedMotion } from "framer-motion";
 import { RotateCcw } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import type { Destination } from "@/lib/quiz/schema";
 import { useSound } from "@/lib/sound/sound-context";
@@ -108,6 +109,16 @@ export function EuropeGlobe({
   selected: Destination[];
   onToggle: (code: Destination) => void;
 }) {
+  const t = useTranslations("quiz");
+  // Country names overlay the schema's `questions.destinations.options.<CODE>`
+  // labels (same English text as the option list) — see docs/features/i18n.md.
+  const countryName = useCallback(
+    (code: Destination, fallback: string): string => {
+      const key = `questions.destinations.options.${code}`;
+      return t.has(key) ? t(key) : fallback;
+    },
+    [t],
+  );
   const [topo, setTopo] = useState<Topology | null>(null);
   const [rotation, setRotation] =
     useState<[number, number, number]>(HOME_ROTATION);
@@ -382,7 +393,15 @@ export function EuropeGlobe({
     Math.abs(rotation[1] - HOME_ROTATION[1]) < 0.5;
 
   if (!topo || !projectionPath) {
-    return <GlobeSkeleton />;
+    return (
+      <GlobeSkeleton
+        label={
+          t.has("questions.destinations.loadingGlobe")
+            ? t("questions.destinations.loadingGlobe")
+            : "Loading globe…"
+        }
+      />
+    );
   }
 
   return (
@@ -391,7 +410,11 @@ export function EuropeGlobe({
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         className="h-auto w-full touch-none select-none [filter:drop-shadow(0_18px_40px_rgba(15,23,42,0.18))]"
         role="group"
-        aria-label="Globe — drag to rotate, click a highlighted country to select"
+        aria-label={
+          t.has("questions.destinations.globeAriaLabel")
+            ? t("questions.destinations.globeAriaLabel")
+            : "Globe — drag to rotate, click a highlighted country to select"
+        }
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={finishDrag}
@@ -481,11 +504,20 @@ export function EuropeGlobe({
             const isSelected = selected.includes(meta.code);
             const d = projectionPath(f);
             if (!d) return null;
+            const name = countryName(meta.code, meta.name);
+            const ariaLabel = isSelected
+              ? t.has("questions.destinations.countryAriaSelected")
+                ? t("questions.destinations.countryAriaSelected", { country: name })
+                : `${name} — selected`
+              : t.has("questions.destinations.countryAriaUnselected")
+                ? t("questions.destinations.countryAriaUnselected", { country: name })
+                : `${name} — click to select`;
             return (
               <SelectablePath
                 key={`sel-${f.id}`}
                 d={d}
-                name={meta.name}
+                name={name}
+                ariaLabel={ariaLabel}
                 code={meta.code}
                 isSelected={isSelected}
                 onToggle={() => {
@@ -533,17 +565,27 @@ export function EuropeGlobe({
           type="button"
           onClick={resetToHome}
           className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur transition-colors hover:bg-accent"
-          aria-label="Center the globe on Europe"
+          aria-label={
+            t.has("questions.destinations.centerAriaLabel")
+              ? t("questions.destinations.centerAriaLabel")
+              : "Center the globe on Europe"
+          }
         >
           <RotateCcw className="size-3.5" />
-          Center on Europe
+          {t.has("questions.destinations.centerButton")
+            ? t("questions.destinations.centerButton")
+            : "Center on Europe"}
         </button>
       ) : null}
 
       <p className="sr-only" aria-live="polite">
         {selected.length === 0
-          ? "No countries selected."
-          : `${selected.length} ${selected.length === 1 ? "country" : "countries"} selected.`}
+          ? t.has("questions.destinations.noneSelectedAria")
+            ? t("questions.destinations.noneSelectedAria")
+            : "No countries selected."
+          : t.has("questions.destinations.countSelectedAria")
+            ? t("questions.destinations.countSelectedAria", { count: selected.length })
+            : `${selected.length} ${selected.length === 1 ? "country" : "countries"} selected.`}
       </p>
     </div>
   );
@@ -552,12 +594,14 @@ export function EuropeGlobe({
 function SelectablePath({
   d,
   name,
+  ariaLabel,
   code,
   isSelected,
   onToggle,
 }: {
   d: string;
   name: string;
+  ariaLabel: string;
   code: Destination;
   isSelected: boolean;
   onToggle: () => void;
@@ -567,7 +611,7 @@ function SelectablePath({
       d={d}
       role="button"
       aria-pressed={isSelected}
-      aria-label={`${name} — ${isSelected ? "selected" : "click to select"}`}
+      aria-label={ariaLabel}
       tabIndex={0}
       data-code={code}
       onClick={onToggle}
@@ -594,11 +638,11 @@ function SelectablePath({
   );
 }
 
-function GlobeSkeleton() {
+function GlobeSkeleton({ label }: { label: string }) {
   return (
     <div className="relative mx-auto flex aspect-square w-full max-w-[480px] items-center justify-center">
       <div className="size-[88%] animate-pulse rounded-full bg-gradient-to-br from-slate-200 to-slate-300" />
-      <span className="sr-only">Loading globe…</span>
+      <span className="sr-only">{label}</span>
     </div>
   );
 }

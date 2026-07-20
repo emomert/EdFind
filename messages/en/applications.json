@@ -1,0 +1,240 @@
+{
+  "meta": {
+    "title": "Your applications",
+    "description": "Track every master's program application you're working on."
+  },
+  "status": {
+    "interested": "Interested",
+    "drafting": "Drafting",
+    "submitted": "Submitted",
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "waitlisted": "Waitlisted",
+    "withdrawn": "Withdrawn"
+  },
+  "taskStatus": {
+    "todo": "To Do",
+    "doing": "Doing",
+    "done": "Done"
+  },
+  "taskCategory": {
+    "documents": "Documents",
+    "language_test": "Language test",
+    "writing": "Writing",
+    "finance": "Finance",
+    "admin": "Admin",
+    "other": "Other"
+  },
+  "documentKind": {
+    "cv": "CV",
+    "cover_letter": "Cover letter"
+  },
+  "testingTools": {
+    "summary": "Testing tools",
+    "confirmReset": "Reset all progress?\n\nThis wipes your quiz answers, matches, shortlist, AND every tracked application and task for this account. It cannot be undone.",
+    "buttonTitle": "Wipe quiz answers, matches, shortlist, applications, and tasks",
+    "buttonReset": "Reset all progress (testing)",
+    "buttonDone": "Reset"
+  },
+  "overview": {
+    "heading": "Your applications",
+    "emptyHint": "Programs you start tracking will show up here.",
+    "countSummary": "{filtered} of {total} {total, plural, one {program} other {programs}}",
+    "searchPlaceholder": "Search programs or universities…",
+    "allStatuses": "All statuses",
+    "sort": {
+      "deadline": "Deadline",
+      "recent": "Recent",
+      "status": "Progress"
+    },
+    "emptyFiltered": {
+      "title": "Nothing matches that filter.",
+      "description": "Try a different status or clear the search."
+    },
+    "emptyNone": {
+      "title": "No applications yet.",
+      "description": "Open any program page and hit “Save”. It'll show up here as one you're interested in.",
+      "quizCta": "Find programs with the quiz",
+      "catalogCta": "Browse the catalog"
+    }
+  },
+  "card": {
+    "advance": {
+      "interested": "Start drafting",
+      "drafting": "Mark submitted"
+    },
+    "nextStep": {
+      "interested": "Decide whether to apply. Move to Drafting when you start.",
+      "draftingWithNotes": "Finish the items in your notes, then submit.",
+      "draftingNoNotes": "Outline your documents and motivation letter.",
+      "submitted": "Wait for the program's decision. Watch your inbox.",
+      "waitlisted": "Stay close — reply quickly if a spot opens.",
+      "accepted": "Compare offers, then confirm your enrollment.",
+      "rejected": "Take a breath. Lean into your other applications.",
+      "withdrawn": "Archived. Remove if you'd like to clear it."
+    },
+    "nextLabel": "Next:",
+    "changeStatusTitle": "Change status",
+    "tasksTitle": "{done} of {total} {total, plural, one {task} other {tasks}} done",
+    "tasksBadge": "{done} / {total} {total, plural, one {task} other {tasks}}",
+    "deadlineInDays": "{date} · in {days}d",
+    "deadlinePassed": "{date} · passed",
+    "statusLabel": "Status",
+    "deadlineLabel": "Your deadline",
+    "deadlineProgramNote": "(program: {date})",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "Documents, recommenders, blockers…",
+    "officialSite": "Official site",
+    "remove": "Remove",
+    "removeConfirm": "Remove \"{program}\" from your tracker?",
+    "open": "Open",
+    "hide": "Hide",
+    "edit": "Edit",
+    "moreAriaLabel": "More"
+  },
+  "deadlineStrip": {
+    "ariaLabel": "Upcoming deadlines",
+    "heading": "Deadlines",
+    "passed": "passed",
+    "today": "today",
+    "inDays": "{days}d"
+  },
+  "kanban": {
+    "heading": "Your task board",
+    "description": "Small steps, one at a time. Drag cards between columns (or use the arrows), and link tasks to a program when it helps.",
+    "newTask": "New task",
+    "emptyColumn": "Nothing here yet.",
+    "showLabel": "Show:",
+    "allTasks": "All tasks",
+    "unassigned": "Unassigned",
+    "doneEncouragement": "Nice work — momentum compounds.",
+    "draft": {
+      "titlePlaceholder": "What needs to get done?",
+      "noProgram": "No program (general task)",
+      "dueDateLabel": "Due date (optional)",
+      "cancel": "Cancel",
+      "add": "Add"
+    },
+    "suggestions": {
+      "heading": "Quick start",
+      "description": "Most application journeys start with the same handful of tasks. Tap to add.",
+      "items": {
+        "uploadTranscript": "Upload transcript",
+        "writeMotivationLetter": "Write motivation letter",
+        "bookLanguageTest": "Book IELTS / TOEFL slot",
+        "requestRecommendation": "Request recommendation letter",
+        "payFee": "Pay application fee",
+        "submitPortal": "Submit application portal"
+      }
+    }
+  },
+  "task": {
+    "unlinkAriaLabel": "Unlink from program",
+    "addDueDate": "Add due date",
+    "dueDateAriaLabel": "Due date",
+    "changeDueDate": "Change due date",
+    "overdue": "overdue",
+    "dueInDays": "{days}d",
+    "moveLeft": "Move left",
+    "moveRight": "Move right",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleteAriaLabel": "Delete task"
+  },
+  "progressCard": {
+    "greeting": "Hello, {name} — your study-abroad journey is on the move.",
+    "subtitleEmpty": "Track the programs you care about and turn the big abstract goal into small, doable steps.",
+    "subtitleWithApps": "You're managing {applications} across {destinations}. One step at a time — you've got this.",
+    "applicationsCount": "{count, plural, one {# application} other {# applications}}",
+    "destinationsCount": "{count, plural, one {# destination} other {# destinations}}",
+    "destinationsYours": "your destinations",
+    "status": {
+      "dreaming": "Dreaming big",
+      "finishLine": "Crossing the finish line",
+      "closingIn": "Closing in",
+      "momentum": "Building momentum",
+      "starting": "Getting started"
+    },
+    "exploringDestinations": "Exploring destinations",
+    "anyDestination": "Open to anywhere",
+    "degreePrograms": "{degree} programs",
+    "overallProgress": "Overall progress",
+    "progressHintEmpty": "Add your first program to see progress.",
+    "progressHint": "Progress moves as you advance applications through stages."
+  },
+  "documentStudio": {
+    "heading": "Document studio",
+    "description": "Draft a CV or a program-specific cover letter with AI, then edit it into your own. Drafts only use facts you give — gaps become [placeholders], never invented details.",
+    "tailorAriaLabel": "Optionally tailor the CV to a tracked program",
+    "coverLetterProgramAriaLabel": "Program the cover letter is for",
+    "generalCv": "General CV (no program)",
+    "pickProgram": "Pick a program…",
+    "coverLetterNeedsProgram": "Track a program first — a cover letter is always written for a specific application.",
+    "highlightsLabel": "Your background, in your own words",
+    "highlightsOptional": "(optional but recommended)",
+    "highlightsPlaceholderCv": "Education dates, internships and jobs (employer, role, what you did), projects, skills, certificates… Turkish is fine — the draft comes out in English.",
+    "highlightsPlaceholderCoverLetter": "Why this program? Relevant courses, projects, work experience, what you want to do after… Turkish is fine — the letter comes out in English.",
+    "charsRemaining": "Add at least {count} more {count, plural, one {character} other {characters}} — a CV needs real facts to draft from.",
+    "charCount": "{count} / {max} characters",
+    "quizTip": "Tip: <link>take the quiz</link> so drafts also know your goals and English level.",
+    "drafting": "Drafting…",
+    "draftCv": "Draft CV",
+    "draftCoverLetter": "Draft cover letter",
+    "updatedOn": "updated {date}",
+    "close": "Close",
+    "open": "Open",
+    "editAriaLabel": "Edit {title}",
+    "saveChanges": "Save changes",
+    "saved": "Saved",
+    "copy": "Copy",
+    "copied": "Copied",
+    "downloadPdf": "Download PDF",
+    "downloadMd": "Download .md",
+    "untitledDocument": "document",
+    "delete": "Delete",
+    "deleteConfirm": "Delete \"{title}\"? This cannot be undone.",
+    "popupBlocked": "Your browser blocked the print window — allow pop-ups for this site and try again.",
+    "placeholdersTitle": "Fill in the placeholders before exporting",
+    "placeholdersDescription": "Only the PDF gets these values — the saved draft keeps its placeholders. Leave a field blank to keep it as-is.",
+    "saveAsPdf": "Save as PDF",
+    "cancel": "Cancel",
+    "reviewFooter": "Always review before sending — fill every [placeholder] and check facts. AI drafts are a starting point, not a finished application."
+  },
+  "documentTitle": {
+    "cv": "CV",
+    "cvTailored": "CV — tailored for {program}",
+    "coverLetter": "Cover letter — {program}"
+  },
+  "errors": {
+    "invalidInput": "Invalid input.",
+    "notAuthorized": "Not authorized.",
+    "signInToTrack": "Please sign in to track applications.",
+    "signInToUpdate": "Please sign in to update applications.",
+    "signInFirst": "Please sign in first.",
+    "signInToAddTasks": "Please sign in to add tasks.",
+    "signInToUpdateTasks": "Please sign in to update tasks.",
+    "signInToGenerateDocuments": "Please sign in to generate documents.",
+    "signInToEditDocuments": "Please sign in to edit documents.",
+    "signInToDeleteDocuments": "Please sign in to delete documents.",
+    "untrackFailed": "Couldn't untrack this application.",
+    "trackFailed": "Couldn't track this application.",
+    "statusUpdateFailed": "Couldn't update status.",
+    "notesUpdateFailed": "Couldn't update notes.",
+    "deadlineUpdateFailed": "Couldn't update deadline.",
+    "removeFailed": "Couldn't remove application.",
+    "resetFailed": "Couldn't reset progress. Try again.",
+    "taskCreateFailed": "Couldn't create task.",
+    "taskUpdateFailed": "Couldn't update task.",
+    "taskMoveFailed": "Couldn't move task.",
+    "taskDeleteFailed": "Couldn't delete task.",
+    "coverLetterNeedsApplication": "Pick a tracked program for the cover letter.",
+    "cvNeedsHighlights": "Tell us a bit about your background first — a CV drafted from nothing would just be placeholders.",
+    "documentLimitReached": "You've reached the limit of {limit} documents — delete some old drafts first.",
+    "aiDisabled": "AI drafting is temporarily disabled.",
+    "aiTimeout": "The AI took too long — please try again.",
+    "generateFailed": "Couldn't generate the draft. Try again.",
+    "saveFailed": "Couldn't save the draft.",
+    "saveChangesFailed": "Couldn't save your changes.",
+    "deleteDocumentFailed": "Couldn't delete the document."
+  }
+}

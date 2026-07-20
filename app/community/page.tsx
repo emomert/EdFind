@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { getUser } from "@/lib/supabase/auth";
 import { createServiceClient } from "@/lib/supabase/server";
@@ -15,12 +16,13 @@ import {
 import { generateCommunityGroups } from "@/lib/community/generate-groups";
 import { FIELD_LABELS, COUNTRY_NAMES } from "@/components/applications/types";
 import { CommunityClient } from "@/components/community/community-client";
+import { localizeCountry, localizeField } from "@/lib/i18n/data-labels";
+import type { Locale } from "@/lib/i18n/config";
 
-export const metadata: Metadata = {
-  title: "Community — Verified Student Insights",
-  description:
-    "Real experiences from verified students across Europe. Join university and program communities, ask questions, and choose your best path.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("community.meta");
+  return { title: t("title"), description: t("description") };
+}
 
 type UniRow = {
   slug: string;
@@ -43,6 +45,7 @@ export default async function CommunityPage() {
   // Writing (chat, reviews, questions) still requires a signed-in user with
   // a verified university email; signed-out visitors just see the verify CTA.
   const user = await getUser();
+  const locale = (await getLocale()) as Locale;
 
   const supabase = createServiceClient();
   const [unisRes, progsRes, subscription, verification] = await Promise.all([
@@ -95,12 +98,18 @@ export default async function CommunityPage() {
     universityNames,
   );
 
-  // Country list (filter dropdown)
+  // Country list (filter dropdown) — universities.country is an ISO-2 code;
+  // COUNTRY_NAMES maps it to the English display name, then localizeCountry
+  // swaps in the Turkish exonym when the active locale is "tr".
   const countryCodes = Array.from(new Set(universities.map((u) => u.country))).sort();
   const catalogCountries = countryCodes.map((code) => ({
     code,
-    name: COUNTRY_NAMES[code] || code,
+    name: localizeCountry(COUNTRY_NAMES[code] || code, locale),
   }));
+  const localizedCountryNames: Record<string, string> = {};
+  for (const code of countryCodes) {
+    localizedCountryNames[code] = localizeCountry(COUNTRY_NAMES[code] || code, locale);
+  }
 
   // Field list (filter dropdown) — only fields that actually appear in the catalog
   const fieldsInCatalog = new Set<string>();
@@ -108,7 +117,10 @@ export default async function CommunityPage() {
     if (p.field_of_study) fieldsInCatalog.add(p.field_of_study);
   }
   const fields = Array.from(fieldsInCatalog)
-    .map((value) => ({ value, label: FIELD_LABELS[value] || value }))
+    .map((value) => ({
+      value,
+      label: localizeField(FIELD_LABELS[value] || value, locale),
+    }))
     .sort((a, b) => a.label.localeCompare(b.label));
 
   return (
@@ -123,7 +135,7 @@ export default async function CommunityPage() {
       universityNames={universityNames}
       universityLogos={universityLogos}
       programNames={programNames}
-      countryNames={COUNTRY_NAMES}
+      countryNames={localizedCountryNames}
       fieldByUniversitySlug={fieldByUniversitySlug}
       fields={fields}
       catalogUniversities={universities}

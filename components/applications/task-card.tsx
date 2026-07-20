@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import {
   ArrowLeft,
   ArrowRight,
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import type { Locale } from "@/lib/i18n/config";
 import {
   deleteTask,
   moveTask,
@@ -26,11 +28,7 @@ import {
   type TaskCategory,
   type TaskStatus,
 } from "@/app/applications/actions";
-import {
-  TASK_CATEGORY_LABELS,
-  type ApplicationItem,
-  type TaskItem,
-} from "./types";
+import { type ApplicationItem, type TaskItem } from "./types";
 
 const CATEGORY_ICON: Record<TaskCategory, React.ReactNode> = {
   documents: <FileText className="size-3.5" />,
@@ -61,6 +59,9 @@ export function TaskCard({
   onChange: (next: TaskItem) => void;
   onRemove: (id: string) => void;
 }) {
+  const t = useTranslations("applications.task");
+  const tCategory = useTranslations("applications.taskCategory");
+  const locale = useLocale() as Locale;
   const [pending, startTransition] = useTransition();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [editingDue, setEditingDue] = useState(false);
@@ -172,7 +173,7 @@ export function TaskCard({
           )}
         >
           {CATEGORY_ICON[task.category]}
-          {TASK_CATEGORY_LABELS[task.category]}
+          {tCategory(task.category)}
         </span>
       </div>
 
@@ -202,8 +203,8 @@ export function TaskCard({
             onClick={unlinkApp}
             disabled={pending}
             className="-mr-0.5 inline-flex size-4 items-center justify-center rounded text-teal-700/70 opacity-0 transition-opacity hover:bg-teal-100 hover:text-teal-900 group-hover:opacity-100"
-            aria-label="Unlink from program"
-            title="Unlink from program"
+            aria-label={t("unlinkAriaLabel")}
+            title={t("unlinkAriaLabel")}
           >
             <Unlink className="size-3" />
           </button>
@@ -219,13 +220,13 @@ export function TaskCard({
           onBlur={() => setEditingDue(false)}
           onKeyDown={(e) => e.key === "Escape" && setEditingDue(false)}
           className="mt-2 w-full rounded-md border border-slate-200 bg-white px-1.5 py-1 text-[11px] text-slate-700 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-          aria-label="Due date"
+          aria-label={t("dueDateAriaLabel")}
         />
       ) : due ? (
         <button
           type="button"
           onClick={() => setEditingDue(true)}
-          title="Change due date"
+          title={t("changeDueDate")}
           className={cn(
             "mt-2 inline-flex items-center gap-1 rounded text-[11px] text-slate-500 transition-colors hover:text-slate-700",
             daysToDue != null && daysToDue <= 7 && daysToDue >= 0 && "text-amber-700 hover:text-amber-800",
@@ -233,12 +234,12 @@ export function TaskCard({
           )}
         >
           <CalendarDays className="size-3" />
-          {new Date(due).toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "short",
-          })}
-          {daysToDue != null && daysToDue >= 0 && ` · ${daysToDue}d`}
-          {daysToDue != null && daysToDue < 0 && " · overdue"}
+          {new Date(due).toLocaleDateString(
+            locale === "tr" ? "tr-TR" : "en-GB",
+            { day: "numeric", month: "short" },
+          )}
+          {daysToDue != null && daysToDue >= 0 && ` · ${t("dueInDays", { days: daysToDue })}`}
+          {daysToDue != null && daysToDue < 0 && ` · ${t("overdue")}`}
         </button>
       ) : (
         <button
@@ -247,7 +248,7 @@ export function TaskCard({
           className="mt-2 inline-flex items-center gap-1 rounded text-[11px] text-slate-400 opacity-0 transition-opacity hover:text-slate-600 focus-visible:opacity-100 group-hover:opacity-100"
         >
           <CalendarDays className="size-3" />
-          Add due date
+          {t("addDueDate")}
         </button>
       )}
 
@@ -259,8 +260,8 @@ export function TaskCard({
               onClick={() => move(prevColumn)}
               disabled={pending}
               className="inline-flex size-7 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-              aria-label="Move left"
-              title="Move left"
+              aria-label={t("moveLeft")}
+              title={t("moveLeft")}
             >
               <ArrowLeft className="size-3.5" />
             </button>
@@ -271,8 +272,8 @@ export function TaskCard({
               onClick={() => move(nextColumn)}
               disabled={pending}
               className="inline-flex size-7 items-center justify-center rounded-md text-teal-600 transition-colors hover:bg-teal-50 hover:text-teal-700"
-              aria-label="Move right"
-              title="Move right"
+              aria-label={t("moveRight")}
+              title={t("moveRight")}
             >
               {nextColumn === "done" ? (
                 <Check className="size-3.5" />
@@ -290,7 +291,7 @@ export function TaskCard({
               disabled={pending}
               className="rounded-md px-2 py-1 text-[11px] text-slate-500 hover:bg-slate-100"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="button"
@@ -298,7 +299,7 @@ export function TaskCard({
               disabled={pending}
               className="rounded-md bg-rose-50 px-2 py-1 text-[11px] font-medium text-rose-700 hover:bg-rose-100"
             >
-              Delete
+              {t("delete")}
             </button>
           </div>
         ) : (
@@ -307,8 +308,8 @@ export function TaskCard({
             onClick={() => setConfirmingDelete(true)}
             disabled={pending}
             className="inline-flex size-7 items-center justify-center rounded-md text-slate-300 transition-colors hover:bg-rose-50 hover:text-rose-600"
-            aria-label="Delete task"
-            title="Delete task"
+            aria-label={t("deleteAriaLabel")}
+            title={t("deleteAriaLabel")}
           >
             <Trash2 className="size-3.5" />
           </button>

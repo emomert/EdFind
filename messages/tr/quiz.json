@@ -1,0 +1,251 @@
+{
+  "meta": {
+    "title": "Profil Testi",
+    "description": "14 hızlı soruyu yanıtla (sonuncusu isteğe bağlı serbest metin), seni Avrupa'daki yüksek lisans programlarıyla eşleştirelim."
+  },
+  "progress": {
+    "question": "Soru {current} / {total}",
+    "ariaLabel": "Test ilerlemesi"
+  },
+  "buttons": {
+    "back": "Geri",
+    "next": "İleri",
+    "seeMyMatches": "Eşleşmelerimi gör",
+    "backToQuestions": "Sorulara dön",
+    "tryAgain": "Tekrar dene"
+  },
+  "error": {
+    "title": "Bir şeyler ters gitti",
+    "default": "Lütfen tekrar göndermeyi dene.",
+    "validation": "Bazı cevaplar eksik veya tanınmıyor. Lütfen tekrar dene."
+  },
+  "mascot": {
+    "default": "Doğru ya da yanlış cevap yok — sana en uygun geleni seç!"
+  },
+  "loading": {
+    "title": "Seni programlarla eşleştiriyoruz…",
+    "subtitle": "Yapay zekâmız cevaplarını katalogdaki her programla karşılaştırıyor. Bu genellikle yaklaşık 2 saniye sürer.",
+    "stages": {
+      "readingPreferences": "Tercihlerin okunuyor",
+      "searchingCatalog": "Avrupa yüksek lisans kataloğu taranıyor",
+      "askingAi": "Yapay zekâ eşleştiricisinden ilk 3'ünü sıralaması isteniyor"
+    }
+  },
+  "freeText": {
+    "requiredHint": "Bir iki cümle yeterli — eşleşmelerini daha isabetli hale getirir.",
+    "optionalHint": "Bunu atlayabilirsin — yapay zekâ diğer cevaplarınla yine de eşleştirme yapar.",
+    "charsLeft": "{count} karakter kaldı",
+    "pleaseDescribe": "Lütfen açıkla"
+  },
+  "questions": {
+    "destinations": {
+      "legend": "Yüksek lisans yolculuğun için hangi hedef sana uygun?",
+      "helper": "Bir veya daha fazlasını seç. Her yere açıksan \"Fark etmez\"i seç.",
+      "options": {
+        "IT": "İtalya",
+        "NL": "Hollanda",
+        "DE": "Almanya",
+        "GB": "Birleşik Krallık",
+        "ES": "İspanya",
+        "FR": "Fransa",
+        "CH": "İsviçre",
+        "SE": "İsveç",
+        "DK": "Danimarka",
+        "IE": "İrlanda",
+        "AT": "Avusturya",
+        "BE": "Belçika",
+        "CZ": "Çekya",
+        "EE": "Estonya",
+        "FI": "Finlandiya",
+        "NO": "Norveç",
+        "PL": "Polonya",
+        "PT": "Portekiz",
+        "ANY": "Fark etmez"
+      },
+      "anywhereInEurope": "Avrupa'da herhangi bir yer",
+      "removeCountryAria": "{country} seçimini kaldır",
+      "matchingAllCountries": "Katalogdaki 18 ülkenin tamamında eşleştiriyoruz.",
+      "clickToAdd": "Eklemek için vurgulanan bir ülkeye tıkla. Kaldırmak için etiketine tıkla.",
+      "selectedCount": "{count} seçildi — kaldırmak için tekrar tıkla, ya da daha fazla seç.",
+      "or": "veya",
+      "globeAriaLabel": "Küre — döndürmek için sürükle, seçmek için vurgulanan bir ülkeye tıkla",
+      "centerAriaLabel": "Küreyi Avrupa'ya ortala",
+      "centerButton": "Avrupa'ya ortala",
+      "noneSelectedAria": "Hiç ülke seçilmedi.",
+      "countSelectedAria": "{count} ülke seçildi.",
+      "countryAriaSelected": "{country} — seçili",
+      "countryAriaUnselected": "{country} — seçmek için tıkla",
+      "loadingMap": "Harita yükleniyor…",
+      "loadingGlobe": "Küre yükleniyor…"
+    },
+    "current_situation": {
+      "legend": "Şu anki durumunu en iyi ne tanımlar?",
+      "options": {
+        "undergraduate": "Şu anda lisans öğrencisiyim",
+        "graduating_soon": "Yakında mezun oluyorum (son sınıf)",
+        "recent_graduate": "Yeni mezunum",
+        "gap_year": "Ara yıldayım / mola veriyorum",
+        "working_professional": "Çalışan bir profesyonelim",
+        "other": "Diğer"
+      },
+      "optionDescriptions": {
+        "recent_graduate": "Son birkaç yıl içinde mezun oldum",
+        "gap_year": "Mezun oldum ve bir sonraki adımdan önce kendime zaman ayırıyorum"
+      },
+      "other": {
+        "placeholder": "Birkaç kelimeyle anlat…"
+      }
+    },
+    "institution": {
+      "legend": {
+        "undergraduate": "Hangi üniversitede okuyorsun?",
+        "graduatingSoon": "Hangi üniversiteden mezun olacaksın?",
+        "graduated": "Hangi üniversiteden mezun oldun?",
+        "default": "Hangi üniversitede okudun?"
+      },
+      "helper": "Türkiye'deki üniversiteler arasında aramak için yazmaya başla — listede yoksa herhangi bir kurumu yazabilirsin.",
+      "searchPlaceholder": "Üniversiteni ara…",
+      "notListedHint": "Listede yok mu? Sadece yaz — tam olarak yazdığını kullanacağız.",
+      "useMyOwn": "Kendi yazdığımı kullan: “<b>{query}</b>”"
+    },
+    "study_background": {
+      "legend": "Ne okudun?",
+      "helper": "Lisansta okuduğun alanı kendi cümlelerinle anlat — sadece ne okuduğunu. Yapay zekâ uygunluğunu değerlendirmek için bunu okuyor. (Ne okumak istediğin bir sonraki soruda.)",
+      "placeholder": "ör. İnşaat Mühendisliği lisansı, ya da yan dal ekonomili Sosyoloji lisansı…"
+    },
+    "desired_study": {
+      "legend": "Ne okumak istiyorsun?",
+      "helper": "İstediğin kadar serbest ol. Bir alan adı da olur (\"ekonomi\"), çok spesifik bir konu da (\"Doğu Asya'nın siyasi ekonomisi\") — hatta belirsiz bir \"siyaset ilgimi çekiyor\" bile yeterli. Doğru programları biz bulacağız.",
+      "placeholder": "ör. veri bilimi, sürdürülebilir mimari, ya da sadece 'siyasetle ilgili bir şey'…"
+    },
+    "gpa_range": {
+      "legend": "Not ortalaman nedir?",
+      "helper": "Okulunun kullandığı not sistemini seç, ardından tam not ortalamanı yaz. Her okul aynı şekilde notlandırmaz — yaklaşık bir değer yeterli.",
+      "scaleOptions": {
+        "4_point": "4.0 sistemi",
+        "100_point": "100 üzerinden",
+        "5_point": "5.0 sistemi",
+        "10_point": "10 üzerinden",
+        "ects_letter": "ECTS / harf notu",
+        "uk_class": "İngiltere (UK) sınıflandırması",
+        "other": "Diğer"
+      },
+      "rangeOptions": {
+        "below_2_0": "2.0'ın altı",
+        "2_0_2_5": "2.0 – 2.5",
+        "2_5_3_0": "2.5 – 3.0",
+        "3_0_3_5": "3.0 – 3.5",
+        "3_5_plus": "3.5+"
+      },
+      "exactPlaceholder": "ör. 3.42, 85/100, ya da 2.1 (Upper Second)",
+      "chooseScalePrompt": "Önce, okulun hangi not sistemini kullanıyor?",
+      "gradingScaleLabel": "Not sistemi:",
+      "change": "Değiştir",
+      "enterGpaLabel": "Şimdi not ortalamanı gir",
+      "orPickRange": "…ya da yaklaşık bir aralık seç",
+      "rangeScaleNote": "(4.0 sistemi)"
+    },
+    "english_level": {
+      "legend": "İngilizceni nasıl tanımlarsın?",
+      "helper": "Her programın gerçek giriş şartıyla eşleştireceğiz. Kendi değerlendirmen yeterli.",
+      "options": {
+        "certified": "Geçerli bir IELTS / TOEFL / Duolingo puanım var",
+        "exam_ready": "Akıcı — IELTS/TOEFL'a girmeye hazırım",
+        "advanced": "İleri düzey (C1)",
+        "upper_intermediate": "Orta-üstü düzey (B2)",
+        "intermediate": "Orta düzey (B1)",
+        "beginner": "Başlangıç / temel düzey (A2 veya altı)"
+      },
+      "optionDescriptions": {
+        "certified": "Sınavı geçtim ve süresi geçerli",
+        "exam_ready": "Sınavı geçebilirim, henüz kayıt yaptırmadım",
+        "advanced": "Akademik İngilizcede rahatım",
+        "intermediate": "Günlük İngilizcem sağlam, hâlâ geliştiriyorum"
+      },
+      "other": {
+        "label": "IELTS / TOEFL / Duolingo puanın",
+        "placeholder": "ör. IELTS 7.5, TOEFL 102, ya da Duolingo 125"
+      }
+    },
+    "budget_per_year": {
+      "legend": "Yıllık bütçen ne kadar?",
+      "helper": "Sadece öğrenim ücreti — yaşam maliyetleri hariç. Bursları ayrıca göstereceğiz.",
+      "options": {
+        "tuition_free": "Sadece ücretsiz / tam burslu",
+        "<10k": "10.000 €'nun altı",
+        "10-15k": "10.000 € – 15.000 €",
+        "15-20k": "15.000 € – 20.000 €",
+        "20-25k": "20.000 € – 25.000 €",
+        "25k+": "25.000 €'nun üzeri",
+        "flexible": "Esnek / henüz emin değilim"
+      },
+      "optionDescriptions": {
+        "tuition_free": "Ücretsiz veya sembolik ücretli devlet üniversiteleri, ya da tam burslar"
+      }
+    },
+    "duration_preference": {
+      "legend": "Programının ne kadar sürmesini istersin?",
+      "options": {
+        "12mo": "12 ay",
+        "18mo": "18 ay",
+        "24mo": "24 ay",
+        "flexible": "Esnek"
+      }
+    },
+    "scholarship_need": {
+      "legend": "Burs desteğine ihtiyacın var mı?",
+      "options": {
+        "required": "Gerekli — katılmak için fona ihtiyacım var",
+        "helpful": "İyi olur — alırım ama olmadan da idare ederim",
+        "not_needed": "Gerekli değil"
+      }
+    },
+    "career_goal": {
+      "legend": "Yüksek lisanstan sonraki hedefin ne?",
+      "helper": "Bunu program karakterini, konumu ve markayı farklı şekilde ağırlıklandırmak için kullanıyoruz.",
+      "options": {
+        "work_in_europe": "Mezun olduktan sonra Avrupa'da çalışmak",
+        "return_to_turkey": "Uluslararası bir dereceyle Türkiye'ye dönmek",
+        "work_internationally": "Uluslararası çalışmak / küresel hareketlilik",
+        "phd_research": "Doktora veya araştırma kariyeri yapmak",
+        "industry_expert": "Alanımda kıdemli / uzman bir role yükselmek",
+        "career_switch": "Yeni bir alana veya sektöre geçiş yapmak",
+        "entrepreneurship": "Kendi şirketimi / girişimimi kurmak",
+        "unsure": "Henüz karar vermedim",
+        "other": "Diğer"
+      },
+      "other": {
+        "placeholder": "Hedefini birkaç kelimeyle anlat…"
+      }
+    },
+    "academic_focus": {
+      "legend": "Ne tarz bir yüksek lisans sana hitap ediyor?",
+      "helper": "Araştırma ağırlıklı programları iş odaklı olanlardan farklı değerlendireceğiz.",
+      "options": {
+        "research": "Araştırma ağırlıklı",
+        "applied": "Sektöre yönelik / uygulamalı",
+        "balanced": "Dengeli"
+      },
+      "optionDescriptions": {
+        "research": "Doktoraya basamak, teorik derinlik, tez odaklı",
+        "applied": "Uygulamalı projeler, stajlar, işe hazır beceriler",
+        "balanced": "İkisinden biraz — seçenekleri açık tut"
+      }
+    },
+    "work_experience": {
+      "legend": "Ne kadar tam zamanlı iş deneyimin var?",
+      "helper": "Bazı programlar (LBS MiM gibi) 1-3 yıl tercih eder; diğerleri yeni mezunları da kabul eder.",
+      "options": {
+        "none": "Yok veya bir yıldan az",
+        "1-2_years": "1-2 yıl",
+        "3-5_years": "3-5 yıl",
+        "5_plus_years": "5+ yıl"
+      }
+    },
+    "additional_context": {
+      "legend": "Bilmemiz gereken başka bir şey var mı? (isteğe bağlı)",
+      "helper": "Çalışmak istediğin belirli laboratuvarlar, katılacağın bir şehirdeki ailen, bu alanı gerçekten neden seçtiğin, çoktan seçmeliden kaçırabileceğimiz her şey. Yapay zekâ bunu okuyor ve gerekçende alıntılıyor.",
+      "placeholder": "ör. Berlin'deki partnerime yakın olmak istiyorum, ya da TU Delft'te Prof. Smith'in robotik laboratuvarını hedefliyorum…"
+    }
+  }
+}

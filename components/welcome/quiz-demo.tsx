@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, MonitorPlay, RotateCw, Sparkles, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import { TOTAL_STEPS } from "@/lib/quiz/schema";
@@ -34,51 +35,42 @@ type DemoStep =
       typed: string;
     };
 
-const DEMO_STEPS: DemoStep[] = [
-  {
-    kind: "select",
-    legend: "Which destination feels right for your master's journey?",
-    helper: "Pick one or more — or \"No preference\" to stay open.",
-    options: ["Italy", "Netherlands", "Germany", "Sweden", "France", "No preference"],
-    picks: [0, 1],
-  },
-  {
-    kind: "select",
-    legend: "What best describes your current situation?",
-    options: [
-      "Current undergraduate student",
-      "Graduating soon (final year)",
-      "Recent graduate",
-      "Working professional",
-    ],
-    picks: [1],
-  },
-  {
-    kind: "text",
-    legend: "What did you study?",
-    helper: "Your undergraduate field, in your own words.",
-    typed: "BSc Industrial Engineering at Istanbul Technical University",
-  },
-  {
-    kind: "text",
-    legend: "What do you want to study?",
-    helper:
-      "Be as free as you like — a field, a precise topic, or just a feeling.",
-    typed: "I want to move into data science — ideally applied to supply chains",
-  },
-  {
-    kind: "select",
-    legend: "What's your budget per year?",
-    helper: "Tuition only — not living costs.",
-    options: [
-      "Tuition-free / fully-funded only",
-      "Under €10,000",
-      "€10,000 – €15,000",
-      "Flexible / not sure yet",
-    ],
-    picks: [2],
-  },
-];
+function buildDemoSteps(t: ReturnType<typeof useTranslations>): DemoStep[] {
+  return [
+    {
+      kind: "select",
+      legend: t("quizDemo.steps.destination.legend"),
+      helper: t("quizDemo.steps.destination.helper"),
+      options: t.raw("quizDemo.steps.destination.options") as string[],
+      picks: [0, 1],
+    },
+    {
+      kind: "select",
+      legend: t("quizDemo.steps.situation.legend"),
+      options: t.raw("quizDemo.steps.situation.options") as string[],
+      picks: [1],
+    },
+    {
+      kind: "text",
+      legend: t("quizDemo.steps.studied.legend"),
+      helper: t("quizDemo.steps.studied.helper"),
+      typed: t("quizDemo.steps.studied.typed"),
+    },
+    {
+      kind: "text",
+      legend: t("quizDemo.steps.wantToStudy.legend"),
+      helper: t("quizDemo.steps.wantToStudy.helper"),
+      typed: t("quizDemo.steps.wantToStudy.typed"),
+    },
+    {
+      kind: "select",
+      legend: t("quizDemo.steps.budget.legend"),
+      helper: t("quizDemo.steps.budget.helper"),
+      options: t.raw("quizDemo.steps.budget.options") as string[],
+      picks: [2],
+    },
+  ];
+}
 
 const PICK_DELAY_MS = 750;
 const AFTER_SELECT_PAUSE_MS = 950;
@@ -86,6 +78,7 @@ const AFTER_TYPE_PAUSE_MS = 1100;
 const TYPE_SPEED_MS = 32;
 
 export function QuizDemoLink({ className }: { className?: string }) {
+  const t = useTranslations("home");
   return (
     <button
       type="button"
@@ -96,12 +89,14 @@ export function QuizDemoLink({ className }: { className?: string }) {
       )}
     >
       <MonitorPlay className="size-3.5" aria-hidden />
-      Watch the quiz in action
+      {t("quizDemo.link")}
     </button>
   );
 }
 
 export function QuizDemo() {
+  const t = useTranslations("home");
+  const DEMO_STEPS = useMemo(() => buildDemoSteps(t), [t]);
   const [open, setOpen] = useState(false);
   // -1 = intro beat, DEMO_STEPS.length = finale.
   const [stepIndex, setStepIndex] = useState(0);
@@ -187,7 +182,7 @@ export function QuizDemo() {
           onClick={close}
           role="dialog"
           aria-modal
-          aria-label="Quiz preview"
+          aria-label={t("quizDemo.dialogAria")}
         >
           <motion.div
             initial={{ y: 24, opacity: 0, scale: 0.97 }}
@@ -202,13 +197,13 @@ export function QuizDemo() {
               <div className="flex items-center justify-between gap-3">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary ring-1 ring-inset ring-primary/20">
                   <Sparkles className="size-3.5" />
-                  Quiz preview — plays by itself
+                  {t("quizDemo.badge")}
                 </span>
                 <button
                   type="button"
                   onClick={close}
                   className="inline-flex size-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-                  aria-label="Close preview"
+                  aria-label={t("quizDemo.closeAria")}
                 >
                   <X className="size-4" />
                 </button>
@@ -223,7 +218,7 @@ export function QuizDemo() {
                 </div>
                 <span className="shrink-0 text-xs tabular-nums text-slate-500">
                   {isFinale
-                    ? "Done"
+                    ? t("quizDemo.done")
                     : `${stepIndex + 1} / ${DEMO_STEPS.length}`}
                 </span>
               </div>
@@ -287,8 +282,7 @@ export function QuizDemo() {
             </div>
 
             <footer className="border-t border-slate-100 bg-slate-50/60 px-6 py-3 text-center text-[11px] text-slate-500 sm:px-8">
-              A shortened preview — the real quiz is {TOTAL_STEPS} quick
-              questions and takes about 2 minutes.
+              {t("quizDemo.footer", { totalSteps: TOTAL_STEPS })}
             </footer>
           </motion.div>
         </motion.div>
@@ -352,6 +346,7 @@ function Finale({
   onReplay: () => void;
   onClose: () => void;
 }) {
+  const t = useTranslations("home");
   return (
     <motion.div
       key="finale"
@@ -368,12 +363,10 @@ function Finale({
         <Sparkles className="size-7" />
       </motion.div>
       <h2 className="mt-5 text-2xl font-semibold tracking-tight text-slate-900">
-        …and that&apos;s when the matching happens
+        {t("quizDemo.finale.title")}
       </h2>
       <p className="mt-2 max-w-md text-sm text-slate-600">
-        Your answers are compared against all 196 programs — real tuition,
-        deadlines, and rankings — and you get your top 3 with a personal
-        explanation for each.
+        {t("quizDemo.finale.description")}
       </p>
       <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
         <Link
@@ -381,7 +374,7 @@ function Finale({
           onClick={onClose}
           className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
         >
-          Take the real quiz
+          {t("quizDemo.finale.takeRealQuiz")}
           <ArrowRight className="size-4" />
         </Link>
         <button
@@ -390,7 +383,7 @@ function Finale({
           className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:border-teal-300 hover:text-teal-700"
         >
           <RotateCw className="size-3.5" />
-          Replay
+          {t("quizDemo.finale.replay")}
         </button>
       </div>
     </motion.div>

@@ -1,17 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 
 export type CommunityTab = "reviews" | "groups" | "questions" | "responsibles";
-
-export const TAB_LABELS: Record<CommunityTab, string> = {
-  reviews: "Reviews",
-  groups: "Groups",
-  questions: "Questions",
-  responsibles: "Campus Responsibles",
-};
 
 export function CommunityTabs({
   value,
@@ -22,10 +16,11 @@ export function CommunityTabs({
   onChange: (tab: CommunityTab) => void;
   counts: Partial<Record<CommunityTab, number>>;
 }) {
+  const t = useTranslations("community.tabs");
   const tabs: CommunityTab[] = ["reviews", "groups", "questions", "responsibles"];
 
   return (
-    <div className="overflow-x-auto" role="tablist" aria-label="Community sections">
+    <div className="overflow-x-auto" role="tablist" aria-label={t("ariaLabel")}>
       <div className="flex min-w-fit gap-1 border-b border-slate-200">
         {tabs.map((tab) => {
           const active = value === tab;
@@ -41,7 +36,7 @@ export function CommunityTabs({
                 active ? "text-teal-700" : "text-slate-500 hover:text-slate-800",
               )}
             >
-              {TAB_LABELS[tab]}
+              {t(tab)}
               {counts[tab] !== undefined && (
                 <span
                   className={cn(

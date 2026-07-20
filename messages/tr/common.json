@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "title": "EdFind — Sana en uygun eğitimi bul",
+    "description": "Türkiye'deki öğrencilerin Avrupa'da doğru yüksek lisans programını bulması için yapay zekâ destekli, tarafsız rehberlik."
+  },
+  "nav": {
+    "ariaMain": "Ana menü",
+    "findPrograms": "Program bul",
+    "catalog": "Katalog",
+    "applications": "Başvurular",
+    "community": "Topluluk"
+  },
+  "header": {
+    "signIn": "Giriş yap",
+    "signOut": "Çıkış yap"
+  },
+  "languageSwitcher": {
+    "label": "Dil",
+    "en": "English",
+    "tr": "Türkçe"
+  },
+  "footer": {
+    "tagline": "Elli tarayıcı sekmesi yerine tek bir aranabilir yer — Türkiye'deki öğrencilerin Avrupa'da doğru yüksek lisans programını bulmasına yardımcı olan tarafsız, yapay zekâ destekli rehberlik.",
+    "explore": "Keşfet",
+    "yourJourney": "Yolculuğun",
+    "legalTransparency": "Yasal ve şeffaflık",
+    "findPrograms": "Program bul",
+    "browseCatalog": "Kataloğa göz at",
+    "community": "Topluluk",
+    "takeQuiz": "Testi çöz",
+    "myApplications": "Başvurularım",
+    "signIn": "Giriş yap",
+    "howEdFindWorks": "EdFind nasıl çalışır",
+    "terms": "Kullanım Koşulları",
+    "privacy": "Gizlilik Politikası",
+    "rights": "© {year} EdFind. Tüm hakları saklıdır.",
+    "disclaimer": "EdFind sana seçim yapmanda yardımcı olmak için bilgi sunar — kabul, hukuk, göçmenlik veya finans danışmanlığı değildir. Başvurmadan önce ayrıntıları mutlaka üniversitenin resmi sitesinden doğrula."
+  },
+  "headerSearch": {
+    "trigger": "Ara",
+    "triggerAriaLabel": "Üniversite ve program ara",
+    "dialogAriaLabel": "Katalog arama",
+    "placeholder": "Üniversite ve program ara…",
+    "closeAriaLabel": "Kapat",
+    "kbdEsc": "Esc",
+    "error": "Katalog şu anda yüklenemedi. Tekrar dene.",
+    "noResults": {
+      "title": "“{query}” için eşleşme yok",
+      "hint": "Farklı bir isim dene ya da ne aradığını anlatmak için <link>Yapay Zekâ Arama</link>'yı kullan."
+    },
+    "hints": {
+      "navigate": "gezin",
+      "open": "aç",
+      "close": "kapat"
+    },
+    "browseCatalog": "Tüm kataloğa göz at",
+    "sections": {
+      "universities": "Üniversiteler",
+      "programs": "Programlar"
+    },
+    "qsRank": " · QS #{rank}",
+    "partnerSuffix": " · Partner"
+  },
+  "mobileNav": {
+    "openMenu": "Menüyü aç",
+    "closeMenu": "Menüyü kapat",
+    "mainMenu": "Ana menü"
+  },
+  "breadcrumbs": {
+    "ariaLabel": "Gezinme yolu"
+  },
+  "selectPill": {
+    "placeholder": "Seç…"
+  },
+  "notFound": {
+    "badge": "404",
+    "title": "Sayfa bulunamadı",
+    "description": "Aradığın sayfa mevcut değil ya da taşınmış olabilir.",
+    "backHome": "Ana sayfaya dön",
+    "browseCatalog": "Kataloğa göz at"
+  },
+  "errors": {
+    "badge": "Hata",
+    "title": "Bir şeyler ters gitti",
+    "description": "Beklenmeyen bir hata oluştu. Tekrar deneyebilir ya da ana sayfaya dönebilirsin.",
+    "tryAgain": "Tekrar dene",
+    "backHome": "Ana sayfaya dön"
+  }
+}

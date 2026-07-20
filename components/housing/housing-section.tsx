@@ -1,3 +1,4 @@
+import { useLocale, useTranslations } from "next-intl";
 import {
   BedDouble,
   Building2,
@@ -11,6 +12,8 @@ import {
 
 import type { HousingCity, HousingUniversity } from "@/lib/housing/types";
 import { eurEquivalent } from "@/lib/format/currency";
+import type { Locale } from "@/lib/i18n/config";
+import { localizeCity } from "@/lib/i18n/data-labels";
 
 function fmt(n: number, currency: string): string {
   try {
@@ -53,17 +56,16 @@ function eurRange(
   return range(eMin, eMax, "EUR");
 }
 
-function formatDate(iso: string | null): string | null {
+function formatDate(iso: string | null, locale: Locale): string | null {
   if (!iso) return null;
   // iso is a date string (YYYY-MM-DD). Render month + year without timezone math.
   const [y, m] = iso.split("-");
-  const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-  ];
   const mi = Number(m) - 1;
   if (!y || mi < 0 || mi > 11) return null;
-  return `${months[mi]} ${y}`;
+  return new Date(Number(y), mi, 1).toLocaleDateString(
+    locale === "tr" ? "tr-TR" : "en-GB",
+    { month: "short", year: "numeric" },
+  );
 }
 
 function MoneyCard({
@@ -107,6 +109,9 @@ export function HousingSection({
   university: HousingUniversity | null;
   cityName: string;
 }) {
+  const t = useTranslations("university");
+  const locale = useLocale() as Locale;
+
   if (!city && !university) return null;
 
   const cur = city?.currency ?? university?.currency ?? "EUR";
@@ -154,6 +159,7 @@ export function HousingSection({
 
   const researched = formatDate(
     city?.researched_on ?? university?.researched_on ?? null,
+    locale,
   );
 
   // Dedupe sources by url across city + university.
@@ -188,11 +194,11 @@ export function HousingSection({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
           <Home className="size-5 text-primary" />
-          Housing &amp; cost of living
+          {t("housing.heading")}
         </h2>
         {researched ? (
           <span className="text-[11px] text-muted-foreground">
-            Researched {researched} · estimates, not quotes
+            {t("housing.researched", { date: researched })}
           </span>
         ) : null}
       </div>
@@ -201,10 +207,10 @@ export function HousingSection({
       {(roomR || studioR || sharedR || livingR) && (
         <div className="mt-4">
           <p className="text-sm font-medium text-foreground">
-            Renting in {cityName}
+            {t("housing.rentingIn", { city: localizeCity(cityName, locale) })}
             {cur !== "EUR" ? (
               <span className="ml-1 font-normal text-muted-foreground">
-                (local prices, with euro estimates)
+                {t("housing.localPricesNote")}
               </span>
             ) : null}
           </p>
@@ -212,41 +218,41 @@ export function HousingSection({
             {roomR ? (
               <MoneyCard
                 icon={<BedDouble className="size-3.5" />}
-                label="Room (shared flat)"
+                label={t("housing.room")}
                 value={roomR}
                 eur={eurRange(city!.rent_room_min, city!.rent_room_max, cur)}
-                sub="per month"
+                sub={t("housing.perMonth")}
               />
             ) : null}
             {studioR ? (
               <MoneyCard
                 icon={<Home className="size-3.5" />}
-                label="Studio"
+                label={t("housing.studio")}
                 value={studioR}
                 eur={eurRange(city!.rent_studio_min, city!.rent_studio_max, cur)}
-                sub="per month"
+                sub={t("housing.perMonth")}
               />
             ) : null}
             {sharedR ? (
               <MoneyCard
                 icon={<Building2 className="size-3.5" />}
-                label="Student housing"
+                label={t("housing.studentHousing")}
                 value={sharedR}
                 eur={eurRange(city!.rent_shared_min, city!.rent_shared_max, cur)}
-                sub="per month"
+                sub={t("housing.perMonth")}
               />
             ) : null}
             {livingR ? (
               <MoneyCard
                 icon={<Wallet className="size-3.5" />}
-                label="Living (ex-rent)"
+                label={t("housing.livingExRent")}
                 value={livingR}
                 eur={eurRange(
                   city!.monthly_living_min,
                   city!.monthly_living_max,
                   cur,
                 )}
-                sub="per month"
+                sub={t("housing.perMonth")}
               />
             ) : null}
           </div>
@@ -259,7 +265,7 @@ export function HousingSection({
         <details className="group mt-4">
           <summary className="flex cursor-pointer list-none items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80 [&::-webkit-details-marker]:hidden">
             <ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" />
-            See the full housing breakdown for {cityName}
+            {t("housing.seeFullBreakdown", { city: localizeCity(cityName, locale) })}
           </summary>
 
           <div className="mt-4 space-y-4">
@@ -268,7 +274,7 @@ export function HousingSection({
               <div>
                 <p className="flex items-center gap-1.5 text-sm font-medium text-foreground">
                   <MapPin className="size-4 text-primary" />
-                  Where students live
+                  {t("housing.whereStudentsLive")}
                 </p>
                 <ul className="mt-2 flex flex-wrap gap-2">
                   {neighborhoods.map((n) => (
@@ -292,15 +298,15 @@ export function HousingSection({
             {hasUniBlock && university && (
               <div className="rounded-xl border border-border bg-card p-4">
                 <p className="text-sm font-medium text-foreground">
-                  University accommodation
+                  {t("housing.universityAccommodation")}
                 </p>
                 <div className="mt-2 space-y-1.5 text-sm text-muted-foreground">
                   {university.has_dorms != null ? (
                     <p>
                       <span className="font-medium text-foreground">
                         {university.has_dorms
-                          ? "Offers university housing"
-                          : "No university housing"}
+                          ? t("housing.offersHousing")
+                          : t("housing.noHousing")}
                       </span>
                       {university.dorm_note ? ` — ${university.dorm_note}` : ""}
                     </p>
@@ -309,30 +315,32 @@ export function HousingSection({
                   ) : null}
                   {onCampus ? (
                     <p>
-                      On-campus / managed:{" "}
+                      {t("housing.onCampus")}{" "}
                       <span className="font-medium text-foreground">
                         {onCampus}
                       </span>
-                      /mo
+                      {t("housing.perMonthSuffix")}
                       {onCampusEur ? (
                         <span className="text-primary/80">
                           {" "}
-                          (≈ {onCampusEur}/mo)
+                          (≈ {onCampusEur}
+                          {t("housing.perMonthSuffix")})
                         </span>
                       ) : null}
                     </p>
                   ) : null}
                   {nearCampus ? (
                     <p>
-                      Private near campus:{" "}
+                      {t("housing.nearCampus")}{" "}
                       <span className="font-medium text-foreground">
                         {nearCampus}
                       </span>
-                      /mo
+                      {t("housing.perMonthSuffix")}
                       {nearCampusEur ? (
                         <span className="text-primary/80">
                           {" "}
-                          (≈ {nearCampusEur}/mo)
+                          (≈ {nearCampusEur}
+                          {t("housing.perMonthSuffix")})
                         </span>
                       ) : null}
                     </p>
@@ -348,7 +356,7 @@ export function HousingSection({
                     rel="noreferrer noopener"
                     className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                   >
-                    University housing office
+                    {t("housing.housingOfficeLink")}
                     <ExternalLink className="size-3" />
                   </a>
                 ) : null}
@@ -361,7 +369,7 @@ export function HousingSection({
                 {city?.deposit_norms ? (
                   <p>
                     <span className="font-medium text-foreground">
-                      Deposits:
+                      {t("housing.deposits")}
                     </span>{" "}
                     {city.deposit_norms}
                   </p>
@@ -375,7 +383,7 @@ export function HousingSection({
             {portals.length > 0 && (
               <div>
                 <p className="text-sm font-medium text-foreground">
-                  Where to look
+                  {t("housing.whereToLook")}
                 </p>
                 <ul className="mt-2 flex flex-wrap gap-2">
                   {portals.map((p) =>
@@ -408,13 +416,11 @@ export function HousingSection({
             <div className="border-t border-border pt-3">
               <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
                 <Info className="mt-0.5 size-3.5 shrink-0" />
-                AI-researched estimates, converted to euros at approximate rates
-                — actual prices vary by year, timing, and luck. Always verify
-                current figures before budgeting.
+                {t("housing.disclaimer")}
               </p>
               {sources.length > 0 ? (
                 <p className="mt-1.5 text-[11px] text-muted-foreground">
-                  Sources:{" "}
+                  {t("housing.sourcesLabel")}{" "}
                   {sources.map((s, i) => (
                     <span key={s.url}>
                       {i > 0 ? " · " : ""}

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
@@ -32,6 +33,7 @@ const MAX_PROGS = 10;
 
 export function HeaderSearch() {
   const router = useRouter();
+  const t = useTranslations("common.headerSearch");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -115,8 +117,8 @@ export function HeaderSearch() {
   // Focus input when opening — pure DOM side effect, no state writes.
   useEffect(() => {
     if (!open) return;
-    const t = setTimeout(() => inputRef.current?.focus(), 30);
-    return () => clearTimeout(t);
+    const focusTimer = setTimeout(() => inputRef.current?.focus(), 30);
+    return () => clearTimeout(focusTimer);
   }, [open]);
 
   // ─── Compute results ──────────────────────────────────────────────
@@ -196,10 +198,10 @@ export function HeaderSearch() {
         type="button"
         onClick={openModal}
         className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition hover:border-teal-300 hover:text-teal-700"
-        aria-label="Search universities & programs"
+        aria-label={t("triggerAriaLabel")}
       >
         <Search className="size-3.5" />
-        <span className="hidden sm:inline">Search</span>
+        <span className="hidden sm:inline">{t("trigger")}</span>
       </button>
 
       <AnimatePresence>
@@ -220,7 +222,7 @@ export function HeaderSearch() {
               onClick={(e) => e.stopPropagation()}
               role="dialog"
               aria-modal
-              aria-label="Catalog search"
+              aria-label={t("dialogAriaLabel")}
               className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200"
             >
               <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
@@ -238,17 +240,17 @@ export function HeaderSearch() {
                     setActiveIndex(0);
                   }}
                   onKeyDown={onKeyDownInput}
-                  placeholder="Search universities & programs…"
+                  placeholder={t("placeholder")}
                   className="flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
                 />
                 <kbd className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-mono text-slate-500">
-                  Esc
+                  {t("kbdEsc")}
                 </kbd>
                 <button
                   type="button"
                   onClick={closeModal}
                   className="inline-flex size-6 items-center justify-center rounded text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-                  aria-label="Close"
+                  aria-label={t("closeAriaLabel")}
                 >
                   <X className="size-3.5" />
                 </button>
@@ -257,7 +259,7 @@ export function HeaderSearch() {
               <div className="max-h-[min(60vh,520px)] overflow-y-auto">
                 {error && (
                   <p className="px-4 py-6 text-center text-sm text-rose-600">
-                    Couldn&apos;t load the catalog right now. Try again.
+                    {t("error")}
                   </p>
                 )}
 
@@ -277,16 +279,16 @@ export function HeaderSearch() {
 
               <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/60 px-4 py-2 text-[11px] text-slate-500">
                 <div className="flex items-center gap-3">
-                  <Hint k="↑↓">navigate</Hint>
-                  <Hint k="↵">open</Hint>
-                  <Hint k="Esc">close</Hint>
+                  <Hint k="↑↓">{t("hints.navigate")}</Hint>
+                  <Hint k="↵">{t("hints.open")}</Hint>
+                  <Hint k="Esc">{t("hints.close")}</Hint>
                 </div>
                 <Link
                   href="/catalog"
                   onClick={closeModal}
                   className="inline-flex items-center gap-1 font-medium text-teal-700 hover:underline"
                 >
-                  Browse the full catalog
+                  {t("browseCatalog")}
                   <ArrowRight className="size-3" />
                 </Link>
               </div>
@@ -310,20 +312,23 @@ function Hint({ k, children }: { k: string; children: React.ReactNode }) {
 }
 
 function NoResults({ query }: { query: string }) {
+  const t = useTranslations("common.headerSearch");
   return (
     <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
       <div className="flex size-10 items-center justify-center rounded-2xl bg-slate-50 text-slate-400">
         <Compass className="size-5" />
       </div>
       <p className="text-sm font-medium text-slate-700">
-        No match for &ldquo;{query}&rdquo;
+        {t("noResults.title", { query })}
       </p>
       <p className="max-w-xs text-xs text-slate-500">
-        Try a different name, or use{" "}
-        <Link href="/search" className="font-medium text-teal-700 hover:underline">
-          AI Search
-        </Link>{" "}
-        to describe what you&apos;re looking for.
+        {t.rich("noResults.hint", {
+          link: (chunks) => (
+            <Link href="/search" className="font-medium text-teal-700 hover:underline">
+              {chunks}
+            </Link>
+          ),
+        })}
       </p>
     </div>
   );
@@ -340,6 +345,7 @@ function ResultsList({
   onHover: (i: number) => void;
   onPick: (r: ResultRow) => void;
 }) {
+  const t = useTranslations("common.headerSearch");
   // Split results into university + program sections for clarity.
   let uniSectionEnd = 0;
   for (let i = 0; i < results.length; i++) {
@@ -356,7 +362,7 @@ function ResultsList({
     <div className="p-2">
       {unis.length > 0 && (
         <Section
-          title="Universities"
+          title={t("sections.universities")}
           icon={<Building2 className="size-3" />}
         >
           {unis.map((row, idx) => (
@@ -372,7 +378,7 @@ function ResultsList({
       )}
       {progs.length > 0 && (
         <Section
-          title="Programs"
+          title={t("sections.programs")}
           icon={<GraduationCap className="size-3" />}
         >
           {progs.map((row, i) => {
@@ -424,6 +430,7 @@ function UniversityRow({
   onHover: () => void;
   onPick: () => void;
 }) {
+  const t = useTranslations("common.headerSearch");
   const u = row.data;
   return (
     <button
@@ -447,8 +454,8 @@ function UniversityRow({
         </p>
         <p className="truncate text-[11px] text-slate-500">
           {u.city}, {COUNTRY_NAMES[u.country] || u.country}
-          {u.qs_world_rank != null && ` · QS #${u.qs_world_rank}`}
-          {u.is_partner && " · Partner"}
+          {u.qs_world_rank != null && t("qsRank", { rank: u.qs_world_rank })}
+          {u.is_partner && t("partnerSuffix")}
         </p>
       </div>
       {active && <ArrowRight className="size-3.5 text-teal-600" />}

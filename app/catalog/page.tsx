@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -7,11 +8,13 @@ import {
   type CatalogUniversity,
 } from "@/components/catalog/catalog-client";
 
-export const metadata: Metadata = {
-  title: "Catalog — Universities & Programs",
-  description:
-    "Browse every verified European master's program in the EdFind catalog. Filter by country, field, language, tuition, and more.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("catalog");
+  return {
+    title: t("meta.title"),
+    description: t("meta.description"),
+  };
+}
 
 type UniRow = {
   slug: string;

@@ -1,0 +1,93 @@
+{
+  "shell": {
+    "lastUpdated": "Son güncelleme: {date}"
+  },
+  "terms": {
+    "meta": {
+      "description": "EdFind'ın kullanımını düzenleyen koşullar — hizmetin ne olduğu, sana ne vaat ettiğimiz ve neyi vaat etmediğimiz."
+    },
+    "title": "Kullanım Koşulları",
+    "intro": "Bu koşullar EdFind'ın kullanımını düzenler. Bir hesap oluşturarak veya hizmeti kullanarak bunları kabul etmiş olursun. Dili sade tuttuk — bir şey belirsizse, ona güvenmeden önce bizimle iletişime geç."
+  },
+  "privacy": {
+    "meta": {
+      "description": "EdFind'ın neyi, neden topladığı, kimin işlediği, nerede sakladığı ve verilerin üzerindeki hakların."
+    },
+    "title": "Gizlilik Politikası",
+    "intro": "EdFind, Türkiye'deki öğrenciler için tasarlandı, AB'de barındırılıyor ve seni iyi eşleştirmek için gereken en az veriyi toplayacak şekilde kuruldu. Bu politika neyi, neden topladığımızı, işlememize kimlerin yardımcı olduğunu ve sahip olduğun hakları açıklar."
+  },
+  "technicalReport": {
+    "meta": {
+      "title": "EdFind nasıl çalışır — teknik genel bakış",
+      "description": "EdFind'ın öğrencileri yüksek lisans programlarıyla nasıl eşleştirdiğine, arkasındaki teknoloji yığınına ve kullandığımız tam yapay zekâ istemlerine dair sade bir teknik genel bakış."
+    },
+    "eyebrow": "Şeffaflık",
+    "title": "EdFind nasıl çalışır",
+    "intro": "Hayatını etkileyecek kararlar öneren bir aracın bunu nasıl yaptığı konusunda dürüst olması gerektiğini düşünüyoruz. Bu sayfa perde arkasında olanları sade bir dille anlatıyor — teknoloji yığınını, eşleştirme sürecini, tarafsızlık kurallarımızı ve modele gönderdiğimiz gerçek yapay zekâ istemlerini.",
+    "sections": {
+      "whatItsDoing": {
+        "heading": "EdFind ne yapıyor",
+        "body": "Avrupa üniversitelerinin yüksek lisans bilgileri, yüzlerce sitede farklı dillerde ve formatlarda dağınık halde bulunuyor. EdFind bunun derlenmiş bir kesitini tek, yapılandırılmış ve aranabilir bir veritabanında topluyor, ardından profilini ve bu kataloğu değerlendirip yakından bakmaya değer programları ortaya çıkarmak için büyük bir dil modeli kullanıyor. Bu bir kâhin değil, bir araştırma hızlandırıcısıdır — her rakam, doğrulaman gereken bir kaynağa bağlanır."
+      },
+      "stack": {
+        "heading": "Teknoloji yığını",
+        "items": {
+          "webApp": "<strong>Web uygulaması:</strong> TypeScript, Tailwind CSS ve shadcn/ui bileşenleriyle Next.js 16 (App Router). Çoğunlukla React Sunucu Bileşenleri olarak render edilir.",
+          "dataAuth": "<strong>Veri + kimlik doğrulama:</strong> AB'de (İrlanda) barındırılan Supabase (PostgreSQL, kimlik doğrulama ve depolama). Erişim, yalnızca uygulama kodunda değil, veritabanı düzeyinde Row-Level Security ile zorunlu kılınır.",
+          "hosting": "<strong>Barındırma:</strong> Vercel.",
+          "ai": "<strong>Yapay zekâ:</strong> yalnızca sunucu tarafında çağrılan DeepSeek V4 Flash (<code>deepseek-v4-flash</code>). Akıl yürütme modu kapalıdır, böylece model doğrudan yapılandırılmış JSON döndürür."
+        },
+        "note": "Her yapay zekâ çağrısı ve her yetkili veritabanı çağrısı sunucuda gerçekleşir. API anahtarları tarayıcına asla ulaşmaz."
+      },
+      "howMatch": {
+        "heading": "Bir eşleşme nasıl oluşturulur",
+        "intro": "Rehberli test {totalSteps} sorudan oluşur (şema sürümü {answersVersion}). Testi gönderdiğinde:",
+        "steps": {
+          "step1": "Yanıtların, sunucuda katı bir şemaya karşı doğrulanır — herhangi bir şey kaydedilmeden önce her değerin bilinen bir seçenek olması ya da sınırlar içinde kalması gerekir.",
+          "step2": "Tüm program kataloğunu veritabanından yükleriz ve makine tarafından okunabilir bir listeye (program, üniversite, alan, dil, süre, öğrenim ücreti + para birimi, sıralamalar) sıkıştırırız.",
+          "step3": "Profilini ve bu kataloğu aşağıdaki <strong>eşleştirme istemiyle</strong> birlikte modele göndeririz. İstem, katı filtreler (hedef ülke, dil, bütçe, süre) ve esnek uyum ölçütleri (alan, akademik odak, not ortalaması, iş deneyimi, serbest metin notların) uygular, ardından 0-100 arası bir puan ve kişiselleştirilmiş bir gerekçeyle en iyi üç programı döndürür.",
+          "step4": "Modelin çıktısını doğrularız, gerçek bir programa işaret etmeyen her şeyi ayıklarız, en iyi üçünü kaydederiz ve sonuçları sana gösteririz."
+        },
+        "note": "Eşleştirici bir program hakkında asla gerçek uydurmaz: yalnızca katalogda olanı sıralayabilir ve abartmak yerine ödünleşimleri kabul etmesi talimatı verilmiştir."
+      },
+      "freeTextSearch": {
+        "heading": "Serbest metin arama",
+        "body": "Testi çözmek yerine istediğini kendi cümlelerinle anlatırsan, ayrı bir <strong>ayrıştırma istemi</strong> önce cümleni aynı yapılandırılmış profile eşler (yalnızca gerçekten söylediklerini doldurur, gerisini boş bırakır), ardından aynı eşleştirme süreci çalışır. Tam olarak yazdığın ifade de iletilir, böylece gerekçe seni alıntılayabilir."
+      },
+      "documentDrafting": {
+        "heading": "Yapay zekâ ile belge taslağı",
+        "body": "Başvuru takipçisi bir CV veya programa özel bir motivasyon mektubu taslağı hazırlayabilir. Bu istemler uydurma konusunda kasıtlı olarak katıdır: model yalnızca senin yazdığın gerçekleri ve program hakkında doğrulanmış katalog verilerini kullanabilir; eksik olan her şey senin doldurman için köşeli parantez içinde bir yer tutucuya dönüşür. Taslak, düzenleyeceğin bir başlangıç noktasıdır — asla olduğu gibi gönderilecek bir şey değildir."
+      },
+      "neutrality": {
+        "heading": "Tarafsızlık",
+        "body": "Partner üniversiteler içerik olarak etiketlenir ve kendi katmanlarında sunulur. Tarafsız eşleştirme sonuçları içinde <strong>asla sessizce öne çıkarılmazlar</strong> — istem, ticari ilişkiye değil uyuma göre sıralar. Bu, partner statüsünü sıralama sinyalinin dışında tutarak uyguladığımız bir ürün taahhüdüdür."
+      },
+      "aiResearchedData": {
+        "heading": "Yapay zekâ ile araştırılan veriler",
+        "body": "Barınma maliyetleri, yaşam maliyeti tahminleri ve üniversite kampüs fotoğrafları gibi bazı içerikler, herkese açık kaynakları okuyup kaynak gösteren yapay zekâ ajanlarıyla araştırılır. Bunlar açıkça tahmin olarak etiketlenir, tarihlendirilir ve kaynaklarıyla birlikte gösterilir. Para birimi rakamları, kolaylık olması için yaklaşık bir euro karşılığı taşır. Bunları her zaman bir teklif değil, bir başlangıç noktası olarak değerlendir."
+      },
+      "promptsIntro": {
+        "heading": "Kullandığımız tam istemler",
+        "body": "Tam şeffaflık için, modele gönderilen sistem talimatlarının birebir kendisi aşağıda. Bunlar doğrudan çalışan koddan render edilir, yani burada gördüğün, ürünün gerçekten kullandığı şeydir (istemler kaliteyi ayarladıkça zamanla değişir)."
+      },
+      "privacySecurity": {
+        "heading": "Kısaca gizlilik ve güvenlik",
+        "body": "Seni eşleştirmek ve ilerlemeni hatırlamak için gereken veriyi toplarız, AB'de saklarız ve asla satmayız. Test yanıtların, eşleşmeleri oluşturmak için yapay zekâ model sağlayıcısına gönderilir — bu yüzden lütfen hassas ayrıntıları serbest metin kutularının dışında tut. Haklarını ve verilerini nasıl silebileceğini de içeren tüm ayrıntılar <privacyLink>Gizlilik Politikamızda</privacyLink>. Kullanım koşulları <termsLink>Kullanım Koşullarımızda</termsLink>."
+      },
+      "limitations": {
+        "heading": "Dürüst sınırlamalar",
+        "items": {
+          "item1": "Katalog, var olan her programı değil, Avrupa yüksek lisans programlarının derlenmiş bir alt kümesini içerir.",
+          "item2": "Yapay zekâ eşleşmeleri önerilerdir. Yanlış olabilir, bağlamı kaçırabilir veya güncel olmayan veriyi yansıtabilir. Önemli olan her şeyi resmi sitede doğrula.",
+          "item3": "Sıralamalar, öğrenim ücretleri, son başvuru tarihleri ve barınma maliyetleri değişir — elimizden geldiğince tarihlendirir ve kaynak veririz, ama para birimi ve zamanlama kayabilir."
+        }
+      }
+    },
+    "promptLabels": {
+      "matching": "Eşleştirme istemi (test + arama sonuçları)",
+      "parser": "Serbest metin sorgu ayrıştırma istemi (/search)",
+      "cv": "CV taslak istemi (/applications üzerindeki belge stüdyosu)",
+      "coverLetter": "Motivasyon mektubu taslak istemi (/applications üzerindeki belge stüdyosu)"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/auth";
@@ -13,10 +14,13 @@ import type {
   TaskItem,
 } from "@/components/applications/types";
 
-export const metadata: Metadata = {
-  title: "Your applications",
-  description: "Track every master's program application you're working on.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("applications.meta");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 type ProfileRow = {
   answers: Record<string, unknown> | null;

@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "title": "Go Premium — EdFind",
+    "description": "AI matching, application tracking, and direct access to campus responsibles — EdFind Premium."
+  },
+  "badge": "EdFind Premium",
+  "title": "Unlock your matches",
+  "subtitle": "AI matching, application tracking, and direct lines to students on campus — everything you need to go from “somewhere in Europe” to a submitted application.",
+  "free": {
+    "heading": "Free",
+    "tagline": "Explore everything, decide later.",
+    "price": "€0",
+    "features": {
+      "catalog": "Browse the full catalog — 58 universities, 196 programs",
+      "detailPages": "University & program detail pages, housing costs, campus photos",
+      "communityRead": "Read every community review, group, and question",
+      "communityWrite": "Write in the community with a verified university email"
+    },
+    "cta": "Keep exploring on Free"
+  },
+  "premium": {
+    "heading": "Premium",
+    "badge": "Recommended",
+    "tagline": "Everything in Free, plus the tools that get you admitted.",
+    "priceSuffix": "/month · cancel any time",
+    "features": {
+      "matching": "AI matching — the guided quiz and free-text AI search, with personalised rationales",
+      "tracking": "Application tracking — shortlist, compare, deadlines, and the task board",
+      "documents": "AI document studio — tailored CV and cover-letter drafts",
+      "messaging": "Message campus responsibles directly"
+    },
+    "cta": "Activate Premium & continue",
+    "demoNote": "Demo mode: this button simulates a successful checkout. In the full version this is where secure payment happens."
+  },
+  "footerNote": "The community stays open to everyone — reading needs no account, and a verified university email (not a subscription) unlocks writing."
+}

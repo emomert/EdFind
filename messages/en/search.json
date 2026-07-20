@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "AI Search",
+    "description": "Describe your ideal master's in plain language. Our AI parses it and matches against every program in the catalog."
+  },
+  "badge": "AI-powered search",
+  "heading": "Tell us what you're looking for",
+  "intro": "Describe your ideal master's in your own words — country, field, budget, timeline, anything. Our AI will translate your description into a structured profile and match it against every program in our catalog.",
+  "form": {
+    "queryLabel": "Your query",
+    "placeholder": "e.g. 'I want a 2-year management masters in Italy or Spain, under €15k a year, with a year of internship experience.'",
+    "charsRemaining": "{count, plural, one {Add at least # more character} other {Add at least # more characters}}",
+    "charCount": "{count} / 1000 characters",
+    "submitHint": "Press <kbd>⌘ Enter</kbd> to submit",
+    "submit": "Match me to programs",
+    "preferQuiz": "Prefer a guided quiz instead?"
+  },
+  "examples": {
+    "heading": "Need inspiration? Try one of these",
+    "items": [
+      "I want a 2-year management masters in Italy or Spain, under €15k a year, and I have a year of internship experience.",
+      "Looking for a research-heavy AI masters in Germany or Switzerland. I'd like to do a PhD after. English is fluent.",
+      "I'm a fresh econ graduate, need scholarship, want to study finance in the Netherlands or Sweden. Plan to work in Europe after."
+    ]
+  },
+  "error": {
+    "heading": "Something went wrong",
+    "fallback": "Please try again.",
+    "editQuery": "Edit your query",
+    "tryAgain": "Try again"
+  },
+  "actions": {
+    "tooShort": "Please describe what you're looking for in a bit more detail (at least 8 characters).",
+    "signInRequired": "Please sign in to run a search.",
+    "parseFailed": "Couldn't understand that query. Try rephrasing or use the quiz."
+  }
+}

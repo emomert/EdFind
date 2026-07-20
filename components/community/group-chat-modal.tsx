@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Crown, Lock, Send, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import type {
@@ -43,6 +44,7 @@ export function GroupChatModal({
   universityName?: string;
   universityLogoUrl?: string | null;
 }) {
+  const t = useTranslations("community");
   return (
     <AnimatePresence>
       {open && group && (
@@ -80,9 +82,9 @@ export function GroupChatModal({
                   {group.name}
                 </h2>
                 <p className="text-xs text-slate-500">
-                  {group.memberCount.toLocaleString()} members ·{" "}
+                  {t("group.memberCount", { count: group.memberCount })} ·{" "}
                   <span className="text-teal-700">
-                    {group.verifiedStudentCount} verified
+                    {t("group.verifiedCount", { count: group.verifiedStudentCount })}
                   </span>
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
@@ -95,7 +97,7 @@ export function GroupChatModal({
                         ))}
                       </span>
                       <Crown className="size-3 text-amber-500" />
-                      Campus responsible{responsibles.length > 1 ? "s" : ""}
+                      {t("group.responsiblePlural", { count: responsibles.length })}
                     </span>
                   )}
                   <Link
@@ -103,7 +105,7 @@ export function GroupChatModal({
                     onClick={onClose}
                     className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-1 text-[11px] font-medium text-teal-700 ring-1 ring-teal-200 transition hover:bg-teal-50"
                   >
-                    {group.type === "program" ? "Program page" : "University page"}
+                    {group.type === "program" ? t("group.programPage") : t("group.universityPage")}
                     <ArrowUpRight className="size-3" />
                   </Link>
                 </div>
@@ -112,7 +114,7 @@ export function GroupChatModal({
                 type="button"
                 onClick={onClose}
                 className="inline-flex size-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                aria-label="Close"
+                aria-label={t("chat.closeAriaLabel")}
               >
                 <X className="size-4" />
               </button>
@@ -141,6 +143,7 @@ function ChatBody({
   users: Readonly<Record<string, CommunityUser>>;
 }) {
   const { canWrite } = useVerification();
+  const t = useTranslations("community.chat");
   const [draft, setDraft] = useState("");
   const [optimisticMessages, setOptimisticMessages] = useState<CommunityMessage[]>([]);
 
@@ -174,7 +177,7 @@ function ChatBody({
               user={
                 m.userId === "user_me"
                   ? {
-                      name: "You",
+                      name: t("you"),
                       role: "applicant",
                       verified: false,
                       enrolled: false,
@@ -208,7 +211,7 @@ function ChatBody({
                   send();
                 }
               }}
-              placeholder="Ask about applications, housing, workload, scholarships…"
+              placeholder={t("composerPlaceholder")}
               className="flex-1 resize-none bg-transparent px-2 py-1.5 text-sm placeholder:text-slate-400 focus:outline-none"
             />
             <button
@@ -216,7 +219,7 @@ function ChatBody({
               onClick={send}
               disabled={!draft.trim()}
               className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-white transition hover:bg-teal-700 disabled:opacity-40"
-              aria-label="Send"
+              aria-label={t("sendAriaLabel")}
             >
               <Send className="size-4" />
             </button>
@@ -236,6 +239,7 @@ function Message({
   user?: CommunityUser;
   isSelf: boolean;
 }) {
+  const t = useTranslations("community.badges");
   if (!user) return null;
   return (
     <motion.div
@@ -261,7 +265,7 @@ function Message({
           )}
           {message.isFromCampusResponsible && (
             <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-200">
-              <Crown className="size-2.5" /> Responsible
+              <Crown className="size-2.5" /> {t("responsible")}
             </span>
           )}
           <span className="text-[10px] text-slate-400">
@@ -286,17 +290,17 @@ function Message({
 }
 
 function EmptyChat() {
+  const t = useTranslations("community.chat");
   return (
     <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
       <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-100 to-emerald-100 text-teal-700">
         <Lock className="size-5" />
       </div>
       <h3 className="text-sm font-semibold text-slate-800">
-        This community is just getting started
+        {t("emptyHeading")}
       </h3>
       <p className="max-w-xs text-xs text-slate-500">
-        Be the first to break the ice — say hi or ask the question you came
-        here to ask.
+        {t("emptyBody")}
       </p>
       <ArrowRight className="size-3 text-slate-300" />
     </div>

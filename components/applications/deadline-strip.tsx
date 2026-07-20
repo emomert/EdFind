@@ -1,9 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import { CalendarClock } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import type { Locale } from "@/lib/i18n/config";
 import type { ApplicationItem } from "./types";
 
 function daysUntil(dateStr: string): number | null {
@@ -14,11 +16,11 @@ function daysUntil(dateStr: string): number | null {
   return Math.round((t - today.getTime()) / (24 * 60 * 60 * 1000));
 }
 
-function shortDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-  });
+function shortDate(dateStr: string, locale: Locale): string {
+  return new Date(dateStr).toLocaleDateString(
+    locale === "tr" ? "tr-TR" : "en-GB",
+    { day: "numeric", month: "short" },
+  );
 }
 
 const TERMINAL = new Set(["accepted", "rejected", "withdrawn"]);
@@ -30,6 +32,8 @@ const TERMINAL = new Set(["accepted", "rejected", "withdrawn"]);
  * a list scan. Renders nothing when there's nothing time-critical.
  */
 export function DeadlineStrip({ items }: { items: ApplicationItem[] }) {
+  const t = useTranslations("applications.deadlineStrip");
+  const locale = useLocale() as Locale;
   const upcoming = items
     .filter((it) => !TERMINAL.has(it.status))
     .map((it) => {
@@ -56,12 +60,12 @@ export function DeadlineStrip({ items }: { items: ApplicationItem[] }) {
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.15, duration: 0.4 }}
-      aria-label="Upcoming deadlines"
+      aria-label={t("ariaLabel")}
       className="mt-4 flex items-center gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white/80 px-3 py-2.5 shadow-sm"
     >
       <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
         <CalendarClock className="size-3.5 text-teal-600" />
-        Deadlines
+        {t("heading")}
       </span>
       <div className="flex items-center gap-1.5">
         {upcoming.map(({ it, deadline, days }) => (
@@ -81,10 +85,14 @@ export function DeadlineStrip({ items }: { items: ApplicationItem[] }) {
           >
             <span className="max-w-[16ch] truncate">{it.program.name}</span>
             <span className="font-semibold tabular-nums">
-              {shortDate(deadline)}
+              {shortDate(deadline, locale)}
             </span>
             <span className="tabular-nums opacity-75">
-              {days < 0 ? "passed" : days === 0 ? "today" : `${days}d`}
+              {days < 0
+                ? t("passed")
+                : days === 0
+                  ? t("today")
+                  : t("inDays", { days })}
             </span>
           </button>
         ))}

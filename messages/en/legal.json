@@ -1,0 +1,93 @@
+{
+  "shell": {
+    "lastUpdated": "Last updated {date}"
+  },
+  "terms": {
+    "meta": {
+      "description": "The terms that govern your use of EdFind — what the service is, what we promise, and what we don't."
+    },
+    "title": "Terms of Service",
+    "intro": "These terms govern your use of EdFind. By creating an account or using the service, you agree to them. We've kept the language plain — if anything is unclear, contact us before relying on it."
+  },
+  "privacy": {
+    "meta": {
+      "description": "What EdFind collects, why, who processes it, where it's stored, and the rights you have over your data."
+    },
+    "title": "Privacy Policy",
+    "intro": "EdFind is built for students in Turkey, hosted in the EU, and designed to collect as little as it needs to match you well. This policy explains what we collect, why, who helps us process it, and the rights you have."
+  },
+  "technicalReport": {
+    "meta": {
+      "title": "How EdFind works — technical overview",
+      "description": "A plain-English technical overview of how EdFind matches students to master's programs, the stack behind it, and the exact AI prompts we use."
+    },
+    "eyebrow": "Transparency",
+    "title": "How EdFind works",
+    "intro": "We think a tool that recommends life decisions should be honest about how it does it. This page explains, in plain terms, what happens under the hood — the stack, the matching pipeline, our neutrality rules, and the actual AI prompts we send to the model.",
+    "sections": {
+      "whatItsDoing": {
+        "heading": "What EdFind is doing",
+        "body": "Master's information for European universities is scattered across hundreds of sites, in different languages and formats. EdFind pulls a curated slice of it into one structured, searchable database, then uses a large language model to reason over your profile and that catalog to surface programs worth a closer look. It is a research accelerator, not an oracle — every figure links back to a source you should verify."
+      },
+      "stack": {
+        "heading": "The stack",
+        "items": {
+          "webApp": "<strong>Web app:</strong> Next.js 16 (App Router) with TypeScript, Tailwind CSS, and shadcn/ui components. Rendered mostly as React Server Components.",
+          "dataAuth": "<strong>Data + auth:</strong> Supabase (PostgreSQL, authentication, and storage) hosted in the EU (Ireland). Access is enforced at the database level with Row-Level Security, not just in app code.",
+          "hosting": "<strong>Hosting:</strong> Vercel.",
+          "ai": "<strong>AI:</strong> DeepSeek V4 Flash (<code>deepseek-v4-flash</code>), called server-side only. Reasoning mode is disabled so the model returns structured JSON directly."
+        },
+        "note": "Every AI call and every privileged database call happens on the server. API keys never reach your browser."
+      },
+      "howMatch": {
+        "heading": "How a match is made",
+        "intro": "The guided quiz is {totalSteps} questions (schema version {answersVersion}). When you submit it:",
+        "steps": {
+          "step1": "Your answers are validated on the server against a strict schema — every value must be a known option or within bounds before anything is stored.",
+          "step2": "We load the full program catalog from the database and compact it into a machine-readable list (program, university, field, language, duration, tuition + currency, rankings).",
+          "step3": "We send your profile and that catalog to the model with the <strong>matching prompt</strong> below. It applies hard filters (destination, language, budget, duration) and soft fits (field, academic focus, GPA, work experience, your free-text notes), then returns the three best programs with a 0–100 score and a personalised rationale.",
+          "step4": "We validate the model's output, drop anything that doesn't point at a real program, store the top three, and show you the results."
+        },
+        "note": "The matcher never invents facts about a program: it can only rank what is in the catalog, and it's instructed to acknowledge trade-offs rather than oversell."
+      },
+      "freeTextSearch": {
+        "heading": "Free-text search",
+        "body": "If you describe what you want in your own words instead of taking the quiz, a separate <strong>parser prompt</strong> first maps your sentence onto the same structured profile (filling only what you actually said and leaving the rest blank), and then the identical matching pipeline runs. Your exact wording is also passed through so the rationale can quote you."
+      },
+      "documentDrafting": {
+        "heading": "AI document drafting",
+        "body": "The application tracker can draft a CV or a program-specific cover letter. These prompts are deliberately strict about fabrication: the model may only use facts you typed and verified catalog data about the program, and anything missing becomes a bracketed placeholder for you to fill in. A draft is a starting point you edit — never something to send as-is."
+      },
+      "neutrality": {
+        "heading": "Neutrality",
+        "body": "Partner universities are content-tagged and surfaced as their own tier. They are <strong>never silently boosted</strong> inside neutral matching results — the prompt ranks on fit, not on commercial relationship. This is a product promise, enforced by keeping partner status out of the ranking signal."
+      },
+      "aiResearchedData": {
+        "heading": "AI-researched data",
+        "body": "Some content — housing costs, cost-of-living estimates, and university campus photos — is researched with AI agents that read public sources and cite them. These are clearly labelled as estimates, dated, and shown with their sources. Currency figures carry an approximate euro conversion for convenience. Always treat them as a starting point, not a quote."
+      },
+      "promptsIntro": {
+        "heading": "The exact prompts we use",
+        "body": "For full transparency, here are the verbatim system instructions sent to the model. They're rendered straight from the running code, so what you see here is what the product actually uses (the prompts evolve as we tune quality)."
+      },
+      "privacySecurity": {
+        "heading": "Privacy & security in brief",
+        "body": "We collect what we need to match you and remember your progress, store it in the EU, and never sell it. Your quiz answers are sent to the AI model provider to generate matches — so please keep sensitive details out of free-text boxes. The full detail, including your rights and how to delete your data, is in our <privacyLink>Privacy Policy</privacyLink>. The terms of use are in our <termsLink>Terms of Service</termsLink>."
+      },
+      "limitations": {
+        "heading": "Honest limitations",
+        "items": {
+          "item1": "The catalog is a curated subset of European master's programs, not every program that exists.",
+          "item2": "AI matches are suggestions. They can be wrong, miss context, or reflect stale data. Verify everything that matters on the official site.",
+          "item3": "Rankings, tuition, deadlines, and housing costs change — we date what we can and link sources, but currency and timing drift."
+        }
+      }
+    },
+    "promptLabels": {
+      "matching": "Matching prompt (quiz + search results)",
+      "parser": "Free-text query parser prompt (/search)",
+      "cv": "CV drafting prompt (document studio on /applications)",
+      "coverLetter": "Cover-letter drafting prompt (document studio on /applications)"
+    }
+  }
+}

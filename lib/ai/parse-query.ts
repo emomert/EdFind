@@ -72,6 +72,7 @@ Allowed values:
 - work_experience: none, 1-2_years, 3-5_years, 5_plus_years. Map "fresh graduate" / "no experience" → none, "couple years" → 1-2_years, "five years" → 5_plus_years, "few years" → 1-2_years.
 
 Rules:
+- The query may be written in Turkish, English, or a mix (EdFind's audience is Turkish students). Interpret Turkish phrasing exactly like its English equivalent — e.g. "Almanya'da ücretsiz yüksek lisans" → destinations ["DE"] + budget_per_year "tuition_free", "burs şart" → scholarship_need "required", "İngilizcem B2" → english_level "upper_intermediate". The allowed output values themselves never change.
 - If a field is genuinely not mentioned or unclear, set it to null. Do NOT guess.
 - For destinations specifically, if the student says "anywhere in Europe" or "no preference", use ["ANY"]; if they don't mention any country at all, use null (server will fill in ["ANY"]).
 - Never invent a value not in the allowed lists.

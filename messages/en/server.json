@@ -1,0 +1,9 @@
+{
+  "errors": {
+    "signInRequired": "Please sign in to submit your profile.",
+    "profileSaveFailed": "Couldn't save your profile. Please try again.",
+    "catalogNotReady": "Our program catalog isn't ready yet. Please try again shortly.",
+    "matcherFailed": "Couldn't run the matcher. Please try again.",
+    "matchesSaveFailed": "Couldn't save your matches. Please try again."
+  }
+}

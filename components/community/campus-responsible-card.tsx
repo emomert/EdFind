@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Clock, Crown, Languages, MessageCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { CommunityUser } from "@/lib/community/types";
 import { VerifiedBadge } from "./verified-badge";
 import { UserAvatar } from "./user-avatar";
@@ -16,6 +17,7 @@ export function CampusResponsibleCard({
   universityName: string;
 }) {
   const { isSubscribed } = useSubscription();
+  const t = useTranslations("community");
 
   return (
     <motion.article
@@ -29,7 +31,7 @@ export function CampusResponsibleCard({
       <div className="absolute right-3 top-3">
         <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700 ring-1 ring-amber-200">
           <Crown className="size-2.5" />
-          Responsible
+          {t("badges.responsible")}
         </span>
       </div>
 
@@ -80,7 +82,7 @@ export function CampusResponsibleCard({
           className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-teal-600 px-3 py-2 text-xs font-medium text-white shadow-sm transition hover:bg-teal-700"
         >
           <MessageCircle className="size-3.5" />
-          {`Message ${user.name.split(" ")[0]}`}
+          {t("common.messageName", { name: user.name.split(" ")[0] })}
         </button>
       ) : (
         // Direct messages are THE Premium perk — this is where the paywall
@@ -90,7 +92,7 @@ export function CampusResponsibleCard({
           className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-teal-300 hover:text-teal-700"
         >
           <MessageCircle className="size-3.5" />
-          {`Go Premium to message ${user.name.split(" ")[0]}`}
+          {t("responsible.goPremiumToMessage", { name: user.name.split(" ")[0] })}
         </Link>
       )}
     </motion.article>

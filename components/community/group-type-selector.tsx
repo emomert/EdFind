@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Building2, GraduationCap, LayoutGrid } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 
@@ -9,18 +10,18 @@ export type GroupTypeFilter = "all" | "university" | "program";
 
 const OPTIONS: ReadonlyArray<{
   key: GroupTypeFilter;
-  label: string;
+  labelKey: string;
   icon: React.ReactNode;
 }> = [
-  { key: "all", label: "All", icon: <LayoutGrid className="size-3.5" /> },
+  { key: "all", labelKey: "all", icon: <LayoutGrid className="size-3.5" /> },
   {
     key: "university",
-    label: "Universities",
+    labelKey: "universities",
     icon: <Building2 className="size-3.5" />,
   },
   {
     key: "program",
-    label: "Programs",
+    labelKey: "programs",
     icon: <GraduationCap className="size-3.5" />,
   },
 ];
@@ -34,10 +35,11 @@ export function GroupTypeSelector({
   onChange: (v: GroupTypeFilter) => void;
   counts: Record<GroupTypeFilter, number>;
 }) {
+  const t = useTranslations("community.groupType");
   return (
     <div
       role="tablist"
-      aria-label="Filter groups by type"
+      aria-label={t("ariaLabel")}
       className="inline-flex items-center gap-0.5 rounded-full border border-slate-200 bg-white p-1 shadow-sm"
     >
       {OPTIONS.map((opt) => {
@@ -65,7 +67,7 @@ export function GroupTypeSelector({
               <span className={active ? "text-teal-600" : "text-slate-400"}>
                 {opt.icon}
               </span>
-              {opt.label}
+              {t(opt.labelKey)}
               <span
                 className={cn(
                   "rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums",

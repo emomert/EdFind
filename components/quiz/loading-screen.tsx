@@ -3,18 +3,28 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { MarkerCheck, MarkerSparkles } from "@/components/decor/marker";
 
 type Stage = {
+  key: string;
   label: string;
   durationMs: number;
 };
 
 const STAGES: Stage[] = [
-  { label: "Reading your preferences", durationMs: 700 },
-  { label: "Searching the European master's catalog", durationMs: 900 },
-  { label: "Asking the AI matcher to rank your top 3", durationMs: 1200 },
+  { key: "readingPreferences", label: "Reading your preferences", durationMs: 700 },
+  {
+    key: "searchingCatalog",
+    label: "Searching the European master's catalog",
+    durationMs: 900,
+  },
+  {
+    key: "askingAi",
+    label: "Asking the AI matcher to rank your top 3",
+    durationMs: 1200,
+  },
 ];
 
 type Props = {
@@ -22,6 +32,7 @@ type Props = {
 };
 
 export function QuizLoadingScreen({ onComplete }: Props) {
+  const t = useTranslations("quiz");
   const [stageIndex, setStageIndex] = useState(0);
   const reduce = useReducedMotion();
 
@@ -63,20 +74,23 @@ export function QuizLoadingScreen({ onComplete }: Props) {
       />
       <Loader2 className="size-12 animate-spin text-primary" aria-hidden="true" />
       <h2 className="mt-6 text-2xl font-semibold tracking-tight">
-        Matching you to programs…
+        {t.has("loading.title") ? t("loading.title") : "Matching you to programs…"}
       </h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        Our AI is comparing your answers against every program in the catalog.
-        This usually takes about 2 seconds.
+        {t.has("loading.subtitle")
+          ? t("loading.subtitle")
+          : "Our AI is comparing your answers against every program in the catalog. This usually takes about 2 seconds."}
       </p>
 
       <ol className="mt-8 w-full space-y-3 text-left">
         {STAGES.map((stage, index) => {
           const status =
             index < stageIndex ? "done" : index === stageIndex ? "active" : "pending";
+          const stageKey = `loading.stages.${stage.key}`;
+          const stageLabel = t.has(stageKey) ? t(stageKey) : stage.label;
           return (
             <li
-              key={stage.label}
+              key={stage.key}
               className={cn(
                 "flex items-center gap-3 rounded-xl border p-3 transition-colors",
                 status === "done" && "border-primary/30 bg-secondary/40 text-foreground",
@@ -113,7 +127,7 @@ export function QuizLoadingScreen({ onComplete }: Props) {
                   <span className="size-2 rounded-full bg-current" />
                 )}
               </span>
-              <span className="text-sm font-medium">{stage.label}</span>
+              <span className="text-sm font-medium">{stageLabel}</span>
             </li>
           );
         })}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/auth";
@@ -8,10 +9,13 @@ import {
   type ShortlistItem,
 } from "@/components/shortlist/shortlist-client";
 
-export const metadata: Metadata = {
-  title: "Your shortlist",
-  description: "Programs you've saved.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("results.meta.shortlist");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 // The shortlist was merged into the applications tracker (2026-06-09): a
 // "saved" program is an application at status 'interested'. This page is the

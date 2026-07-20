@@ -1,0 +1,176 @@
+{
+  "meta": {
+    "title": "Community — Verified Student Insights",
+    "description": "Real experiences from verified students across Europe. Join university and program communities, ask questions, and choose your best path."
+  },
+  "hero": {
+    "badge": "Verified Student Insights",
+    "heading": "Real experiences. Real students. <highlight>Real answers.</highlight>",
+    "body": "Join university and program communities to ask questions, compare experiences, and choose your best path. Every voice is verified — no spam, no anonymous noise.",
+    "chips": {
+      "verifiedOnly": "Verified only",
+      "europeanFocus": "European focus",
+      "communityDriven": "Community driven",
+      "campusResponsibles": "Campus responsibles",
+      "programSpecificGroups": "Program-specific groups"
+    }
+  },
+  "tabs": {
+    "ariaLabel": "Community sections",
+    "reviews": "Reviews",
+    "groups": "Groups",
+    "questions": "Questions",
+    "responsibles": "Campus Responsibles"
+  },
+  "filters": {
+    "searchPlaceholder": "Search reviews, groups, questions…",
+    "countryAriaLabel": "Filter by country",
+    "universityAriaLabel": "Filter by university",
+    "fieldAriaLabel": "Filter by field",
+    "sortAriaLabel": "Sort results",
+    "sortPrefix": "Sort:",
+    "allCountries": "All countries",
+    "allUniversities": "All universities",
+    "allFields": "All fields",
+    "verifiedOnly": "Verified only",
+    "sort": {
+      "mostHelpful": "Most helpful",
+      "mostActive": "Most active",
+      "mostRecent": "Most recent",
+      "mostMembers": "Most members",
+      "highestRated": "Highest rated"
+    }
+  },
+  "groupType": {
+    "ariaLabel": "Filter groups by type",
+    "all": "All",
+    "universities": "Universities",
+    "programs": "Programs"
+  },
+  "actionCards": {
+    "verifyNote": "{action} is for verified students — confirm your university email in the “Become a verified student” card.",
+    "askAction": "Asking questions",
+    "shareAction": "Writing reviews",
+    "ask": {
+      "heading": "Ask the community",
+      "body": "Stuck on something specific? Drop a question — verified students and responsibles answer fastest when the question is clear and short.",
+      "button": "Ask a question"
+    },
+    "share": {
+      "heading": "Share your experience",
+      "body": "Already studying or graduated? Write a verified review and help the next cohort make a better decision.",
+      "button": "Write a review"
+    }
+  },
+  "verify": {
+    "errors": {
+      "invalidEmail": "That doesn't look like a valid email address.",
+      "freeMail": "Personal providers (Gmail, Outlook, …) don't count — use your university address.",
+      "notAcademic": "We couldn't recognise this as a university domain. Double-check the address.",
+      "alreadyVerified": "Your account already has a verified university email.",
+      "cooldown": "We just sent you a link — wait a couple of minutes before requesting another.",
+      "sendFailed": "We couldn't send the email right now. Please try again.",
+      "storageFailed": "Something went wrong saving your request. Please try again.",
+      "unauthorized": "Please sign in again, then retry.",
+      "network": "Network error — please try again."
+    },
+    "verifiedHeading": "Verified student",
+    "verifiedBody": "You can chat, review, and ask questions across the community.",
+    "sentBody": "We emailed a confirmation link to <strong>{email}</strong>. It's valid for 24 hours — check your inbox (and spam).",
+    "devModeLabel": "Dev mode — email sending not configured",
+    "devLinkFor": "Confirmation link for <strong>{email}</strong>:",
+    "emailPlaceholder": "you@university.edu",
+    "emailAriaLabel": "University email address",
+    "expiredNotice": "Your previous link expired — request a new one.",
+    "sending": "Sending link…",
+    "sendButton": "Send confirmation link",
+    "resend": "Resend or use a different address",
+    "inputVariantNotice": "Only verified students can send messages — confirm your university email to join the conversation.",
+    "sidebarHeading": "Become a verified student",
+    "sidebarBody": "Everyone can read the community. To write — chat, reviews, questions — confirm a university email address linked to your account."
+  },
+  "badges": {
+    "verifiedEnrolledStudent": "Verified enrolled student",
+    "responsible": "Responsible",
+    "roleProspect": "Prospect",
+    "roleApplicant": "Applicant",
+    "roleVerifiedStudent": "Verified Student",
+    "roleAlumni": "Alumni",
+    "roleCampusResponsible": "Campus Responsible"
+  },
+  "common": {
+    "reply": "Reply",
+    "preview": "Preview",
+    "messageName": "Message {name}"
+  },
+  "review": {
+    "helpful": "Helpful · {count}",
+    "subscribeToMessage": "Subscribe to message",
+    "reportAriaLabel": "Report"
+  },
+  "question": {
+    "replies": "{count, plural, one {# reply} other {# replies}}",
+    "verifyToReply": "Verify to reply"
+  },
+  "group": {
+    "typeProgram": "Program",
+    "typeUniversity": "University",
+    "activityLow": "Quiet",
+    "activityMedium": "Active",
+    "activityHigh": "Buzzing",
+    "activityTitle": "Activity: {label}",
+    "verifiedCount": "{count} verified",
+    "memberCount": "{count, plural, one {# member} other {# members}}",
+    "latestDiscussion": "Latest discussion · ",
+    "responsiblePlural": "{count, plural, one {Campus responsible} other {Campus responsibles}}",
+    "responsibleComingSoon": "Responsible coming soon",
+    "programPage": "Program page",
+    "universityPage": "University page",
+    "joinChat": "Join chat"
+  },
+  "client": {
+    "emptyReviews": "No reviews match your filters yet.",
+    "emptyGroups": "No groups match your filters yet.",
+    "emptyQuestions": "No popular questions for this filter yet.",
+    "emptyResponsibles": "No campus responsibles match this filter. Try clearing it — every university has one.",
+    "typeHintUniversity": "University-wide communities — meet the whole cohort.",
+    "typeHintProgram": "Program-specific communities — laser-focused on one master's.",
+    "typeHintAll": "Universities and programs in one view.",
+    "showingCount": "Showing {shown} of {total} groups. Refine filters to narrow."
+  },
+  "chat": {
+    "closeAriaLabel": "Close",
+    "sendAriaLabel": "Send",
+    "composerPlaceholder": "Ask about applications, housing, workload, scholarships…",
+    "emptyHeading": "This community is just getting started",
+    "emptyBody": "Be the first to break the ice — say hi or ask the question you came here to ask.",
+    "you": "You"
+  },
+  "upgrade": {
+    "ctaDefault": "Upgrade to join the conversation",
+    "inputMessageDefault": "Subscribe to send messages in this community.",
+    "goPremium": "Go Premium",
+    "inlineMessageDefault": "Subscribe to unlock",
+    "panelHeading": "Unlock the full Community",
+    "panelMessageDefault": "Subscribe to message verified students and EdFind campus responsibles, join group chats, and access detailed program-specific insights.",
+    "bullets": {
+      "messageResponsibles": "Message campus responsibles",
+      "joinGroupChats": "Join group chats",
+      "replyDiscussions": "Reply to discussions",
+      "detailedInsights": "Detailed verified-student insights"
+    },
+    "priceLine": "€5/month · cancel any time"
+  },
+  "responsible": {
+    "goPremiumToMessage": "Go Premium to message {name}"
+  },
+  "devToggle": {
+    "heading": "Demo mode",
+    "body": "Stripe isn't wired yet. Flip between Free and Premium to preview both states. Saves to a cookie.",
+    "free": "Free",
+    "premium": "Premium",
+    "freeDescription": "Public previews only",
+    "premiumDescription": "Full access",
+    "pillLabel": "Demo: {state}"
+  }
+}

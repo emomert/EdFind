@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,6 @@ import type { ApplicationStatus } from "@/app/applications/actions";
 import { ApplicationCard } from "./application-card";
 import {
   ALL_APPLICATION_STATUSES,
-  APPLICATION_STATUS_LABELS,
   STATUS_PROGRESS_WEIGHT,
   type ApplicationItem,
   type TaskItem,
@@ -33,6 +33,7 @@ export function ApplicationsOverview({
   tasks: TaskItem[];
   setItems: React.Dispatch<React.SetStateAction<ApplicationItem[]>>;
 }) {
+  const t = useTranslations("applications");
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | "all">(
     "all",
@@ -72,12 +73,15 @@ export function ApplicationsOverview({
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold tracking-tight text-foreground">
-            Your applications
+            {t("overview.heading")}
           </h2>
           <p className="text-sm text-muted-foreground">
             {items.length === 0
-              ? "Programs you start tracking will show up here."
-              : `${filtered.length} of ${items.length} program${items.length === 1 ? "" : "s"}`}
+              ? t("overview.emptyHint")
+              : t("overview.countSummary", {
+                  filtered: filtered.length,
+                  total: items.length,
+                })}
           </p>
         </div>
       </header>
@@ -89,7 +93,7 @@ export function ApplicationsOverview({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search programs or universities…"
+            placeholder={t("overview.searchPlaceholder")}
             className="w-full rounded-full border border-slate-200 bg-white py-1.5 pl-8 pr-3 text-sm shadow-sm transition focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
           />
         </label>
@@ -100,19 +104,19 @@ export function ApplicationsOverview({
           }
           className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm shadow-sm transition focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
         >
-          <option value="all">All statuses</option>
+          <option value="all">{t("overview.allStatuses")}</option>
           {ALL_APPLICATION_STATUSES.map((s) => (
             <option key={s} value={s}>
-              {APPLICATION_STATUS_LABELS[s]}
+              {t(`status.${s}`)}
             </option>
           ))}
         </select>
         <div className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-1 py-1 text-xs font-medium text-slate-600 shadow-sm">
           <SlidersHorizontal className="ml-1 size-3 text-slate-400" />
           {([
-            ["deadline", "Deadline"],
-            ["recent", "Recent"],
-            ["status", "Progress"],
+            ["deadline", t("overview.sort.deadline")],
+            ["recent", t("overview.sort.recent")],
+            ["status", t("overview.sort.status")],
           ] as const).map(([k, label]) => (
             <button
               key={k}
@@ -171,6 +175,7 @@ export function ApplicationsOverview({
 }
 
 function EmptyApplicationsState({ hasAnyApps }: { hasAnyApps: boolean }) {
+  const t = useTranslations("applications.overview");
   return (
     <motion.div
       layout
@@ -204,20 +209,20 @@ function EmptyApplicationsState({ hasAnyApps }: { hasAnyApps: boolean }) {
         </div>
       )}
       <h3 className="mt-4 text-base font-semibold tracking-tight">
-        {hasAnyApps ? "Nothing matches that filter." : "No applications yet."}
+        {hasAnyApps ? t("emptyFiltered.title") : t("emptyNone.title")}
       </h3>
       <p className="mx-auto mt-1 max-w-sm text-sm text-slate-500">
         {hasAnyApps
-          ? "Try a different status or clear the search."
-          : "Open any program page and hit “Save”. It'll show up here as one you're interested in."}
+          ? t("emptyFiltered.description")
+          : t("emptyNone.description")}
       </p>
       {!hasAnyApps && (
         <div className="mt-5 flex justify-center gap-2">
           <Button asChild size="sm">
-            <Link href="/quiz">Find programs with the quiz</Link>
+            <Link href="/quiz">{t("emptyNone.quizCta")}</Link>
           </Button>
           <Button asChild size="sm" variant="outline">
-            <Link href="/catalog">Browse the catalog</Link>
+            <Link href="/catalog">{t("emptyNone.catalogCta")}</Link>
           </Button>
         </div>
       )}

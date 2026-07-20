@@ -52,3 +52,4 @@ What did we choose, in one or two sentences.
 - [0004 — Resend transactional email](0004-resend-transactional-email.md)
 - [0005 — Entitlements not on `profiles.tier`](0005-entitlements-not-on-profiles.md) *(Proposed)*
 - [0006 — AI rate limiting](0006-ai-rate-limiting.md) *(Proposed)*
+- [0007 — Turkish localization via next-intl](0007-i18n-next-intl.md)

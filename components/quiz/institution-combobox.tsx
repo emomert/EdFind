@@ -2,6 +2,7 @@
 
 import { useId, useMemo, useRef, useState } from "react";
 import { Building2, Check, Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import {
@@ -25,6 +26,7 @@ export function InstitutionCombobox({
   value: string | null;
   onChange: (next: string | null) => void;
 }) {
+  const t = useTranslations("quiz.questions.institution");
   const [query, setQuery] = useState(value ?? "");
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -92,7 +94,11 @@ export function InstitutionCombobox({
           aria-autocomplete="list"
           autoComplete="off"
           value={query}
-          placeholder="Search for your university…"
+          placeholder={
+            t.has("searchPlaceholder")
+              ? t("searchPlaceholder")
+              : "Search for your university…"
+          }
           onChange={(e) => handleChange(e.target.value)}
           onFocus={() => query.trim().length > 0 && setOpen(true)}
           onKeyDown={handleKeyDown}
@@ -152,8 +158,21 @@ export function InstitutionCombobox({
               >
                 <Search className="size-4 shrink-0 text-muted-foreground" />
                 <span className="min-w-0 flex-1 text-muted-foreground">
-                  Use my own:{" "}
-                  <span className="font-medium text-foreground">“{query.trim()}”</span>
+                  {t.has("useMyOwn") ? (
+                    t.rich("useMyOwn", {
+                      query: query.trim(),
+                      b: (chunks) => (
+                        <span className="font-medium text-foreground">{chunks}</span>
+                      ),
+                    })
+                  ) : (
+                    <>
+                      Use my own:{" "}
+                      <span className="font-medium text-foreground">
+                        “{query.trim()}”
+                      </span>
+                    </>
+                  )}
                 </span>
               </button>
             </li>
@@ -162,7 +181,9 @@ export function InstitutionCombobox({
       ) : null}
 
       <p className="mt-2 text-xs text-muted-foreground">
-        Not listed? Just type it in — we&apos;ll use exactly what you write.
+        {t.has("notListedHint")
+          ? t("notListedHint")
+          : "Not listed? Just type it in — we'll use exactly what you write."}
       </p>
     </div>
   );

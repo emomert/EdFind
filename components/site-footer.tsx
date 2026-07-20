@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { Logo } from "@/components/logo";
 import { APPLICATIONS_ENABLED, COMMUNITY_ENABLED } from "@/lib/feature-flags";
@@ -6,26 +7,28 @@ import { APPLICATIONS_ENABLED, COMMUNITY_ENABLED } from "@/lib/feature-flags";
 type FooterLink = { href: string; label: string; external?: boolean };
 
 export function SiteFooter() {
+  const t = useTranslations("common.footer");
+
   const explore: FooterLink[] = [
-    { href: "/start", label: "Find programs" },
-    { href: "/catalog", label: "Browse the catalog" },
+    { href: "/start", label: t("findPrograms") },
+    { href: "/catalog", label: t("browseCatalog") },
     ...(COMMUNITY_ENABLED
-      ? [{ href: "/community", label: "Community" }]
+      ? [{ href: "/community", label: t("community") }]
       : []),
   ];
 
   const account: FooterLink[] = [
-    { href: "/quiz", label: "Take the quiz" },
+    { href: "/quiz", label: t("takeQuiz") },
     ...(APPLICATIONS_ENABLED
-      ? [{ href: "/applications", label: "My applications" }]
+      ? [{ href: "/applications", label: t("myApplications") }]
       : []),
-    { href: "/login", label: "Sign in" },
+    { href: "/login", label: t("signIn") },
   ];
 
   const legal: FooterLink[] = [
-    { href: "/technical-report", label: "How EdFind works" },
-    { href: "/terms", label: "Terms of Service" },
-    { href: "/privacy", label: "Privacy Policy" },
+    { href: "/technical-report", label: t("howEdFindWorks") },
+    { href: "/terms", label: t("terms") },
+    { href: "/privacy", label: t("privacy") },
   ];
 
   const year = new Date().getFullYear();
@@ -37,24 +40,18 @@ export function SiteFooter() {
           <div className="max-w-xs">
             <Logo />
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Neutral, AI-supported guidance to help students in Turkey find the
-              right master&apos;s program in Europe — one searchable place
-              instead of fifty browser tabs.
+              {t("tagline")}
             </p>
           </div>
 
-          <FooterColumn title="Explore" links={explore} />
-          <FooterColumn title="Your journey" links={account} />
-          <FooterColumn title="Legal &amp; transparency" links={legal} />
+          <FooterColumn title={t("explore")} links={explore} />
+          <FooterColumn title={t("yourJourney")} links={account} />
+          <FooterColumn title={t("legalTransparency")} links={legal} />
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} EdFind. All rights reserved.</p>
-          <p className="max-w-xl sm:text-right">
-            EdFind provides information to help you choose — not admissions,
-            legal, immigration, or financial advice. Always confirm details on
-            the university&apos;s official site before you apply.
-          </p>
+          <p>{t("rights", { year })}</p>
+          <p className="max-w-xl sm:text-right">{t("disclaimer")}</p>
         </div>
       </div>
     </footer>

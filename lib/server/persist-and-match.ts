@@ -1,7 +1,9 @@
 import "server-only";
 
 import { cookies } from "next/headers";
+import { getLocale, getTranslations } from "next-intl/server";
 
+import { isLocale, DEFAULT_LOCALE } from "@/lib/i18n/config";
 import { createServiceClient } from "@/lib/supabase/server";
 import {
   ANSWERS_VERSION,
@@ -38,11 +40,17 @@ export async function persistAndMatch(
   clientId: string,
   answers: ValidatedAnswers,
 ): Promise<PersistAndMatchResult> {
-  const user = await getUser();
+  const [user, t, rawLocale] = await Promise.all([
+    getUser(),
+    getTranslations("server.errors"),
+    getLocale(),
+  ]);
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to submit your profile.",
+      error: t("signInRequired"),
       needsAuth: true,
     };
   }
@@ -63,7 +71,7 @@ export async function persistAndMatch(
 
   if (profileInsert.error || !profileInsert.data) {
     console.error("[persistAndMatch] profile insert failed", profileInsert.error);
-    return { ok: false, error: "Couldn't save your profile. Please try again." };
+    return { ok: false, error: t("profileSaveFailed") };
   }
 
   const profileId = profileInsert.data.id;
@@ -81,7 +89,7 @@ export async function persistAndMatch(
     console.error("[persistAndMatch] catalog load failed", programsRes.error);
     return {
       ok: false,
-      error: "Our program catalog isn't ready yet. Please try again shortly.",
+      error: t("catalogNotReady"),
     };
   }
 
@@ -121,10 +129,11 @@ export async function persistAndMatch(
 
   let suggestions;
   try {
-    suggestions = await matchProgramsToProfile(answers, programs);
+    // The matcher writes its rationale in the student's interface language.
+    suggestions = await matchProgramsToProfile(answers, programs, locale);
   } catch (err) {
     console.error("[persistAndMatch] matcher failed", err);
-    return { ok: false, error: "Couldn't run the matcher. Please try again." };
+    return { ok: false, error: t("matcherFailed") };
   }
 
   const matchesToInsert = suggestions.map((s) => ({
@@ -146,7 +155,7 @@ export async function persistAndMatch(
     matchesInsertRes.data.length === 0
   ) {
     console.error("[persistAndMatch] match insert failed", matchesInsertRes.error);
-    return { ok: false, error: "Couldn't save your matches. Please try again." };
+    return { ok: false, error: t("matchesSaveFailed") };
   }
 
   const sortedMatches = [...matchesInsertRes.data].sort(

@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { CLIENT_ID_COOKIE } from "@/lib/quiz/client-id";
@@ -140,14 +141,15 @@ async function assertOptionalApplicationOwnership(
 export async function toggleTrackedApplication(
   rawInput: unknown,
 ): Promise<TrackResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = TrackInputSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to track applications.",
+      error: t("signInToTrack"),
       needsAuth: true,
     };
   }
@@ -169,7 +171,7 @@ export async function toggleTrackedApplication(
       .eq("id", existing.data.id);
     if (del.error) {
       console.error("[toggleTrackedApplication] delete failed", del.error);
-      return { ok: false, error: "Couldn't untrack this application." };
+      return { ok: false, error: t("untrackFailed") };
     }
     revalidatePath("/applications");
     return { ok: true, tracked: false };
@@ -183,7 +185,7 @@ export async function toggleTrackedApplication(
   });
   if (ins.error) {
     console.error("[toggleTrackedApplication] insert failed", ins.error);
-    return { ok: false, error: "Couldn't track this application." };
+    return { ok: false, error: t("trackFailed") };
   }
   revalidatePath("/applications");
   return { ok: true, tracked: true };
@@ -192,21 +194,22 @@ export async function toggleTrackedApplication(
 export async function setApplicationStatus(
   rawInput: unknown,
 ): Promise<ActionResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = SetStatusInputSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to update applications.",
+      error: t("signInToUpdate"),
       needsAuth: true,
     };
   }
 
   const app = await loadApplicationForUser(parsed.data.applicationId, user.id);
   if (!app) {
-    return { ok: false, error: "Not authorized." };
+    return { ok: false, error: t("notAuthorized") };
   }
 
   const supabase = createServiceClient();
@@ -217,7 +220,7 @@ export async function setApplicationStatus(
     .eq("user_id", user.id);
   if (upd.error) {
     console.error("[setApplicationStatus] update failed", upd.error);
-    return { ok: false, error: "Couldn't update status." };
+    return { ok: false, error: t("statusUpdateFailed") };
   }
   revalidatePath("/applications");
   return { ok: true };
@@ -226,21 +229,22 @@ export async function setApplicationStatus(
 export async function setApplicationNotes(
   rawInput: unknown,
 ): Promise<ActionResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = SetNotesInputSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to update applications.",
+      error: t("signInToUpdate"),
       needsAuth: true,
     };
   }
 
   const app = await loadApplicationForUser(parsed.data.applicationId, user.id);
   if (!app) {
-    return { ok: false, error: "Not authorized." };
+    return { ok: false, error: t("notAuthorized") };
   }
 
   const supabase = createServiceClient();
@@ -251,7 +255,7 @@ export async function setApplicationNotes(
     .eq("user_id", user.id);
   if (upd.error) {
     console.error("[setApplicationNotes] update failed", upd.error);
-    return { ok: false, error: "Couldn't update notes." };
+    return { ok: false, error: t("notesUpdateFailed") };
   }
   return { ok: true };
 }
@@ -259,21 +263,22 @@ export async function setApplicationNotes(
 export async function setApplicationDeadline(
   rawInput: unknown,
 ): Promise<ActionResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = SetDeadlineInputSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to update applications.",
+      error: t("signInToUpdate"),
       needsAuth: true,
     };
   }
 
   const app = await loadApplicationForUser(parsed.data.applicationId, user.id);
   if (!app) {
-    return { ok: false, error: "Not authorized." };
+    return { ok: false, error: t("notAuthorized") };
   }
 
   const supabase = createServiceClient();
@@ -284,7 +289,7 @@ export async function setApplicationDeadline(
     .eq("user_id", user.id);
   if (upd.error) {
     console.error("[setApplicationDeadline] update failed", upd.error);
-    return { ok: false, error: "Couldn't update deadline." };
+    return { ok: false, error: t("deadlineUpdateFailed") };
   }
   return { ok: true };
 }
@@ -292,21 +297,22 @@ export async function setApplicationDeadline(
 export async function removeApplication(
   rawInput: unknown,
 ): Promise<ActionResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = RemoveInputSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to update applications.",
+      error: t("signInToUpdate"),
       needsAuth: true,
     };
   }
 
   const app = await loadApplicationForUser(parsed.data.applicationId, user.id);
   if (!app) {
-    return { ok: false, error: "Not authorized." };
+    return { ok: false, error: t("notAuthorized") };
   }
 
   const supabase = createServiceClient();
@@ -317,7 +323,7 @@ export async function removeApplication(
     .eq("user_id", user.id);
   if (del.error) {
     console.error("[removeApplication] delete failed", del.error);
-    return { ok: false, error: "Couldn't remove application." };
+    return { ok: false, error: t("removeFailed") };
   }
   revalidatePath("/applications");
   return { ok: true };
@@ -336,14 +342,15 @@ export async function removeApplication(
 export async function resetAllProgress(
   rawInput: unknown,
 ): Promise<ActionResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = ResetInputSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in first.",
+      error: t("signInFirst"),
       needsAuth: true,
     };
   }
@@ -370,7 +377,7 @@ export async function resetAllProgress(
   });
   if (error) {
     console.error("[resetAllProgress] rpc failed", error);
-    return { ok: false, error: "Couldn't reset progress. Try again." };
+    return { ok: false, error: t("resetFailed") };
   }
 
   revalidatePath("/applications");
@@ -402,14 +409,15 @@ export type CreatedTaskResult =
 export async function createTask(
   rawInput: unknown,
 ): Promise<CreatedTaskResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = CreateTaskSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to add tasks.",
+      error: t("signInToAddTasks"),
       needsAuth: true,
     };
   }
@@ -420,7 +428,7 @@ export async function createTask(
       user.id,
     ))
   ) {
-    return { ok: false, error: "Not authorized." };
+    return { ok: false, error: t("notAuthorized") };
   }
 
   const supabase = createServiceClient();
@@ -452,27 +460,28 @@ export async function createTask(
     .single();
   if (ins.error || !ins.data) {
     console.error("[createTask] insert failed", ins.error);
-    return { ok: false, error: "Couldn't create task." };
+    return { ok: false, error: t("taskCreateFailed") };
   }
   revalidatePath("/applications");
   return { ok: true, id: (ins.data as { id: string }).id };
 }
 
 export async function updateTask(rawInput: unknown): Promise<ActionResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = UpdateTaskSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to update tasks.",
+      error: t("signInToUpdateTasks"),
       needsAuth: true,
     };
   }
 
   const task = await loadTaskForUser(parsed.data.id, user.id);
-  if (!task) return { ok: false, error: "Not authorized." };
+  if (!task) return { ok: false, error: t("notAuthorized") };
 
   if (
     parsed.data.applicationId !== undefined &&
@@ -481,7 +490,7 @@ export async function updateTask(rawInput: unknown): Promise<ActionResult> {
       user.id,
     ))
   ) {
-    return { ok: false, error: "Not authorized." };
+    return { ok: false, error: t("notAuthorized") };
   }
 
   const patch: Record<string, unknown> = {};
@@ -502,27 +511,28 @@ export async function updateTask(rawInput: unknown): Promise<ActionResult> {
     .eq("user_id", user.id);
   if (upd.error) {
     console.error("[updateTask] update failed", upd.error);
-    return { ok: false, error: "Couldn't update task." };
+    return { ok: false, error: t("taskUpdateFailed") };
   }
   revalidatePath("/applications");
   return { ok: true };
 }
 
 export async function moveTask(rawInput: unknown): Promise<ActionResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = MoveTaskSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to update tasks.",
+      error: t("signInToUpdateTasks"),
       needsAuth: true,
     };
   }
 
   const task = await loadTaskForUser(parsed.data.id, user.id);
-  if (!task) return { ok: false, error: "Not authorized." };
+  if (!task) return { ok: false, error: t("notAuthorized") };
 
   const supabase = createServiceClient();
   const tail = await supabase
@@ -544,27 +554,28 @@ export async function moveTask(rawInput: unknown): Promise<ActionResult> {
     .eq("user_id", user.id);
   if (upd.error) {
     console.error("[moveTask] update failed", upd.error);
-    return { ok: false, error: "Couldn't move task." };
+    return { ok: false, error: t("taskMoveFailed") };
   }
   revalidatePath("/applications");
   return { ok: true };
 }
 
 export async function deleteTask(rawInput: unknown): Promise<ActionResult> {
+  const t = await getTranslations("applications.errors");
   const parsed = DeleteTaskSchema.safeParse(rawInput);
-  if (!parsed.success) return { ok: false, error: "Invalid input." };
+  if (!parsed.success) return { ok: false, error: t("invalidInput") };
 
   const user = await getUser();
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to update tasks.",
+      error: t("signInToUpdateTasks"),
       needsAuth: true,
     };
   }
 
   const task = await loadTaskForUser(parsed.data.id, user.id);
-  if (!task) return { ok: false, error: "Not authorized." };
+  if (!task) return { ok: false, error: t("notAuthorized") };
 
   const supabase = createServiceClient();
   const del = await supabase
@@ -574,7 +585,7 @@ export async function deleteTask(rawInput: unknown): Promise<ActionResult> {
     .eq("user_id", user.id);
   if (del.error) {
     console.error("[deleteTask] delete failed", del.error);
-    return { ok: false, error: "Couldn't delete task." };
+    return { ok: false, error: t("taskDeleteFailed") };
   }
   revalidatePath("/applications");
   return { ok: true };

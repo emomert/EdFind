@@ -1,8 +1,19 @@
 import { Crown, GraduationCap, MapPin, Sparkles, User } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import type { CommunityUserRole } from "@/lib/community/types";
-import { ROLE_LABELS } from "@/lib/community/types";
+
+// Maps each role to its translation key under community.badges — the
+// English labels themselves stay in lib/community/types.ts (ROLE_LABELS,
+// unowned by this pass) purely as the type's documentation default.
+const ROLE_LABEL_KEYS: Record<CommunityUserRole, string> = {
+  prospect: "roleProspect",
+  applicant: "roleApplicant",
+  verified_student: "roleVerifiedStudent",
+  alumni: "roleAlumni",
+  campus_responsible: "roleCampusResponsible",
+};
 
 const ROLE_TONE: Record<CommunityUserRole, string> = {
   prospect: "bg-slate-100 text-slate-600 ring-slate-200",
@@ -27,6 +38,7 @@ export function RoleBadge({
   role: CommunityUserRole;
   className?: string;
 }) {
+  const t = useTranslations("community.badges");
   return (
     <span
       className={cn(
@@ -36,7 +48,7 @@ export function RoleBadge({
       )}
     >
       {ROLE_ICON[role] ?? <User className="size-3" />}
-      {ROLE_LABELS[role]}
+      {t(ROLE_LABEL_KEYS[role])}
     </span>
   );
 }

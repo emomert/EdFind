@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 
 import { parseFreeTextToProfile } from "@/lib/ai/parse-query";
 import { persistAndMatch } from "@/lib/server/persist-and-match";
@@ -26,12 +27,12 @@ export type SearchResult =
  * since the data shape (profile → top 3 matches) is identical.
  */
 export async function searchByText(rawInput: unknown): Promise<SearchResult> {
+  const t = await getTranslations("search.actions");
   const parsed = SearchInputSchema.safeParse(rawInput);
   if (!parsed.success) {
     return {
       ok: false,
-      error:
-        "Please describe what you're looking for in a bit more detail (at least 8 characters).",
+      error: t("tooShort"),
     };
   }
 
@@ -40,7 +41,7 @@ export async function searchByText(rawInput: unknown): Promise<SearchResult> {
   if (!user) {
     return {
       ok: false,
-      error: "Please sign in to run a search.",
+      error: t("signInRequired"),
       needsAuth: true,
     };
   }
@@ -52,7 +53,7 @@ export async function searchByText(rawInput: unknown): Promise<SearchResult> {
     console.error("[searchByText] parser failed", err);
     return {
       ok: false,
-      error: "Couldn't understand that query. Try rephrasing or use the quiz.",
+      error: t("parseFailed"),
     };
   }
 

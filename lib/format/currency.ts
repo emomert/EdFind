@@ -1,3 +1,5 @@
+import type { Locale } from "@/lib/i18n/config";
+
 /**
  * Tuition formatter with optional EUR equivalent.
  *
@@ -33,32 +35,43 @@ export type TuitionVariant = "long" | "short" | "chip";
 /**
  * Format a tuition amount + currency for display.
  *
+ * `locale` only swaps the surrounding words ("year"/"yr", the "not listed"
+ * fallback) — the number grouping itself stays "en-GB" regardless of locale
+ * (pure formatting, not a translated label).
+ *
  *   formatTuition(32500, "GBP")            → "GBP 32,500 / year (~€38,300)"
  *   formatTuition(32500, "GBP", "short")   → "GBP 32,500/yr (~€38,300)"
  *   formatTuition(32500, "GBP", "chip")    → "32,500 GBP/yr · ~€38,300"
  *   formatTuition(20000, "EUR")            → "EUR 20,000 / year"
  *   formatTuition(null,  "EUR")            → "Tuition not listed"
  *   formatTuition(null,  "EUR", "chip")    → ""
+ *   formatTuition(20000, "EUR", "long", "tr") → "EUR 20,000 / yıl"
  */
 export function formatTuition(
   amount: string | number | null,
   currency: string,
   variant: TuitionVariant = "long",
+  locale: Locale = "en",
 ): string {
+  const notListed =
+    locale === "tr" ? "Öğrenim ücreti belirtilmemiş" : "Tuition not listed";
   if (amount == null) {
-    return variant === "chip" ? "" : "Tuition not listed";
+    return variant === "chip" ? "" : notListed;
   }
   const num = typeof amount === "string" ? Number(amount) : amount;
   if (!Number.isFinite(num)) {
-    return variant === "chip" ? "" : "Tuition not listed";
+    return variant === "chip" ? "" : notListed;
   }
+
+  const yr = locale === "tr" ? "yıl" : "yr";
+  const year = locale === "tr" ? "yıl" : "year";
 
   const native =
     variant === "chip"
-      ? `${Math.round(num).toLocaleString("en-GB")} ${currency}/yr`
+      ? `${Math.round(num).toLocaleString("en-GB")} ${currency}/${yr}`
       : variant === "short"
-      ? `${currency} ${num.toLocaleString("en-GB")}/yr`
-      : `${currency} ${num.toLocaleString("en-GB")} / year`;
+      ? `${currency} ${num.toLocaleString("en-GB")}/${yr}`
+      : `${currency} ${num.toLocaleString("en-GB")} / ${year}`;
 
   const eur = eurEquivalent(num, currency);
   if (eur == null) return native;

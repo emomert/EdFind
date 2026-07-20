@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Award,
   CalendarDays,
@@ -24,6 +25,13 @@ import {
 import { Stagger, StaggerItem } from "@/components/motion";
 import { cn } from "@/lib/utils";
 import { formatTuition } from "@/lib/format/currency";
+import type { Locale } from "@/lib/i18n/config";
+import {
+  localizeCity,
+  localizeCountry,
+  localizeField,
+  localizeLanguage,
+} from "@/lib/i18n/data-labels";
 
 export type ShortlistItem = {
   id: string;
@@ -73,15 +81,17 @@ const LANGUAGE_LABELS: Record<string, string> = {
   fr: "French",
 };
 
-function formatField(field: string): string {
-  return FIELD_LABELS[field] ?? field;
+function formatField(field: string, locale: Locale): string {
+  return localizeField(FIELD_LABELS[field] ?? field, locale);
 }
 
-function formatLanguage(code: string): string {
-  return LANGUAGE_LABELS[code] ?? code.toUpperCase();
+function formatLanguage(code: string, locale: Locale): string {
+  return localizeLanguage(LANGUAGE_LABELS[code] ?? code.toUpperCase(), locale);
 }
 
 export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
+  const t = useTranslations("results.shortlist");
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
 
@@ -112,25 +122,27 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
   const helperText = useMemo(() => {
     if (emptyState) return null;
     if (selected.size === 0) {
-      return `Tick at least 2 programs to compare side-by-side (up to ${COMPARE_MAX}).`;
+      return t("compareHelperZero", { max: COMPARE_MAX });
     }
     if (selected.size === 1) {
-      return "Select one more to compare.";
+      return t("compareHelperOne");
     }
-    return `${selected.size} selected${reachedMax ? " (max)" : ""}.`;
-  }, [emptyState, selected.size, reachedMax]);
+    return reachedMax
+      ? t("selectedCountMax", { count: selected.size })
+      : t("selectedCount", { count: selected.size });
+  }, [emptyState, selected.size, reachedMax, t]);
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Your shortlist
+            {t("heading")}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {emptyState
-              ? "You haven't saved any programs yet."
-              : `${items.length} program${items.length === 1 ? "" : "s"} saved.`}
+              ? t("emptyDescription")
+              : t("countDescription", { count: items.length })}
           </p>
         </div>
         {!emptyState ? (
@@ -145,7 +157,7 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
               disabled={!canCompare}
             >
               <Scale />
-              Compare {selected.size > 0 ? `(${selected.size})` : ""}
+              {t("compareButton")} {selected.size > 0 ? `(${selected.size})` : ""}
             </Button>
           </div>
         ) : null}
@@ -178,18 +190,17 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
             />
           </div>
           <h2 className="mt-4 text-lg font-semibold tracking-tight">
-            Nothing saved yet
+            {t("empty.heading")}
           </h2>
           <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-            Hit the save button on any program card or detail page and it&apos;ll
-            land here — ready to compare side-by-side.
+            {t("empty.description")}
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Button asChild>
-              <Link href="/quiz">Take the quiz</Link>
+              <Link href="/quiz">{t("empty.takeQuiz")}</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/search">Search with AI</Link>
+              <Link href="/search">{t("empty.searchWithAi")}</Link>
             </Button>
           </div>
         </div>
@@ -224,9 +235,9 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
                       checked={isSelected}
                       disabled={checkDisabled}
                       onChange={() => toggle(item.program_id)}
-                      aria-label="Select for compare"
+                      aria-label={t("selectForCompare")}
                     />
-                    <span className="hidden sm:inline">Compare</span>
+                    <span className="hidden sm:inline">{t("compareLabel")}</span>
                   </label>
 
                   <Link
@@ -246,7 +257,7 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
                             className="mr-1 inline size-3"
                             aria-hidden="true"
                           />
-                          {u.city}, {u.country}
+                          {localizeCity(u.city, locale)}, {localizeCountry(u.country, locale)}
                         </p>
                         <p className="mt-0.5 text-xs text-muted-foreground">
                           {u.name}
@@ -260,7 +271,7 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
                       {p.degree}
                       {u.qs_world_rank ? (
                         <span className="ml-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                          QS #{u.qs_world_rank}
+                          {t("qsRank", { rank: u.qs_world_rank })}
                         </span>
                       ) : null}
                     </p>
@@ -268,29 +279,37 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
                     <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-muted-foreground">
                       <Pair
                         icon={<GraduationCap className="size-3.5" />}
-                        label="Field"
-                        value={formatField(p.field_of_study)}
+                        label={t("fields.field")}
+                        value={formatField(p.field_of_study, locale)}
                       />
                       <Pair
                         icon={<Wallet className="size-3.5" />}
-                        label="Tuition"
-                        value={formatTuition(p.tuition_per_year, p.currency)}
+                        label={t("fields.tuition")}
+                        value={formatTuition(
+                          p.tuition_per_year,
+                          p.currency,
+                          "long",
+                          locale,
+                        )}
                       />
                       <Pair
                         icon={<CalendarDays className="size-3.5" />}
-                        label="Duration"
-                        value={`${p.duration_months} months`}
+                        label={t("fields.duration")}
+                        value={t("fields.durationValue", { count: p.duration_months })}
                       />
                       <Pair
                         icon={<Languages className="size-3.5" />}
-                        label="Language"
-                        value={formatLanguage(p.language)}
+                        label={t("fields.language")}
+                        value={formatLanguage(p.language, locale)}
                       />
                       {p.qs_subject_rank && p.qs_subject_area ? (
                         <Pair
                           icon={<Award className="size-3.5" />}
-                          label="Subject rank"
-                          value={`#${p.qs_subject_rank} ${p.qs_subject_area}`}
+                          label={t("fields.subjectRank")}
+                          value={t("fields.subjectRankValue", {
+                            rank: p.qs_subject_rank,
+                            area: localizeField(p.qs_subject_area, locale),
+                          })}
                           span={2}
                         />
                       ) : null}
@@ -302,7 +321,7 @@ export function ShortlistClient({ items }: { items: ShortlistItem[] }) {
                       href={`/programs/${u.slug}/${p.slug}`}
                       className="text-xs font-semibold text-primary hover:underline"
                     >
-                      See full details →
+                      {t("seeFullDetails")} →
                     </Link>
                     <SaveButton
                       programId={item.program_id}

@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 import { requireUser } from "@/lib/supabase/auth";
 import { requirePremium } from "@/lib/premium/premium";
 import { QuizClient } from "@/components/quiz/quiz-client";
 
-export const metadata: Metadata = {
-  title: "Profile Quiz",
-  description:
-    "Answer 10 quick questions (the last is an optional free-text) and we'll match you to master's programs in Europe.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("quiz.meta");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default async function QuizPage() {
   await requireUser("/quiz");

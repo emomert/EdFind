@@ -1,0 +1,61 @@
+{
+  "meta": {
+    "title": "Catalog — Universities & Programs",
+    "description": "Browse every verified European master's program in the EdFind catalog. Filter by country, field, language, tuition, and more."
+  },
+  "hero": {
+    "badge": "EdFind Catalog",
+    "title": "Browse every university and master's program <highlight>we've verified.</highlight>",
+    "subtitle": "Filter by country, field, language, or tuition — or jump straight to a university you already have in mind. Every entry links to a detailed program page."
+  },
+  "entities": {
+    "universities": "Universities",
+    "programs": "Programs",
+    "countries": "Countries"
+  },
+  "filters": {
+    "searchUniversitiesPlaceholder": "Search universities or cities…",
+    "searchProgramsPlaceholder": "Search programs by name…",
+    "countryAriaLabel": "Filter by country",
+    "allCountries": "All countries",
+    "fieldAriaLabel": "Filter by field",
+    "allFields": "All fields",
+    "languageAriaLabel": "Filter by language",
+    "allLanguages": "All languages",
+    "durationAriaLabel": "Filter by duration",
+    "anyDuration": "Any duration",
+    "durationOption": "{months, plural, one {# month} other {# months}}",
+    "partnerOnly": "Partner only",
+    "sortUniversitiesAriaLabel": "Sort universities",
+    "sortProgramsAriaLabel": "Sort programs",
+    "sortPrefix": "Sort:",
+    "sortRank": "QS rank",
+    "sortNameAZ": "Name (A→Z)",
+    "sortCountry": "Country",
+    "sortTuitionAsc": "Tuition (low→high)",
+    "sortTuitionDesc": "Tuition (high→low)",
+    "sortDuration": "Duration"
+  },
+  "empty": {
+    "noUniversities": "No universities match these filters.",
+    "noPrograms": "No programs match these filters."
+  },
+  "institutionType": {
+    "public": "Public",
+    "private": "Private"
+  },
+  "universityCard": {
+    "partner": "Partner",
+    "established": "Est. {year}",
+    "qsRank": "QS #{rank}",
+    "programCount": "{count, plural, one {# program} other {# programs}}",
+    "viewUniversity": "View university"
+  },
+  "programCard": {
+    "durationMonths": "{months} mo",
+    "applyBy": "Apply by {date}",
+    "startsMonth": "Starts {month}",
+    "yearRoundIntake": "Year-round intake",
+    "viewProgram": "View program"
+  }
+}

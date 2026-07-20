@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, RotateCw, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { QuizLoadingScreen } from "@/components/quiz/loading-screen";
@@ -13,13 +14,9 @@ type Phase = "input" | "loading" | "error";
 
 const MIN_QUERY_LENGTH = 8;
 
-const EXAMPLES: ReadonlyArray<string> = [
-  "I want a 2-year management masters in Italy or Spain, under €15k a year, and I have a year of internship experience.",
-  "Looking for a research-heavy AI masters in Germany or Switzerland. I'd like to do a PhD after. English is fluent.",
-  "I'm a fresh econ graduate, need scholarship, want to study finance in the Netherlands or Sweden. Plan to work in Europe after.",
-];
-
 export function SearchClient() {
+  const t = useTranslations("search");
+  const EXAMPLES = t.raw("examples.items") as ReadonlyArray<string>;
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("input");
   const [query, setQuery] = useState("");
@@ -99,19 +96,19 @@ export function SearchClient() {
         className="mx-auto flex max-w-md flex-col items-center px-6 py-16 text-center"
       >
         <h2 className="text-2xl font-semibold tracking-tight">
-          Something went wrong
+          {t("error.heading")}
         </h2>
         <p className="mt-3 text-sm text-muted-foreground">
-          {errorMessage ?? "Please try again."}
+          {errorMessage ?? t("error.fallback")}
         </p>
         <div className="mt-8 flex gap-3">
           <Button type="button" variant="outline" onClick={handleRetry}>
             <ArrowLeft />
-            Edit your query
+            {t("error.editQuery")}
           </Button>
           <Button type="button" onClick={runSearch}>
             <RotateCw />
-            Try again
+            {t("error.tryAgain")}
           </Button>
         </div>
       </div>
@@ -122,15 +119,13 @@ export function SearchClient() {
     <div className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
       <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-primary">
         <Sparkles className="size-3.5" />
-        AI-powered search
+        {t("badge")}
       </span>
       <h1 className="mt-5 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-        Tell us what you&apos;re looking for
+        {t("heading")}
       </h1>
       <p className="mt-4 text-pretty text-muted-foreground">
-        Describe your ideal master&apos;s in your own words — country, field,
-        budget, timeline, anything. Our AI will translate your description into
-        a structured profile and match it against every program in our catalog.
+        {t("intro")}
       </p>
 
       <form
@@ -144,7 +139,7 @@ export function SearchClient() {
           htmlFor="search-query"
           className="block text-sm font-medium text-foreground"
         >
-          Your query
+          {t("form.queryLabel")}
         </label>
         <textarea
           id="search-query"
@@ -153,36 +148,42 @@ export function SearchClient() {
           onKeyDown={handleKeyDown}
           rows={5}
           maxLength={1000}
-          placeholder="e.g. 'I want a 2-year management masters in Italy or Spain, under €15k a year, with a year of internship experience.'"
+          placeholder={t("form.placeholder")}
           className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
         <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
           <span>
             {query.trim().length < MIN_QUERY_LENGTH
-              ? `Add at least ${MIN_QUERY_LENGTH - query.trim().length} more character${
-                  MIN_QUERY_LENGTH - query.trim().length === 1 ? "" : "s"
-                }`
-              : `${query.length} / 1000 characters`}
+              ? t("form.charsRemaining", {
+                  count: MIN_QUERY_LENGTH - query.trim().length,
+                })
+              : t("form.charCount", { count: query.length })}
           </span>
           <span className="hidden sm:inline">
-            Press <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">⌘ Enter</kbd> to submit
+            {t.rich("form.submitHint", {
+              kbd: (chunks) => (
+                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">
+                  {chunks}
+                </kbd>
+              ),
+            })}
           </span>
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Button type="submit" size="lg" disabled={!canSubmit}>
             <Sparkles />
-            Match me to programs
+            {t("form.submit")}
           </Button>
           <Button asChild variant="ghost" size="sm">
-            <a href="/quiz">Prefer a guided quiz instead?</a>
+            <a href="/quiz">{t("form.preferQuiz")}</a>
           </Button>
         </div>
       </form>
 
       <section className="mt-12 border-t border-border pt-8">
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Need inspiration? Try one of these
+          {t("examples.heading")}
         </p>
         <ul className="mt-4 space-y-2">
           {EXAMPLES.map((example) => (

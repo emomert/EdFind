@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "title": "EdFind — Find your best education",
+    "description": "AI-supported, neutral guidance for Turkish students to find the right master's programs in Europe."
+  },
+  "nav": {
+    "ariaMain": "Main",
+    "findPrograms": "Find programs",
+    "catalog": "Catalog",
+    "applications": "Applications",
+    "community": "Community"
+  },
+  "header": {
+    "signIn": "Sign in",
+    "signOut": "Sign out"
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "en": "English",
+    "tr": "Türkçe"
+  },
+  "footer": {
+    "tagline": "Neutral, AI-supported guidance to help students in Turkey find the right master's program in Europe — one searchable place instead of fifty browser tabs.",
+    "explore": "Explore",
+    "yourJourney": "Your journey",
+    "legalTransparency": "Legal & transparency",
+    "findPrograms": "Find programs",
+    "browseCatalog": "Browse the catalog",
+    "community": "Community",
+    "takeQuiz": "Take the quiz",
+    "myApplications": "My applications",
+    "signIn": "Sign in",
+    "howEdFindWorks": "How EdFind works",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "rights": "© {year} EdFind. All rights reserved.",
+    "disclaimer": "EdFind provides information to help you choose — not admissions, legal, immigration, or financial advice. Always confirm details on the university's official site before you apply."
+  },
+  "headerSearch": {
+    "trigger": "Search",
+    "triggerAriaLabel": "Search universities & programs",
+    "dialogAriaLabel": "Catalog search",
+    "placeholder": "Search universities & programs…",
+    "closeAriaLabel": "Close",
+    "kbdEsc": "Esc",
+    "error": "Couldn't load the catalog right now. Try again.",
+    "noResults": {
+      "title": "No match for “{query}”",
+      "hint": "Try a different name, or use <link>AI Search</link> to describe what you're looking for."
+    },
+    "hints": {
+      "navigate": "navigate",
+      "open": "open",
+      "close": "close"
+    },
+    "browseCatalog": "Browse the full catalog",
+    "sections": {
+      "universities": "Universities",
+      "programs": "Programs"
+    },
+    "qsRank": " · QS #{rank}",
+    "partnerSuffix": " · Partner"
+  },
+  "mobileNav": {
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "mainMenu": "Main menu"
+  },
+  "breadcrumbs": {
+    "ariaLabel": "Breadcrumb"
+  },
+  "selectPill": {
+    "placeholder": "Select…"
+  },
+  "notFound": {
+    "badge": "404",
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or may have moved.",
+    "backHome": "Back home",
+    "browseCatalog": "Browse the catalog"
+  },
+  "errors": {
+    "badge": "Error",
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. You can try again, or head back home.",
+    "tryAgain": "Try again",
+    "backHome": "Back home"
+  }
+}

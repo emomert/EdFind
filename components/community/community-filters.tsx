@@ -1,6 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import { SelectPill } from "@/components/ui/select-pill";
@@ -15,12 +16,13 @@ export type CommunityFilterValues = {
   sort: "most_helpful" | "most_active" | "most_recent" | "most_members" | "highest_rated";
 };
 
-export const SORT_LABELS: Record<CommunityFilterValues["sort"], string> = {
-  most_helpful: "Most helpful",
-  most_active: "Most active",
-  most_recent: "Most recent",
-  most_members: "Most members",
-  highest_rated: "Highest rated",
+// Maps each sort value to its translation key under community.filters.sort.
+const SORT_LABEL_KEYS: Record<CommunityFilterValues["sort"], string> = {
+  most_helpful: "mostHelpful",
+  most_active: "mostActive",
+  most_recent: "mostRecent",
+  most_members: "mostMembers",
+  highest_rated: "highestRated",
 };
 
 export function CommunityFilters({
@@ -36,6 +38,7 @@ export function CommunityFilters({
   universities: { slug: string; name: string }[];
   fields: { value: string; label: string }[];
 }) {
+  const t = useTranslations("community.filters");
   return (
     <section className="rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm backdrop-blur sm:p-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -43,7 +46,7 @@ export function CommunityFilters({
           <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search reviews, groups, questions…"
+            placeholder={t("searchPlaceholder")}
             value={values.query}
             onChange={(e) => onChange({ ...values, query: e.target.value })}
             className="w-full rounded-full border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm transition focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
@@ -51,33 +54,33 @@ export function CommunityFilters({
         </label>
 
         <SelectPill
-          ariaLabel="Filter by country"
+          ariaLabel={t("countryAriaLabel")}
           value={values.country}
           onChange={(country) => onChange({ ...values, country })}
           options={[
-            { value: "", label: "All countries" },
+            { value: "", label: t("allCountries") },
             ...countries.map((c) => ({ value: c.code, label: c.name })),
           ]}
         />
 
         <SelectPill
-          ariaLabel="Filter by university"
+          ariaLabel={t("universityAriaLabel")}
           className="max-w-[260px]"
           panelClassName="w-[300px]"
           value={values.universitySlug}
           onChange={(universitySlug) => onChange({ ...values, universitySlug })}
           options={[
-            { value: "", label: "All universities" },
+            { value: "", label: t("allUniversities") },
             ...universities.map((u) => ({ value: u.slug, label: u.name })),
           ]}
         />
 
         <SelectPill
-          ariaLabel="Filter by field"
+          ariaLabel={t("fieldAriaLabel")}
           value={values.field}
           onChange={(field) => onChange({ ...values, field })}
           options={[
-            { value: "", label: "All fields" },
+            { value: "", label: t("allFields") },
             ...fields.map((f) => ({ value: f.value, label: f.label })),
           ]}
         />
@@ -99,19 +102,19 @@ export function CommunityFilters({
               values.verifiedOnly ? "bg-teal-500" : "bg-slate-300",
             )}
           />
-          Verified only
+          {t("verifiedOnly")}
         </button>
 
         <SelectPill
-          ariaLabel="Sort results"
-          prefix="Sort:"
+          ariaLabel={t("sortAriaLabel")}
+          prefix={t("sortPrefix")}
           value={values.sort}
           onChange={(sort) =>
             onChange({ ...values, sort: sort as CommunityFilterValues["sort"] })
           }
           options={(
-            Object.keys(SORT_LABELS) as Array<keyof typeof SORT_LABELS>
-          ).map((k) => ({ value: k, label: SORT_LABELS[k] }))}
+            Object.keys(SORT_LABEL_KEYS) as Array<keyof typeof SORT_LABEL_KEYS>
+          ).map((k) => ({ value: k, label: t(`sort.${SORT_LABEL_KEYS[k]}`) }))}
         />
       </div>
     </section>

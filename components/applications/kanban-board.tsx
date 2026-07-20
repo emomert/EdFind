@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Plus, SlidersHorizontal, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -14,7 +15,6 @@ import {
 import { TaskCard } from "./task-card";
 import {
   TASK_CATEGORY_LABELS,
-  TASK_STATUS_LABELS,
   type ApplicationItem,
   type TaskItem,
 } from "./types";
@@ -45,13 +45,13 @@ const COLUMNS: ReadonlyArray<{
   },
 ];
 
-const SUGGESTIONS: ReadonlyArray<{ title: string; category: TaskCategory }> = [
-  { title: "Upload transcript", category: "documents" },
-  { title: "Write motivation letter", category: "writing" },
-  { title: "Book IELTS / TOEFL slot", category: "language_test" },
-  { title: "Request recommendation letter", category: "documents" },
-  { title: "Pay application fee", category: "finance" },
-  { title: "Submit application portal", category: "admin" },
+const SUGGESTIONS: ReadonlyArray<{ key: string; category: TaskCategory }> = [
+  { key: "uploadTranscript", category: "documents" },
+  { key: "writeMotivationLetter", category: "writing" },
+  { key: "bookLanguageTest", category: "language_test" },
+  { key: "requestRecommendation", category: "documents" },
+  { key: "payFee", category: "finance" },
+  { key: "submitPortal", category: "admin" },
 ];
 
 type AppFilter = "all" | "unassigned" | string;
@@ -65,6 +65,7 @@ export function KanbanBoard({
   setTasks: React.Dispatch<React.SetStateAction<TaskItem[]>>;
   applications: ApplicationItem[];
 }) {
+  const t = useTranslations("applications");
   const [pending, startTransition] = useTransition();
   const [draft, setDraft] = useState<{
     title: string;
@@ -94,11 +95,11 @@ export function KanbanBoard({
     status: TaskStatus = "todo",
     dueAt: string | null = null,
   ) => {
-    const t = title.trim();
-    if (!t) return;
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) return;
     const optimistic: TaskItem = {
       id: `optimistic-${Math.random().toString(36).slice(2)}`,
-      title: t,
+      title: trimmedTitle,
       category,
       status,
       due_at: dueAt,
@@ -109,7 +110,7 @@ export function KanbanBoard({
     setDraft(null);
     startTransition(async () => {
       const res = await createTask({
-        title: t,
+        title: trimmedTitle,
         category,
         status,
         dueAt,
@@ -158,11 +159,10 @@ export function KanbanBoard({
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold tracking-tight text-foreground">
-            Your task board
+            {t("kanban.heading")}
           </h2>
           <p className="text-sm text-muted-foreground">
-            Small steps, one at a time. Drag cards between columns (or use the
-            arrows), and link tasks to a program when it helps.
+            {t("kanban.description")}
           </p>
         </div>
         <button
@@ -182,7 +182,7 @@ export function KanbanBoard({
           className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-50"
         >
           <Plus className="size-4" />
-          New task
+          {t("kanban.newTask")}
         </button>
       </header>
 
@@ -213,7 +213,7 @@ export function KanbanBoard({
         {buckets.map(({ col, items }) => (
           <KanbanColumn
             key={col.key}
-            label={TASK_STATUS_LABELS[col.key]}
+            label={t(`taskStatus.${col.key}`)}
             accent={col.accent}
             tint={col.tint}
             countBg={col.countBg}
@@ -253,7 +253,7 @@ export function KanbanBoard({
             </AnimatePresence>
             {col.key !== "todo" && items.length === 0 && (
               <p className="rounded-xl border border-dashed border-slate-200 px-3 py-6 text-center text-xs italic text-slate-400">
-                Nothing here yet.
+                {t("kanban.emptyColumn")}
               </p>
             )}
           </KanbanColumn>
@@ -274,6 +274,7 @@ function AppFilterStrip({
   value: AppFilter;
   onChange: (v: AppFilter) => void;
 }) {
+  const t = useTranslations("applications.kanban");
   const counts = useMemo(() => {
     const c: Record<string, number> = {
       all: tasks.length,
@@ -286,8 +287,8 @@ function AppFilterStrip({
   }, [tasks, applications]);
 
   const chips: Array<{ key: AppFilter; label: string; subtle?: boolean }> = [
-    { key: "all", label: "All tasks" },
-    { key: "unassigned", label: "Unassigned", subtle: true },
+    { key: "all", label: t("allTasks") },
+    { key: "unassigned", label: t("unassigned"), subtle: true },
     ...applications.map((a) => ({ key: a.id, label: a.program.name })),
   ];
 
@@ -300,7 +301,7 @@ function AppFilterStrip({
     >
       <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-slate-500">
         <SlidersHorizontal className="size-3.5" />
-        Show:
+        {t("showLabel")}
       </span>
       <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto">
         {chips.map((chip) => {
@@ -359,6 +360,7 @@ function KanbanColumn({
   onDropTask: (taskId: string) => void;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("applications.kanban");
   const [dragOver, setDragOver] = useState(false);
   return (
     <motion.section
@@ -407,7 +409,7 @@ function KanbanColumn({
       {isDoneColumn && count > 0 && (
         <p className="flex items-center gap-1 px-1 text-[11px] text-emerald-700">
           <Sparkles className="size-3" />
-          Nice work — momentum compounds.
+          {t("doneEncouragement")}
         </p>
       )}
       <div className="flex flex-col gap-2">{children}</div>
@@ -440,6 +442,8 @@ function DraftTaskCard({
   ) => void;
   onCancel: () => void;
 }) {
+  const t = useTranslations("applications.kanban");
+  const tCategory = useTranslations("applications.taskCategory");
   return (
     <motion.div
       layout
@@ -462,7 +466,7 @@ function DraftTaskCard({
             onCancel();
           }
         }}
-        placeholder="What needs to get done?"
+        placeholder={t("draft.titlePlaceholder")}
         className="w-full bg-transparent text-sm font-medium leading-snug text-slate-900 placeholder:text-slate-400 focus:outline-none"
       />
 
@@ -477,7 +481,7 @@ function DraftTaskCard({
           }
           className="w-full rounded-md bg-slate-50 px-1.5 py-1 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-100"
         >
-          <option value="">No program (general task)</option>
+          <option value="">{t("draft.noProgram")}</option>
           {applications.map((a) => (
             <option key={a.id} value={a.id}>
               ↳ {a.program.name} · {a.program.university.name}
@@ -498,7 +502,7 @@ function DraftTaskCard({
             >
               {(Object.keys(TASK_CATEGORY_LABELS) as TaskCategory[]).map((c) => (
                 <option key={c} value={c}>
-                  {TASK_CATEGORY_LABELS[c]}
+                  {tCategory(c)}
                 </option>
               ))}
             </select>
@@ -512,8 +516,8 @@ function DraftTaskCard({
                 })
               }
               className="rounded-md bg-slate-50 px-1.5 py-1 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-100"
-              aria-label="Due date (optional)"
-              title="Due date (optional)"
+              aria-label={t("draft.dueDateLabel")}
+              title={t("draft.dueDateLabel")}
             />
           </div>
           <div className="flex gap-1">
@@ -522,7 +526,7 @@ function DraftTaskCard({
               onClick={onCancel}
               className="rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
             >
-              Cancel
+              {t("draft.cancel")}
             </button>
             <button
               type="button"
@@ -532,7 +536,7 @@ function DraftTaskCard({
               disabled={!draft.title.trim()}
               className="rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-50"
             >
-              Add
+              {t("draft.add")}
             </button>
           </div>
         </div>
@@ -546,6 +550,7 @@ function SuggestionStrip({
 }: {
   onAdd: (title: string, category: TaskCategory) => void;
 }) {
+  const t = useTranslations("applications.kanban.suggestions");
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
@@ -554,22 +559,23 @@ function SuggestionStrip({
       className="rounded-2xl bg-gradient-to-br from-teal-50 to-white p-4 ring-1 ring-teal-100"
     >
       <p className="text-xs font-semibold uppercase tracking-wider text-teal-700">
-        Quick start
+        {t("heading")}
       </p>
-      <p className="mt-1 text-sm text-slate-600">
-        Most application journeys start with the same handful of tasks. Tap to add.
-      </p>
+      <p className="mt-1 text-sm text-slate-600">{t("description")}</p>
       <div className="mt-3 flex flex-wrap gap-2">
-        {SUGGESTIONS.map((s) => (
-          <button
-            key={s.title}
-            type="button"
-            onClick={() => onAdd(s.title, s.category)}
-            className="rounded-full bg-white px-3 py-1.5 text-xs font-medium text-slate-700 ring-1 ring-slate-200 transition hover:bg-teal-50 hover:text-teal-700 hover:ring-teal-200"
-          >
-            + {s.title}
-          </button>
-        ))}
+        {SUGGESTIONS.map((s) => {
+          const title = t(`items.${s.key}`);
+          return (
+            <button
+              key={s.key}
+              type="button"
+              onClick={() => onAdd(title, s.category)}
+              className="rounded-full bg-white px-3 py-1.5 text-xs font-medium text-slate-700 ring-1 ring-slate-200 transition hover:bg-teal-50 hover:text-teal-700 hover:ring-teal-200"
+            >
+              + {title}
+            </button>
+          );
+        })}
       </div>
     </motion.div>
   );

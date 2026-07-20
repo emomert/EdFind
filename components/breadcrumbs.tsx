@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ChevronRight } from "lucide-react";
 
 export type Crumb = { href?: string; label: string };
@@ -9,8 +10,9 @@ export type Crumb = { href?: string; label: string };
  * Replaces the old single "Back to …" links, which assumed one entry path.
  */
 export function Breadcrumbs({ items }: { items: Crumb[] }) {
+  const t = useTranslations("common.breadcrumbs");
   return (
-    <nav aria-label="Breadcrumb">
+    <nav aria-label={t("ariaLabel")}>
       <ol className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
         {items.map((item, i) => {
           const isLast = i === items.length - 1;

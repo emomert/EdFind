@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { getUser } from "@/lib/supabase/auth";
 import { LoginClient } from "@/components/auth/login-client";
 import { sanitizeNextPath } from "@/lib/auth/safe-redirect";
 
-export const metadata: Metadata = {
-  title: "Sign in",
-  description: "Sign in to EdFind to keep your matches across devices.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("auth.login.meta");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default async function LoginPage({
   searchParams,
