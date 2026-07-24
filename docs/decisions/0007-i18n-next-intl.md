@@ -23,8 +23,10 @@ while the site is live at ed-find.vercel.app. Constraints:
 Use **next-intl** (v4, explicit Next 16 peer support) **without i18n routing**:
 the locale lives in an `edfind_locale` cookie (default `en`), read per-request
 in `i18n/request.ts`, with a header `LanguageSwitcher` that sets the cookie via
-a Server Action and refreshes. Messages are per-namespace JSON files under
-`messages/{en,tr}/`.
+a Server Action. Next.js re-renders the current page and layouts as part of
+that action response, so the switcher must not follow it with a redundant
+`router.refresh()`. The selected language pill is optimistic while the action
+is pending. Messages are per-namespace JSON files under `messages/{en,tr}/`.
 
 ## Alternatives considered
 
