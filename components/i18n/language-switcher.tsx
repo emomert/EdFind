@@ -1,25 +1,14 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
-import { LOCALES, type Locale } from "@/lib/i18n/config";
-import { setLocale } from "@/lib/i18n/actions";
+import { LOCALES } from "@/lib/i18n/config";
+import { useLocaleTransition } from "@/components/i18n/locale-transition";
 import { cn } from "@/lib/utils";
 
 export function LanguageSwitcher() {
-  const locale = useLocale() as Locale;
-  const [optimisticLocale, setOptimisticLocale] = useOptimistic(locale);
   const t = useTranslations("common.languageSwitcher");
-  const [isPending, startTransition] = useTransition();
-
-  function switchTo(next: Locale) {
-    if (next === locale || isPending) return;
-    startTransition(async () => {
-      setOptimisticLocale(next);
-      await setLocale(next);
-    });
-  }
+  const { isSwitching, activeLocale, switchLocale } = useLocaleTransition();
 
   return (
     <div
@@ -31,13 +20,13 @@ export function LanguageSwitcher() {
         <button
           key={code}
           type="button"
-          onClick={() => switchTo(code)}
-          aria-pressed={optimisticLocale === code}
+          onClick={() => switchLocale(code)}
+          aria-pressed={activeLocale === code}
           aria-label={t(code)}
-          disabled={isPending}
+          disabled={isSwitching}
           className={cn(
             "rounded-full px-2 py-1 uppercase transition-colors",
-            optimisticLocale === code
+            activeLocale === code
               ? "bg-background text-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground",
           )}

@@ -4,6 +4,10 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import {
+  LocaleTransitionProvider,
+  LocaleFadeMain,
+} from "@/components/i18n/locale-transition";
 import "./globals.css";
 
 const inter = Inter({
@@ -37,9 +41,11 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
+          <LocaleTransitionProvider>
+            <SiteHeader />
+            <LocaleFadeMain>{children}</LocaleFadeMain>
+            <SiteFooter />
+          </LocaleTransitionProvider>
         </NextIntlClientProvider>
       </body>
     </html>
